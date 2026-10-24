@@ -37,8 +37,12 @@ its internal state, which is more fragile than the small cursor we have.
 
 ## Install
 
-1. Copy the `PadKeys` folder into
-   `<WoW install>/<Forever client folder>/Interface/AddOns/`.
+1. Download **PadKeys.zip** from the repository's **Releases** page, release
+   "PadKeys (latest)". It's rebuilt every time the addon changes on `main`.
+   Unzip it into `<WoW install>/<Forever client folder>/Interface/AddOns/`,
+   so you end up with `Interface/AddOns/PadKeys/PadKeys.toc`. (Without the
+   release: download the repository as a ZIP and copy `tools/PadKeys`
+   there instead.)
 2. Enable *PadKeys* at character select (tick **Load out of date AddOns** if
    it is listed as out of date).
 3. In game, type `/padkeys preview` to see which keys would change, then
