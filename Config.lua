@@ -8,10 +8,10 @@ local _, ns = ...
 -- gamepad bar has. Each modifier is a layer, like the gamepad shoulders.
 local FACE_KEYS = { "1", "2", "3", "4", "Q", "E", "R", "T" }
 local LAYERS = {
-  [""] = "ACTIONBUTTON",               -- main bar (Action Bar 1)
-  ["SHIFT-"] = "MULTIACTIONBAR1BUTTON", -- Action Bar 2
-  ["CTRL-"] = "MULTIACTIONBAR2BUTTON",  -- Action Bar 3
-  ["ALT-"] = "BONUSACTIONBUTTON",       -- pet bar
+  [""] = "ACTIONBUTTON",                -- main bar (Action Bar 1)
+  ["ALT-"] = "MULTIACTIONBAR1BUTTON",   -- Action Bar 2
+  ["SHIFT-"] = "MULTIACTIONBAR2BUTTON", -- Action Bar 3
+  ["CTRL-"] = "BONUSACTIONBUTTON",      -- pet bar
 }
 
 local bindings = {

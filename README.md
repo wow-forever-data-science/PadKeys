@@ -26,7 +26,7 @@ Expect small fixes on launch day; see the checklist at the end.
 3. In game, type `/padkeys preview` to see which keys would change, then
    `/padkeys apply`. `/padkeys restore` puts your old keys back.
 4. Turn on **Action Bar 2** and **Action Bar 3** (Options or Edit Mode). The
-   Shift and Ctrl layers fire those bars, so their buttons must exist.
+   Alt and Shift layers fire those bars, so their buttons must exist.
 
 Everything is set in `Config.lua`: edit it and `/reload`.
 
@@ -35,7 +35,7 @@ Everything is set in `Config.lua`: edit it and `/reload`.
 Eight "face buttons", each with a layer per modifier, like the eight
 gamepad action buttons plus the shoulder buttons.
 
-| Keys | Plain | Shift | Ctrl | Alt |
+| Keys | Plain | Alt | Shift | Ctrl |
 |---|---|---|---|---|
 | 1 2 3 4 Q E R T | Action Bar 1, slots 1–8 | Action Bar 2, slots 1–8 | Action Bar 3, slots 1–8 | Pet bar, slots 1–8 |
 
@@ -55,8 +55,8 @@ auto loot.
 
 What you lose from the defaults: Q/E strafe (now on A/D), R reply to whisper
 (type `/r`), T attack (soft targeting starts attacks), Z sheathe, Shift+1–6
-bar paging, Ctrl+1–0 pet bar (now Alt), and Alt as the self-cast modifier on
-those eight keys.
+bar paging, and Alt as the self-cast modifier on those eight keys. The pet
+bar stays on Ctrl, as in the defaults.
 
 ## 2. Keyboard UI cursor
 
