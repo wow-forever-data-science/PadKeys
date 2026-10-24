@@ -7,6 +7,7 @@ BINDING_HEADER_PADKEYS = "PadKeys"
 BINDING_NAME_PADKEYS_CURSOR = "Toggle keyboard UI cursor"
 _G["BINDING_NAME_CLICK PadKeysRing1:LeftButton"] = "Radial ring 1 (hold)"
 _G["BINDING_NAME_CLICK PadKeysRing2:LeftButton"] = "Radial ring 2 (hold)"
+_G["BINDING_NAME_CLICK PadKeysRing3:LeftButton"] = "Radial ring 3 (hold)"
 
 function ns.say(msg)
   print("|cff33ccffPadKeys|r: " .. msg)

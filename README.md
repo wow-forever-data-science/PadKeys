@@ -47,6 +47,8 @@ gamepad action buttons plus the shoulder buttons.
 | Shift+F | Assist (cycles rewards while a quest window is open) |
 | Z (hold) | Radial ring 1: Menu |
 | Shift+Z (hold) | Radial ring 2: Utility |
+| G (hold) | Radial ring 3: Ping your target |
+| Shift+G (hold) | Blizzard's ping listener: click a spot in the world to ping it |
 | \` | Toggle the keyboard UI cursor |
 
 `/padkeys apply` also switches on soft targeting for keyboard
@@ -54,7 +56,8 @@ gamepad action buttons plus the shoulder buttons.
 auto loot.
 
 What you lose from the defaults: Q/E strafe (now on A/D), R reply to whisper
-(type `/r`), T attack (soft targeting starts attacks), Z sheathe, Shift+1–6
+(type `/r`), T attack (soft targeting starts attacks), Z sheathe, G target
+last hostile, Shift+1–6
 bar paging, and Alt as the self-cast modifier on those eight keys. The pet
 bar stays on Ctrl, as in the defaults.
 
@@ -86,6 +89,11 @@ cancels. This works in combat.
 - **Menu** (Z): Character, Spellbook, Talents, Professions, Legacy, Quests,
   Map, Bags.
 - **Utility** (Shift+Z): Hearthstone, sit, dismount, stop casting.
+- **Ping** (G): Attack (top), Assist, On my way, Not a threat, Threat,
+  Warning, going clockwise. Each slot runs `/ping <n>`, a secure macro
+  command in Forever's UI, so it works in combat. The game picks what to
+  ping: your target if you have one. To ping a spot on the ground instead,
+  hold **Shift+G** (Blizzard's ping listener) and click it.
 
 Add rings or slots in `Config.lua`. A slot can be a `spell`, an `item`, a
 `macro` (macro text) or a `binding` (any key binding name).
@@ -119,6 +127,9 @@ gamepad's own quest action in Forever's UI code
 5. **Cursor**: open the spellbook, press \`, move with WASD, Space on a spell.
    Then try the bags with Shift+Space.
 6. **Quests**: talk to a quest giver with F and keep pressing F.
+7. **Pings** (in a group): target a mob, hold G, point at Attack, release.
+   Then hold Shift+G and click the ground. Also check what `/ping 1` does
+   with no target.
 
 Known risks:
 - Tooltips while the cursor moves come from calling Blizzard's own OnEnter

@@ -25,6 +25,10 @@ local bindings = {
   -- Hold to open a ring, point with the mouse, release to use.
   Z = "CLICK PadKeysRing1:LeftButton",
   ["SHIFT-Z"] = "CLICK PadKeysRing2:LeftButton",
+  -- Ping your target with the Ping ring; Shift+G holds Blizzard's own ping
+  -- listener (click a spot in the world, or drag for its wheel).
+  G = "CLICK PadKeysRing3:LeftButton",
+  ["SHIFT-G"] = "TOGGLEPINGLISTENER",
   -- Move a cursor through open windows with the keyboard.
   ["`"] = "PADKEYS_CURSOR",
 }
@@ -116,6 +120,26 @@ ns.config = {
           { label = "Stop casting", macro = "/stopcasting",
             icon = "Interface\\Icons\\Spell_Shadow_SacrificialShield" },
           -- { label = "Frost Nova", spell = "Frost Nova" },
+        },
+      },
+      {
+        name = "Ping",
+        -- /ping takes 1 attack, 2 warning, 3 on my way, 4 assist,
+        -- 5 not a threat, 6 threat (numbers work in every client language).
+        -- With no target the game picks what to ping.
+        slots = {
+          { label = "Attack", macro = "/ping 1",
+            icon = "Interface\\Icons\\Ability_DualWield" },
+          { label = "Assist", macro = "/ping 4",
+            icon = "Interface\\Icons\\Spell_Holy_HolyBolt" },
+          { label = "On my way", macro = "/ping 3",
+            icon = "Interface\\Icons\\Ability_Rogue_Sprint" },
+          { label = "Not a threat", macro = "/ping 5",
+            icon = "Interface\\Icons\\Spell_Holy_Restoration" },
+          { label = "Threat", macro = "/ping 6",
+            icon = "Interface\\Icons\\Ability_Warrior_Challange" },
+          { label = "Warning", macro = "/ping 2",
+            icon = "Interface\\Icons\\Spell_Shadow_DeathScream" },
         },
       },
     },
