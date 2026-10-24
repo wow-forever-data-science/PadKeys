@@ -5,6 +5,8 @@
 	<Binding name="PADKEYS_RADIAL" runOnUp="true">
 		PadKeys.radial_key(keystate);
 	</Binding>
+	<Binding name="CLICK PadKeysRing1:LeftButton"/>
+	<Binding name="CLICK PadKeysRing2:LeftButton"/>
 	<Binding name="CLICK PadKeysGroupCycle:LeftButton"/>
 	<Binding name="CLICK PadKeysGroupCycle:RightButton"/>
 </Bindings>

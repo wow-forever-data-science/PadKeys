@@ -6,6 +6,8 @@ PadKeys = ns
 BINDING_HEADER_PADKEYS = "PadKeys"
 BINDING_NAME_PADKEYS_CURSOR = "Toggle keyboard UI cursor"
 BINDING_NAME_PADKEYS_RADIAL = "Main menu radial (hold)"
+_G["BINDING_NAME_CLICK PadKeysRing1:LeftButton"] = "Utility ring (hold)"
+_G["BINDING_NAME_CLICK PadKeysRing2:LeftButton"] = "Ping ring (hold)"
 _G["BINDING_NAME_CLICK PadKeysGroupCycle:LeftButton"] = "Next party/raid member"
 _G["BINDING_NAME_CLICK PadKeysGroupCycle:RightButton"] = "Previous party/raid member"
 

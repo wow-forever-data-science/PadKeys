@@ -69,6 +69,8 @@ gamepad action buttons plus the shoulder buttons.
 | Ctrl+Tab / Ctrl+Shift+Tab | Next / previous party or raid member, in raid frame order (works in combat) |
 | Z (hold) | Blizzard's main-menu radial |
 | G (hold) | Blizzard's ping system |
+| Shift+Z (hold) | Our Utility ring |
+| Shift+G (hold) | Our Ping ring: ping your target, in combat too |
 | \` | Toggle the keyboard UI cursor |
 
 F1–F5 are unbound.
@@ -185,13 +187,26 @@ Known risks:
   `Cursor.lua`.
 - Long scroll lists aren't scrolled by the cursor yet; use the mouse wheel.
 
-## Not included any more
+## Our own rings (branch `feat/padkeys-custom-rings`)
 
-Earlier versions had our own secure rings (a utility ring with Hearthstone
-and macros, and a ping ring that worked in combat). They were replaced by
-Blizzard's radial and ping system to avoid duplicating Blizzard's code.
-Blizzard has no ring for your own spells and items, so that would need our
-code again if you want it.
+This branch adds `Rings.lua`: secure rings for what Blizzard's radials
+don't offer. They work in combat.
+
+- **Utility** (Shift+Z): Hearthstone, sit, dismount, stop casting. Add your
+  own `spell`, `item`, `macro` or `binding` slots under `rings` in
+  `Config.lua`.
+- **Ping** (Shift+G): Attack (top), Assist, On my way, Not a threat, Threat,
+  Warning, going clockwise. Each slot runs `/ping <n>`, a secure macro
+  command in Forever's UI, so it pings your target in combat without
+  clicking.
+
+Hold the key, move the mouse towards a slot, release. Releasing near the
+centre cancels. Each ring key clicks a hidden secure action button; a
+secure snippet shows the ring on key down and turns the release into the
+slot the mouse points at.
+
+The branch is one commit on top of `feat/padkeys-addon`, so it can be
+rebased onto it or cherry-picked.
 
 ## Terms of service
 

@@ -37,6 +37,9 @@ local bindings = {
   -- Hold for Blizzard's ping system: click a spot or unit to ping it, or
   -- drag for Blizzard's ping wheel.
   G = "TOGGLEPINGLISTENER",
+  -- Our own rings (Rings.lua): hold, point with the mouse, release.
+  ["SHIFT-Z"] = "CLICK PadKeysRing1:LeftButton", -- Utility
+  ["SHIFT-G"] = "CLICK PadKeysRing2:LeftButton", -- Ping your target
   -- Move a cursor through open windows with the keyboard.
   ["`"] = "PADKEYS_CURSOR",
 }
@@ -101,6 +104,47 @@ ns.config = {
     page_keys = {
       previous = { "Q", "MOUSEWHEELUP" },
       next = { "E", "MOUSEWHEELDOWN" },
+    },
+  },
+  rings = {
+    radius = 120,   -- pixels from the ring centre to the slot centres
+    deadzone = 30,  -- release closer than this to the centre to cancel
+    list = {
+      {
+        name = "Utility",
+        -- Slot types: spell = "Name" or id, item = id or "Name",
+        -- macro = "/macro text", binding = "BINDING_NAME".
+        slots = {
+          { label = "Hearthstone", item = 6948 },
+          { label = "Sit / stand", macro = "/sit",
+            icon = "Interface\\Icons\\Spell_Nature_Sleep" },
+          { label = "Dismount", macro = "/dismount",
+            icon = "Interface\\Icons\\Ability_Mount_RidingHorse" },
+          { label = "Stop casting", macro = "/stopcasting",
+            icon = "Interface\\Icons\\Spell_Shadow_SacrificialShield" },
+          -- { label = "Frost Nova", spell = "Frost Nova" },
+        },
+      },
+      {
+        name = "Ping",
+        -- /ping takes 1 attack, 2 warning, 3 on my way, 4 assist,
+        -- 5 not a threat, 6 threat (numbers work in every client language).
+        -- With no target the game picks what to ping. Works in combat.
+        slots = {
+          { label = "Attack", macro = "/ping 1",
+            icon = "Interface\\Icons\\Ability_DualWield" },
+          { label = "Assist", macro = "/ping 4",
+            icon = "Interface\\Icons\\Spell_Holy_HolyBolt" },
+          { label = "On my way", macro = "/ping 3",
+            icon = "Interface\\Icons\\Ability_Rogue_Sprint" },
+          { label = "Not a threat", macro = "/ping 5",
+            icon = "Interface\\Icons\\Spell_Holy_Restoration" },
+          { label = "Threat", macro = "/ping 6",
+            icon = "Interface\\Icons\\Ability_Warrior_Challange" },
+          { label = "Warning", macro = "/ping 2",
+            icon = "Interface\\Icons\\Spell_Shadow_DeathScream" },
+        },
+      },
     },
   },
 }
