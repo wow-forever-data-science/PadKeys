@@ -5,4 +5,6 @@
 	<Binding name="CLICK PadKeysRing1:LeftButton"/>
 	<Binding name="CLICK PadKeysRing2:LeftButton"/>
 	<Binding name="CLICK PadKeysRing3:LeftButton"/>
+	<Binding name="CLICK PadKeysGroupCycle:LeftButton"/>
+	<Binding name="CLICK PadKeysGroupCycle:RightButton"/>
 </Bindings>

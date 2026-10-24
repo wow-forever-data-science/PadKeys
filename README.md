@@ -44,7 +44,12 @@ gamepad action buttons plus the shoulder buttons.
 | W / S | Move forward / back |
 | A / D | **Strafe** (turn with the mouse or the arrow keys) |
 | F | **Interact** with what you face: loot, NPCs, herbs, ore. Smart quest steps while a quest window is open (below). |
-| Shift+F | Assist (cycles rewards while a quest window is open) |
+| Shift+F | Assist: target your target's target (cycles rewards while a quest window is open) |
+| Ctrl+F | Last target: swap back to your previous target |
+| Alt+F | Last hostile target |
+| Tab / Shift+Tab | Next / previous enemy |
+| Ctrl+Tab / Ctrl+Shift+Tab | Next / previous party or raid member, in raid frame order (works in combat) |
+| F1–F5 | Yourself / party members 1–4 (WoW defaults, unchanged) |
 | Z (hold) | Radial ring 1: Menu |
 | Shift+Z (hold) | Radial ring 2: Utility |
 | G (hold) | Radial ring 3: Ping your target |
@@ -57,7 +62,7 @@ auto loot.
 
 What you lose from the defaults: Q/E strafe (now on A/D), R reply to whisper
 (type `/r`), T attack (soft targeting starts attacks), Z sheathe, G target
-last hostile, Shift+1–6
+last hostile (now Alt+F), Ctrl+Tab nearest friend, Shift+1–6
 bar paging, and Alt as the self-cast modifier on those eight keys. The pet
 bar stays on Ctrl, as in the defaults.
 
@@ -75,7 +80,13 @@ gossip, quest, merchant, loot window or a popup opens.
 | Backspace / Q | Leave cursor mode |
 
 While the cursor is on, W/A/S/D move the cursor, not you, like the gamepad's
-UI focus mode. It switches off when the windows close or combat starts.
+UI focus mode. It switches off when combat starts.
+
+- **Started with \`:** it also reaches the player, target and focus frames
+  and the party and raid frames, where Space targets that unit. Leave with
+  Backspace.
+- **Started by a window opening:** it only covers windows, and switches off
+  when they close.
 
 Clicks go through a secure button bound to the key, so they count as real
 key presses, and spells and items work. Moving the cursor is blocked in
@@ -127,7 +138,10 @@ gamepad's own quest action in Forever's UI code
 5. **Cursor**: open the spellbook, press \`, move with WASD, Space on a spell.
    Then try the bags with Shift+Space.
 6. **Quests**: talk to a quest giver with F and keep pressing F.
-7. **Pings** (in a group): target a mob, hold G, point at Attack, release.
+7. **Targeting** (in a group): Ctrl+Tab through the party, Ctrl+F back to
+   the previous target, Shift+F to assist. Press \` and move over the raid
+   frames.
+8. **Pings** (in a group): target a mob, hold G, point at Attack, release.
    Then hold Shift+G and click the ground. Also check what `/ping 1` does
    with no target.
 

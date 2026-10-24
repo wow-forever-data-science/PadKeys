@@ -19,9 +19,18 @@ local bindings = {
   -- arrow keys.
   A = "STRAFELEFT",
   D = "STRAFERIGHT",
+  -- F cluster: interact and target memory.
   -- Interact with whatever you face: loot, NPCs, herbs, ore, mailboxes.
   F = "INTERACTTARGET",
-  ["SHIFT-F"] = "ASSISTTARGET",
+  ["SHIFT-F"] = "ASSISTTARGET",       -- target your target's target
+  ["CTRL-F"] = "TARGETLASTTARGET",    -- swap back to your previous target
+  ["ALT-F"] = "TARGETLASTHOSTILE",    -- last enemy you targeted
+  -- Tab cluster: cycle enemies, and cycle your party or raid in frame order
+  -- (works in combat). F1-F5 still target yourself and party members 1-4.
+  TAB = "TARGETNEARESTENEMY",
+  ["SHIFT-TAB"] = "TARGETPREVIOUSENEMY",
+  ["CTRL-TAB"] = "CLICK PadKeysGroupCycle:LeftButton",
+  ["CTRL-SHIFT-TAB"] = "CLICK PadKeysGroupCycle:RightButton",
   -- Hold to open a ring, point with the mouse, release to use.
   Z = "CLICK PadKeysRing1:LeftButton",
   ["SHIFT-Z"] = "CLICK PadKeysRing2:LeftButton",

@@ -17,6 +17,13 @@ local EXTRA_ROOTS = {
 for i = 1, 13 do
   EXTRA_ROOTS[#EXTRA_ROOTS + 1] = "ContainerFrame" .. i
 end
+-- Unit and group frames (clicking one targets that unit). They are always
+-- shown, so they're only included when the cursor was started by hand;
+-- otherwise the cursor would never switch itself off.
+local UNIT_ROOTS = {
+  "PlayerFrame", "TargetFrame", "FocusFrame", "PartyFrame",
+  "CompactPartyFrame", "CompactRaidFrameContainer",
+}
 -- Action bars become targets while a spell or item is on the cursor.
 local BAR_ROOTS = {
   "MainActionBar", "MultiBarBottomLeft", "MultiBarBottomRight",
@@ -27,7 +34,7 @@ local DIRECTIONS = {
 }
 
 local owner = CreateFrame("Frame", "PadKeysCursorOwner", UIParent)
-local active, current = false, nil
+local active, manual, current = false, false, nil
 
 -- Highlight box drawn around the current button.
 local box = CreateFrame("Frame", nil, UIParent)
@@ -124,6 +131,11 @@ local function root_names()
   end
   if GetCursorInfo() then
     for _, name in ipairs(BAR_ROOTS) do
+      names[#names + 1] = name
+    end
+  end
+  if manual then
+    for _, name in ipairs(UNIT_ROOTS) do
       names[#names + 1] = name
     end
   end
@@ -270,14 +282,15 @@ local function bind(keys, name, mouse_button)
   end
 end
 
-local function start(quiet)
+local function start(by_hand)
   if active or InCombatLockdown() then
     return
   end
+  manual = by_hand
   local cands = candidates()
   if #cands == 0 then
-    if not quiet then
-      ns.say("no open window to move through.")
+    if by_hand then
+      ns.say("nothing to move through.")
     end
     return
   end
@@ -298,7 +311,7 @@ function ns.toggle_cursor()
   if active then
     stop()
   else
-    start(false)
+    start(true)
   end
 end
 
@@ -327,7 +340,7 @@ owner:SetScript("OnEvent", function(_, event)
       local frame = _G[name]
       if frame and frame.HookScript then
         frame:HookScript("OnShow", function()
-          C_Timer.After(0.05, function() start(true) end)
+          C_Timer.After(0.05, function() start(false) end)
         end)
       end
     end
