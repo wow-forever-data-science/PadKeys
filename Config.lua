@@ -74,9 +74,11 @@ ns.config = {
       left = { "A", "LEFT" },
       right = { "D", "RIGHT" },
       click = { "SPACE", "ENTER" },          -- gamepad A
-      rightclick = { "SHIFT-SPACE", "E" },   -- use item, sell to vendor
+      rightclick = { "SHIFT-SPACE" },        -- use item, sell to vendor
       pickup = { "CTRL-SPACE" },             -- drag a spell or item
-      back = { "BACKSPACE", "Q" },           -- gamepad B: leave cursor mode
+      -- gamepad B: leave cursor mode. Escape is only taken over while the
+      -- cursor is on; otherwise it opens the game menu as usual.
+      back = { "ESCAPE", "BACKSPACE" },
     },
     -- Start the cursor by itself when these windows open (talk to an NPC
     -- with F, then pick an option with W/S and Space).

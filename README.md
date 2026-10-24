@@ -121,16 +121,17 @@ gossip, quest, merchant, loot window or a popup opens.
 |---|---|
 | W A S D / arrows | Move between buttons |
 | Space / Enter | Click (cast from the spellbook, pick a gossip line) |
-| Shift+Space / E | Right-click (use or sell an item) |
+| Shift+Space | Right-click (use or sell an item) |
 | Ctrl+Space | Pick up the spell or item (then move to an action bar slot and click to place it) |
-| Backspace / Q | Leave cursor mode |
+| Esc / Backspace | Leave cursor mode (a second Esc then closes windows or opens the game menu as usual) |
 
 While the cursor is on, W/A/S/D move the cursor, not you, like the gamepad's
-UI focus mode. It switches off when combat starts.
+UI focus mode. These keys (and Esc) are only taken over while the cursor is
+on; your spell keys and Esc work normally the rest of the time. It switches off when combat starts.
 
 - **Started with \`:** it also reaches the player, target and focus frames
   and the party and raid frames, where Space targets that unit. Leave with
-  Backspace.
+  Esc.
 - **Started by a window opening:** it only covers windows, and switches off
   when they close.
 
