@@ -31,8 +31,8 @@ local ON_CLICK = [[
   return false
 ]]
 
-local header = PadKeysHeader or
-  CreateFrame("Frame", "PadKeysHeader", UIParent, "SecureHandlerBaseTemplate")
+local header = CreateFrame("Frame", "PadKeysHeader", UIParent,
+                           "SecureHandlerBaseTemplate")
 
 local button = CreateFrame("Button", "PadKeysGroupCycle", UIParent,
                            "SecureActionButtonTemplate")

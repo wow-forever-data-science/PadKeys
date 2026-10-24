@@ -1,188 +1,97 @@
--- Radial rings, like Forever's gamepad radial menus: hold the ring key, move
--- the mouse towards a slot, release to use it. Releasing near the centre
--- cancels.
+-- Blizzard's gamepad main-menu radial (GamepadRadial, in Forever's
+-- Blizzard_Gamepad addon, which loads in keyboard mode too), driven from
+-- the keyboard and mouse. Blizzard's code draws it, pages it, picks the
+-- segment and runs it; this file only feeds it input:
 --
--- Each ring key clicks a hidden secure action button. A secure snippet
--- wrapped around its OnClick runs on key down (show the ring where the mouse
--- is, and suppress the click) and on key up (hide it, work out which slot
--- the mouse points at, and turn the click into "slot<i>"). The button then
--- casts or uses that slot's type-slot<i> action. All of this works in
--- combat; only editing the rings (Config.lua + /reload) needs to be out of
--- combat.
+-- * hold the radial key: show it;
+-- * move the mouse: the offset from where it opened acts as the right
+--   stick (GamepadRadialMixin:ProcessInput);
+-- * page keys while open: PreviousPage / NextPage (the gamepad shoulders);
+-- * release: recentre the "stick", which is how Blizzard triggers the
+--   highlighted segment. Releasing with nothing highlighted closes it.
+--
+-- It opens windows, so like on a gamepad it is meant for out of combat.
 
 local _, ns = ...
 
-local cfg = ns.config.radial
-local SLOT_SIZE = 44
-local DEFAULT_ICON = "Interface\\Icons\\INV_Misc_QuestionMark"
+local owner = CreateFrame("Frame", "PadKeysRadialOwner", UIParent)
+local origin_x, origin_y
 
-local header = CreateFrame("Frame", "PadKeysHeader", UIParent,
-                           "SecureHandlerBaseTemplate")
--- Full-screen protected frame used to read the mouse position securely.
-local area = CreateFrame("Frame", "PadKeysRingArea", UIParent,
-                         "SecureFrameTemplate")
-area:SetAllPoints(UIParent)
-
--- Runs in the restricted environment, with self = the ring button.
-local ON_CLICK = [[
-  local ring = self:GetFrameRef("ring")
-  local area = self:GetFrameRef("area")
-  local x, y = area:GetMousePosition()
-  local w, h = area:GetWidth(), area:GetHeight()
-  if down then
-    x, y = (x or 0.5) * w, (y or 0.5) * h
-    ring:SetAttribute("cx", x)
-    ring:SetAttribute("cy", y)
-    ring:ClearAllPoints()
-    ring:SetPoint("CENTER", area, "BOTTOMLEFT", x, y)
-    ring:Show()
-    return false
-  end
-  if not ring:IsShown() then
-    return false
-  end
-  ring:Hide()
-  if not x then
-    return false
-  end
-  local dx = x * w - ring:GetAttribute("cx")
-  local dy = y * h - ring:GetAttribute("cy")
-  local n = self:GetAttribute("numslots")
-  local dead = self:GetAttribute("deadzone")
-  if n == 0 or dx * dx + dy * dy < dead * dead then
-    return false
-  end
-  local step = 360 / n
-  local angle = (90 - math.deg(math.atan2(dy, dx))) % 360
-  return "slot" .. (math.floor((angle + step / 2) / step) % n + 1)
-]]
-
--- Same maths as the snippet, for the highlight drawn while the key is held.
-local function pointed_slot(ring, n)
+local function stick()
   local x, y = GetCursorPosition()
-  local scale = area:GetEffectiveScale()
-  local dx = x / scale - (ring:GetAttribute("cx") or 0)
-  local dy = y / scale - (ring:GetAttribute("cy") or 0)
-  if n == 0 or dx * dx + dy * dy < cfg.deadzone * cfg.deadzone then
-    return nil
+  local reach = ns.config.radial.reach
+  x, y = (x - origin_x) / reach, (y - origin_y) / reach
+  local length = math.sqrt(x * x + y * y)
+  if length > 1 then
+    x, y = x / length, y / length
   end
-  local step = 360 / n
-  local angle = (90 - math.deg(math.atan2(dy, dx))) % 360
-  return math.floor((angle + step / 2) / step) % n + 1
+  return x, y, length
 end
 
-local function slot_icon(slot)
-  if slot.icon then
-    return slot.icon
-  end
-  local icon
-  if slot.spell then
-    icon = C_Spell and C_Spell.GetSpellTexture and
-      C_Spell.GetSpellTexture(slot.spell)
-  elseif slot.item then
-    icon = C_Item and C_Item.GetItemIconByID and
-      C_Item.GetItemIconByID(slot.item)
-  end
-  return icon or DEFAULT_ICON
-end
-
--- Secure action attributes for one slot, read when the button is clicked
--- as "slot<i>".
-local function set_slot(button, i, slot)
-  local b = "slot" .. i
-  if slot.spell then
-    button:SetAttribute("type-" .. b, "spell")
-    button:SetAttribute("spell-" .. b, slot.spell)
-  elseif slot.item then
-    local item = slot.item
-    if type(item) == "number" then
-      item = "item:" .. item
-    end
-    button:SetAttribute("type-" .. b, "item")
-    button:SetAttribute("item-" .. b, item)
-  elseif slot.macro then
-    button:SetAttribute("type-" .. b, "macro")
-    button:SetAttribute("macrotext-" .. b, slot.macro)
-  elseif slot.binding then
-    button:SetAttribute("type-" .. b, "binding")
-    button:SetAttribute("binding-" .. b, slot.binding)
+-- Only push past Blizzard's selection threshold (0.5); a mouse drifting
+-- back towards the centre must not count as releasing the stick.
+local function on_update()
+  local x, y, length = stick()
+  if length >= 0.5 then
+    GamepadRadial:ProcessInput(x, y)
   end
 end
 
--- Handler for the custom "binding" type: run a key binding's action, e.g.
--- TOGGLESPELLBOOK. Opening windows isn't a protected action.
-local function run_binding(self, _, button)
-  local binding = self:GetAttribute("binding-" .. button)
-  if binding then
-    RunBinding(binding)
+local function page_button(name, func)
+  local button = CreateFrame("Button", name, UIParent)
+  button:RegisterForClicks("AnyDown")
+  button:SetScript("OnClick", func)
+end
+page_button("PadKeysRadialPrev", function() GamepadRadial:PreviousPage() end)
+page_button("PadKeysRadialNext", function() GamepadRadial:NextPage() end)
+
+local function open()
+  if not GamepadRadial or GamepadRadial:IsShown() then
+    return
+  end
+  if InCombatLockdown() then
+    ns.say("the menu radial works out of combat.")
+    return
+  end
+  origin_x, origin_y = GetCursorPosition()
+  GamepadRadial:Show()
+  local keys = ns.config.radial.page_keys
+  for _, key in ipairs(keys.previous) do
+    SetOverrideBindingClick(owner, true, key, "PadKeysRadialPrev")
+  end
+  for _, key in ipairs(keys.next) do
+    SetOverrideBindingClick(owner, true, key, "PadKeysRadialNext")
+  end
+  owner:SetScript("OnUpdate", on_update)
+end
+
+local function release()
+  if not (GamepadRadial and GamepadRadial:IsShown()) then
+    return
+  end
+  -- Recentring triggers the highlighted segment (and Blizzard hides the
+  -- radial if it ran); with nothing highlighted, close it ourselves.
+  GamepadRadial:ProcessInput(0, 0)
+  GamepadRadial:Hide()
+end
+
+-- Called by the PADKEYS_RADIAL binding on key down and key up.
+function ns.radial_key(keystate)
+  if keystate == "down" then
+    open()
+  else
+    release()
   end
 end
 
-local function build_ring(index, ring)
-  local name = "PadKeysRing" .. index
-  local n = #ring.slots
-
-  local button = CreateFrame("Button", name, UIParent,
-                             "SecureActionButtonTemplate")
-  button:RegisterForClicks("AnyDown", "AnyUp")
-  button:SetAttribute("useOnKeyDown", false)
-  button:SetAttribute("numslots", n)
-  button:SetAttribute("deadzone", cfg.deadzone)
-  button.binding = run_binding
-
-  local frame = CreateFrame("Frame", name .. "Frame", UIParent,
-                            "SecureFrameTemplate")
-  local size = cfg.radius * 2 + SLOT_SIZE * 2
-  frame:SetSize(size, size)
-  frame:SetFrameStrata("DIALOG")
-  frame:SetPoint("CENTER")
-  frame:Hide()
-
-  local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-  title:SetPoint("CENTER")
-  title:SetText(ring.name or name)
-
-  local icons = {}
-  for i, slot in ipairs(ring.slots) do
-    set_slot(button, i, slot)
-    local angle = math.rad(90 - (i - 1) * 360 / n)
-    local x, y = math.cos(angle) * cfg.radius, math.sin(angle) * cfg.radius
-
-    local icon = frame:CreateTexture(nil, "ARTWORK")
-    icon:SetSize(SLOT_SIZE, SLOT_SIZE)
-    icon:SetPoint("CENTER", frame, "CENTER", x, y)
-    icons[i] = icon
-
-    local label = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    label:SetPoint("TOP", icon, "BOTTOM", 0, -2)
-    label:SetText(slot.label or "")
+owner:RegisterEvent("PLAYER_LOGIN")
+owner:SetScript("OnEvent", function()
+  if GamepadRadial then
+    GamepadRadial:HookScript("OnHide", function()
+      owner:SetScript("OnUpdate", nil)
+      if not InCombatLockdown() then
+        ClearOverrideBindings(owner)
+      end
+    end)
   end
-
-  local glow = frame:CreateTexture(nil, "BACKGROUND")
-  glow:SetSize(SLOT_SIZE + 14, SLOT_SIZE + 14)
-  glow:SetColorTexture(0.2, 0.8, 1, 0.5)
-  glow:Hide()
-
-  frame:SetScript("OnShow", function()
-    for i, slot in ipairs(ring.slots) do
-      icons[i]:SetTexture(slot_icon(slot))
-    end
-  end)
-  frame:SetScript("OnUpdate", function(self)
-    local i = pointed_slot(self, n)
-    if i then
-      glow:SetPoint("CENTER", icons[i], "CENTER")
-      glow:Show()
-    else
-      glow:Hide()
-    end
-  end)
-
-  SecureHandlerSetFrameRef(button, "ring", frame)
-  SecureHandlerSetFrameRef(button, "area", area)
-  SecureHandlerWrapScript(button, "OnClick", header, ON_CLICK)
-end
-
-for i, ring in ipairs(cfg.rings) do
-  build_ring(i, ring)
-end
+end)

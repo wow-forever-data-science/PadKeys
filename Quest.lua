@@ -4,10 +4,10 @@
 -- window when nothing is left. A second key cycles quest reward choices.
 -- With no window open, F is the normal "Interact with Target" binding.
 --
--- This mirrors the gamepad's QuestFrame_GeneralProgressAction in Forever's
--- UI (Blizzard_UIPanels_Game/Mainline/QuestFrame.lua) by clicking the same
--- Blizzard buttons, so their checks (reward chosen, expensive quest
--- confirmation) still apply. Each press does one step.
+-- On quest pages it calls the gamepad's own QuestFrame_GeneralProgressAction
+-- (Blizzard_UIPanels_Game/Mainline/QuestFrame.lua), which clicks Blizzard's
+-- buttons, so their checks (reward chosen, expensive quest confirmation)
+-- still apply. Each press does one step.
 
 local _, ns = ...
 
@@ -89,26 +89,22 @@ local function cycle_reward()
   show_choice(QuestInfoFrame.itemChoice % n + 1)
 end
 
+-- Accept, continue and complete are Blizzard's own gamepad action. Only the
+-- cases it leaves to the gamepad cursor are handled here: picking from the
+-- greeting list, a quest you can't hand in yet, and no reward chosen.
 local function quest_step()
-  if QuestFrameDetailPanel:IsVisible() then
-    QuestFrameAcceptButton:Click()
-  elseif QuestFrameProgressPanel:IsVisible() then
-    if IsQuestCompletable() then
-      QuestFrameCompleteButton:Click()
-    else
-      close_window()
-    end
-  elseif QuestFrameRewardPanel:IsVisible() then
-    if GetNumQuestChoices() > 1 and QuestInfoFrame.itemChoice == 0 then
-      show_choice(1)
-      ns.say("choose a reward (cycle with " ..
-               table.concat(ns.config.quest.cycle, " or ") ..
-               "), then press again.")
-    else
-      QuestFrameCompleteQuestButton:Click()
-    end
-  elseif QuestFrameGreetingPanel:IsVisible() then
+  if QuestFrameGreetingPanel:IsVisible() then
     greeting_step()
+  elseif QuestFrameProgressPanel:IsVisible() and not IsQuestCompletable() then
+    close_window()
+  elseif QuestFrameRewardPanel:IsVisible() and GetNumQuestChoices() > 1 and
+    QuestInfoFrame.itemChoice == 0 then
+    show_choice(1)
+    ns.say("choose a reward (cycle with " ..
+             table.concat(ns.config.quest.cycle, " or ") ..
+             "), then press again.")
+  else
+    QuestFrame_GeneralProgressAction(QuestFrame)
   end
 end
 

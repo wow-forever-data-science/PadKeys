@@ -1,13 +1,15 @@
 # PadKeys (WoW addon)
 
-Gamepad-style play on a keyboard for World of Warcraft: Forever:
+Gamepad-style play on a keyboard for World of Warcraft: Forever. It uses
+Blizzard's own gamepad UI code wherever that code runs without a gamepad,
+and adds as little of its own as possible:
 
 1. a **key layout** with few keys and modifier layers, like a gamepad;
-2. a **keyboard UI cursor** that moves through open windows, like the
-   gamepad's menu cursor;
-3. **radial rings**: hold a key, point with the mouse, release;
-
-plus a **smart interact** key that walks through quest dialogs.
+2. Blizzard's **gamepad main-menu radial** (three pages), driven by mouse
+   and keyboard;
+3. Blizzard's **ping system** on one key;
+4. a **keyboard UI cursor** that moves through open windows;
+5. a **smart interact** key that walks through quest dialogs.
 
 It is not part of the R package (`tools/` is in `.Rbuildignore`).
 
@@ -16,6 +18,22 @@ Forever's UI source (Gethe's mirror, branch `forever`, build 1.60.1 (70532):
 <https://github.com/Gethe/wow-ui-source/tree/forever>). The function and
 frame names were checked there, and the logic was run against a stubbed API.
 Expect small fixes on launch day; see the checklist at the end.
+
+## What is Blizzard's and what is ours
+
+| Feature | Blizzard code used | Our code |
+|---|---|---|
+| Menu radial | `GamepadRadial` (`Blizzard_Gamepad/UI/Radials`): its art, pages, segments and actions | ~100 lines feeding it the mouse as the "stick", page keys and release |
+| Pings | The ping system (`TOGGLEPINGLISTENER` binding, `Blizzard_PingUI`), including its ping wheel | none, only the key |
+| Quest steps | `QuestFrame_GeneralProgressAction`, the gamepad's own accept/continue/complete action | gossip and greeting lists, and the reward choice |
+| Key layout | Blizzard's binding actions | apply/restore of the bindings |
+| Group cycling | none: Blizzard's party/raid targeting only runs in gamepad mode | a secure button that targets the next group member |
+| UI cursor | none: Blizzard's SmartNavigation only runs in gamepad mode | our own cursor |
+
+Blizzard's menu cursor (SmartNavigation) and group targeting depend on the
+gamepad frame manager, which only starts when the interface is in gamepad
+mode. Switching Blizzard's code on by hand from an addon would mean forcing
+its internal state, which is more fragile than the small cursor we have.
 
 ## Install
 
@@ -49,24 +67,52 @@ gamepad action buttons plus the shoulder buttons.
 | Alt+F | Last hostile target |
 | Tab / Shift+Tab | Next / previous enemy |
 | Ctrl+Tab / Ctrl+Shift+Tab | Next / previous party or raid member, in raid frame order (works in combat) |
-| F1–F5 | Yourself / party members 1–4 (WoW defaults, unchanged) |
-| Z (hold) | Radial ring 1: Menu |
-| Shift+Z (hold) | Radial ring 2: Utility |
-| G (hold) | Radial ring 3: Ping your target |
-| Shift+G (hold) | Blizzard's ping listener: click a spot in the world to ping it |
+| Z (hold) | Blizzard's main-menu radial |
+| G (hold) | Blizzard's ping system |
 | \` | Toggle the keyboard UI cursor |
+
+F1–F5 are unbound.
 
 `/padkeys apply` also switches on soft targeting for keyboard
 (`SoftTargetInteract` and `SoftTargetEnemy` set to 3), key-down casting and
 auto loot.
 
-What you lose from the defaults: Q/E strafe (now on A/D), R reply to whisper
-(type `/r`), T attack (soft targeting starts attacks), Z sheathe, G target
-last hostile (now Alt+F), Ctrl+Tab nearest friend, Shift+1–6
-bar paging, and Alt as the self-cast modifier on those eight keys. The pet
-bar stays on Ctrl, as in the defaults.
+What you lose from the defaults:
+- Q/E strafe (now on A/D) and R reply to whisper (type `/r`);
+- T attack (soft targeting starts attacks) and Z sheathe;
+- G target last hostile (now Alt+F) and Ctrl+Tab nearest friend;
+- F1–F5 targeting yourself and party members;
+- Shift+1–6 bar paging;
+- Alt as the self-cast modifier on the eight face keys.
 
-## 2. Keyboard UI cursor
+The pet bar stays on Ctrl, as in the defaults.
+
+## 2. Main-menu radial (Blizzard's)
+
+Hold **Z**. Blizzard's gamepad radial opens with its three pages, centre page
+first:
+
+- **Left:** Group Finder, Legacy, Shop, Guild, Social, Buffs, Tracking,
+  Collections.
+- **Centre:** Bags, Professions, Character, Talents, Map, Chat, Menu,
+  Spellbook.
+- **Right:** Clock, Calendar, PvP.
+
+Move the mouse towards a segment; the mouse acts as the right stick. Switch
+pages with **Q / E** or the **mouse wheel** (the gamepad's shoulder buttons).
+Release Z to open the highlighted segment, or release with nothing
+highlighted to close.
+
+It opens windows, so it is for out of combat, as on a gamepad. The page
+hints show gamepad button icons, because it is Blizzard's gamepad art.
+
+## 3. Pings (Blizzard's)
+
+Hold **G**: Blizzard's ping system. Click a unit or a spot to send a
+contextual ping, or drag for Blizzard's ping wheel (Attack, Warning, On my
+way, Assist). This is Blizzard's code and art.
+
+## 4. Keyboard UI cursor
 
 Press \` with any window open. The cursor also starts by itself when a
 gossip, quest, merchant, loot window or a popup opens.
@@ -92,38 +138,20 @@ Clicks go through a secure button bound to the key, so they count as real
 key presses, and spells and items work. Moving the cursor is blocked in
 combat, so it only works out of combat.
 
-## 3. Radial rings
-
-Hold Z, move the mouse towards a slot, release. Releasing near the centre
-cancels. This works in combat.
-
-- **Menu** (Z): Character, Spellbook, Talents, Professions, Legacy, Quests,
-  Map, Bags.
-- **Utility** (Shift+Z): Hearthstone, sit, dismount, stop casting.
-- **Ping** (G): Attack (top), Assist, On my way, Not a threat, Threat,
-  Warning, going clockwise. Each slot runs `/ping <n>`, a secure macro
-  command in Forever's UI, so it works in combat. The game picks what to
-  ping: your target if you have one. To ping a spot on the ground instead,
-  hold **Shift+G** (Blizzard's ping listener) and click it.
-
-Add rings or slots in `Config.lua`. A slot can be a `spell`, an `item`, a
-`macro` (macro text) or a `binding` (any key binding name).
-
-## Smart interact (quests)
+## 5. Smart interact (quests)
 
 While a quest giver's window is open, each press of **F** does the next step:
 
 1. In the gossip list: pick a quest you can turn in, else a new quest, else
    the only chat option, else close.
-2. On a quest page: **Accept** → **Continue** → **Complete**.
+2. On a quest page: **Accept** → **Continue** → **Complete**, using
+   Blizzard's gamepad action.
 3. If there are several rewards, the first press selects one and shows its
    tooltip. **Tab** or **Shift+F** cycles through them, and F takes the one
    shown.
 4. When nothing is left, F closes the window.
 
-Each press does exactly one step; nothing is automated. This mirrors the
-gamepad's own quest action in Forever's UI code
-(`QuestFrame_GeneralProgressAction`).
+Each press does exactly one step; nothing is automated.
 
 ## Launch-day checklist (Nov 4)
 
@@ -132,20 +160,23 @@ gamepad's own quest action in Forever's UI code
    `/dump select(4, GetBuildInfo())` and update `## Interface:` in
    `PadKeys.toc`.
 2. **Layout**: `/padkeys apply`, then check Options → Keybindings. Press 1–T
-   with and without Shift/Ctrl.
+   on their own and with Alt, Shift and Ctrl.
 3. **Interact**: face a corpse or an NPC and press F.
-4. **Rings**: hold Z, point, release. Try it in combat on a training dummy.
+4. **Radial**: hold Z, move the mouse, switch pages with Q/E and the wheel,
+   release on a segment. Watch for Lua errors when it opens: it is
+   Blizzard's gamepad frame running in keyboard mode.
 5. **Cursor**: open the spellbook, press \`, move with WASD, Space on a spell.
    Then try the bags with Shift+Space.
 6. **Quests**: talk to a quest giver with F and keep pressing F.
 7. **Targeting** (in a group): Ctrl+Tab through the party, Ctrl+F back to
    the previous target, Shift+F to assist. Press \` and move over the raid
    frames.
-8. **Pings** (in a group): target a mob, hold G, point at Attack, release.
-   Then hold Shift+G and click the ground. Also check what `/ping 1` does
-   with no target.
+8. **Pings** (in a group): hold G and click a mob, then drag for the wheel.
 
 Known risks:
+- The radial is Blizzard's gamepad frame. If it errors in keyboard mode, its
+  open/close steps call gamepad managers that may not be running; send the
+  error and it can be fixed or worked around.
 - Tooltips while the cursor moves come from calling Blizzard's own OnEnter
   handlers. If that causes "action blocked" errors, set `tooltips = false`
   under `cursor` in `Config.lua`.
@@ -153,6 +184,14 @@ Known risks:
   short list of names. A window it misses can be added to `EXTRA_ROOTS` in
   `Cursor.lua`.
 - Long scroll lists aren't scrolled by the cursor yet; use the mouse wheel.
+
+## Not included any more
+
+Earlier versions had our own secure rings (a utility ring with Hearthstone
+and macros, and a ping ring that worked in combat). They were replaced by
+Blizzard's radial and ping system to avoid duplicating Blizzard's code.
+Blizzard has no ring for your own spells and items, so that would need our
+code again if you want it.
 
 ## Terms of service
 

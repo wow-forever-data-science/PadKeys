@@ -26,18 +26,17 @@ local bindings = {
   ["CTRL-F"] = "TARGETLASTTARGET",    -- swap back to your previous target
   ["ALT-F"] = "TARGETLASTHOSTILE",    -- last enemy you targeted
   -- Tab cluster: cycle enemies, and cycle your party or raid in frame order
-  -- (works in combat). F1-F5 still target yourself and party members 1-4.
+  -- (works in combat).
   TAB = "TARGETNEARESTENEMY",
   ["SHIFT-TAB"] = "TARGETPREVIOUSENEMY",
   ["CTRL-TAB"] = "CLICK PadKeysGroupCycle:LeftButton",
   ["CTRL-SHIFT-TAB"] = "CLICK PadKeysGroupCycle:RightButton",
-  -- Hold to open a ring, point with the mouse, release to use.
-  Z = "CLICK PadKeysRing1:LeftButton",
-  ["SHIFT-Z"] = "CLICK PadKeysRing2:LeftButton",
-  -- Ping your target with the Ping ring; Shift+G holds Blizzard's own ping
-  -- listener (click a spot in the world, or drag for its wheel).
-  G = "CLICK PadKeysRing3:LeftButton",
-  ["SHIFT-G"] = "TOGGLEPINGLISTENER",
+  -- Hold for Blizzard's gamepad main-menu radial; point with the mouse,
+  -- release to open. Q/E or the mouse wheel switch between its 3 pages.
+  Z = "PADKEYS_RADIAL",
+  -- Hold for Blizzard's ping system: click a spot or unit to ping it, or
+  -- drag for Blizzard's ping wheel.
+  G = "TOGGLEPINGLISTENER",
   -- Move a cursor through open windows with the keyboard.
   ["`"] = "PADKEYS_CURSOR",
 }
@@ -45,6 +44,10 @@ for prefix, command in pairs(LAYERS) do
   for i, key in ipairs(FACE_KEYS) do
     bindings[prefix .. key] = command .. i
   end
+end
+-- false unbinds a key: F1-F5 target yourself and party members by default.
+for i = 1, 5 do
+  bindings["F" .. i] = false
 end
 
 ns.config = {
@@ -92,65 +95,12 @@ ns.config = {
   },
 
   radial = {
-    radius = 120,   -- pixels from the ring centre to the slot centres
-    deadzone = 30,  -- release closer than this to the centre to cancel
-    rings = {
-      {
-        name = "Menu",
-        slots = {
-          { label = "Character", binding = "TOGGLECHARACTER0",
-            icon = "Interface\\Icons\\INV_Chest_Cloth_17" },
-          { label = "Spellbook", binding = "TOGGLESPELLBOOK",
-            icon = "Interface\\Icons\\INV_Misc_Book_09" },
-          { label = "Talents", binding = "TOGGLETALENTS",
-            icon = "Interface\\Icons\\Ability_Marksmanship" },
-          { label = "Professions", binding = "TOGGLEPROFESSIONBOOK",
-            icon = "Interface\\Icons\\Trade_BlackSmithing" },
-          { label = "Legacy", binding = "TOGGLELEGACYSYSTEM",
-            icon = "Interface\\Icons\\INV_Misc_Book_11" },
-          { label = "Quests", binding = "TOGGLEQUESTLOG",
-            icon = "Interface\\Icons\\INV_Misc_Note_01" },
-          { label = "Map", binding = "TOGGLEWORLDMAP",
-            icon = "Interface\\Icons\\INV_Misc_Map_01" },
-          { label = "Bags", binding = "OPENALLBAGS",
-            icon = "Interface\\Icons\\INV_Misc_Bag_08" },
-        },
-      },
-      {
-        name = "Utility",
-        -- Slot types: spell = "Name" or id, item = id or "Name",
-        -- macro = "/macro text", binding = "BINDING_NAME".
-        slots = {
-          { label = "Hearthstone", item = 6948 },
-          { label = "Sit / stand", macro = "/sit",
-            icon = "Interface\\Icons\\Spell_Nature_Sleep" },
-          { label = "Dismount", macro = "/dismount",
-            icon = "Interface\\Icons\\Ability_Mount_RidingHorse" },
-          { label = "Stop casting", macro = "/stopcasting",
-            icon = "Interface\\Icons\\Spell_Shadow_SacrificialShield" },
-          -- { label = "Frost Nova", spell = "Frost Nova" },
-        },
-      },
-      {
-        name = "Ping",
-        -- /ping takes 1 attack, 2 warning, 3 on my way, 4 assist,
-        -- 5 not a threat, 6 threat (numbers work in every client language).
-        -- With no target the game picks what to ping.
-        slots = {
-          { label = "Attack", macro = "/ping 1",
-            icon = "Interface\\Icons\\Ability_DualWield" },
-          { label = "Assist", macro = "/ping 4",
-            icon = "Interface\\Icons\\Spell_Holy_HolyBolt" },
-          { label = "On my way", macro = "/ping 3",
-            icon = "Interface\\Icons\\Ability_Rogue_Sprint" },
-          { label = "Not a threat", macro = "/ping 5",
-            icon = "Interface\\Icons\\Spell_Holy_Restoration" },
-          { label = "Threat", macro = "/ping 6",
-            icon = "Interface\\Icons\\Ability_Warrior_Challange" },
-          { label = "Warning", macro = "/ping 2",
-            icon = "Interface\\Icons\\Spell_Shadow_DeathScream" },
-        },
-      },
+    -- Mouse distance (pixels) that counts as pushing the stick all the way.
+    reach = 120,
+    -- Page keys while the radial is open, like the gamepad shoulders.
+    page_keys = {
+      previous = { "Q", "MOUSEWHEELUP" },
+      next = { "E", "MOUSEWHEELDOWN" },
     },
   },
 }

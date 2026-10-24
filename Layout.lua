@@ -23,9 +23,11 @@ end
 
 function ns.preview_layout()
   for _, row in ipairs(planned_changes()) do
-    if row.old ~= row.action then
-      local old = row.old ~= "" and row.old or "(unbound)"
-      ns.say(format("%s: %s -> %s", row.key, old, row.action))
+    local new = row.action or ""
+    if row.old ~= new then
+      ns.say(format("%s: %s -> %s", row.key,
+                    row.old ~= "" and row.old or "(unbound)",
+                    new ~= "" and new or "(unbound)"))
     end
   end
 end
@@ -41,7 +43,11 @@ function ns.apply_layout()
     if ns.db.keys[row.key] == nil then
       ns.db.keys[row.key] = row.old
     end
-    SetBinding(row.key, row.action)
+    if row.action then
+      SetBinding(row.key, row.action)
+    else
+      SetBinding(row.key)
+    end
   end
   SaveBindings(GetCurrentBindingSet())
 
