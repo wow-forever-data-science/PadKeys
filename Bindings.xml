@@ -1,0 +1,7 @@
+<Bindings>
+	<Binding name="PADKEYS_CURSOR" header="PADKEYS">
+		PadKeys.toggle_cursor();
+	</Binding>
+	<Binding name="CLICK PadKeysRing1:LeftButton"/>
+	<Binding name="CLICK PadKeysRing2:LeftButton"/>
+</Bindings>
