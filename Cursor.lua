@@ -23,6 +23,9 @@ end
 local UNIT_ROOTS = {
   "PlayerFrame", "TargetFrame", "FocusFrame", "PartyFrame",
   "CompactPartyFrame", "CompactRaidFrameContainer",
+  -- Your buffs and debuffs: the cursor shows their tooltips, and right-click
+  -- cancels a buff, as the gamepad does (BuffFrameMixin:CancelSelectedBuff).
+  "BuffFrame", "DebuffFrame",
 }
 -- Action bars become targets while a spell or item is on the cursor.
 local BAR_ROOTS = {
@@ -282,7 +285,19 @@ local function bind(keys, name, mouse_button)
   end
 end
 
-local function start(by_hand)
+local function inside(frame, root)
+  while frame do
+    if frame == root then
+      return true
+    end
+    frame = frame:GetParent()
+  end
+  return false
+end
+
+-- by_hand: started with the cursor key (also reaches unit frames and auras).
+-- root: optional frame to start on, e.g. BuffFrame.
+local function start(by_hand, root)
   if active or InCombatLockdown() then
     return
   end
@@ -304,7 +319,13 @@ local function start(by_hand)
   bind(keys.rightclick, "PadKeysCursorClick", "RightButton")
   bind(keys.pickup, "PadKeysNavPickup")
   bind(keys.back, "PadKeysNavBack")
-  select_button(first(cands))
+  local in_root = {}
+  for _, frame in ipairs(cands) do
+    if root and inside(frame, root) then
+      in_root[#in_root + 1] = frame
+    end
+  end
+  select_button(first(#in_root > 0 and in_root or cands))
 end
 
 function ns.toggle_cursor()
@@ -343,6 +364,17 @@ owner:SetScript("OnEvent", function(_, event)
           C_Timer.After(0.05, function() start(false) end)
         end)
       end
+    end
+    -- Blizzard's radial "Buffs" item calls BuffFrame:SetGamepadFocus(), which
+    -- only works in gamepad mode. On keyboard, open our cursor on the auras.
+    if BuffFrame and BuffFrame.SetGamepadFocus then
+      hooksecurefunc(BuffFrame, "SetGamepadFocus", function(self)
+        if InputUtil.IsGamepadUIEnabled() then
+          return
+        end
+        local root = self:HasActiveAura() and self or DebuffFrame
+        C_Timer.After(0, function() start(true, root) end)
+      end)
     end
   end
 end)

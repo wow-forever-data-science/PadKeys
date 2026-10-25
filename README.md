@@ -111,7 +111,11 @@ pages with **Q / E** or the **mouse wheel** (the gamepad's shoulder buttons).
 Release Z to open the highlighted segment, or release with nothing
 highlighted to close.
 
-It opens windows, so it is for out of combat, as on a gamepad. The page
+It opens windows, so it is for out of combat, as on a gamepad.
+
+The **Buffs** item (left page) only works in gamepad mode in Blizzard's
+code. On keyboard, PadKeys hooks it to open the cursor on your buffs (or
+debuffs, if you have no buffs). The page
 hints show gamepad button icons, because it is Blizzard's gamepad art.
 
 ## 3. Pings (Blizzard's)
@@ -138,8 +142,10 @@ UI focus mode. These keys (and Esc) are only taken over while the cursor is
 on; your spell keys and Esc work normally the rest of the time. It switches off when combat starts.
 
 - **Started with \`:** it also reaches the player, target and focus frames
-  and the party and raid frames, where Space targets that unit. Leave with
-  Esc.
+  and the party and raid frames, where Space targets that unit, and your
+  **buffs and debuffs**: the highlighted one shows its tooltip, and
+  **Shift+Space cancels a buff** (the same right-click Blizzard's gamepad
+  uses). Debuffs can't be cancelled, only inspected. Leave with Esc.
 - **Started by a window opening:** it only covers windows, and switches off
   when they close.
 
@@ -177,11 +183,13 @@ Each press does exactly one step; nothing is automated.
    Blizzard's gamepad frame running in keyboard mode.
 5. **Cursor**: open the spellbook, press \`, move with WASD, Space on a spell.
    Then try the bags with Shift+Space.
-6. **Quests**: talk to a quest giver with F and keep pressing F.
-7. **Targeting** (in a group): Ctrl+Tab through the party, Ctrl+F back to
+6. **Buffs**: hold Z, left page, pick Buffs. The cursor should land on your
+   buffs; check the tooltips and cancel one with Shift+Space.
+7. **Quests**: talk to a quest giver with F and keep pressing F.
+8. **Targeting** (in a group): Ctrl+Tab through the party, Ctrl+F back to
    the previous target, Shift+F to assist. Press \` and move over the raid
    frames.
-8. **Pings** (in a group): hold G and click a mob, then drag for the wheel.
+9. **Pings** (in a group): hold G and click a mob, then drag for the wheel.
 
 Known risks:
 - The radial is Blizzard's gamepad frame. If it errors in keyboard mode, its
