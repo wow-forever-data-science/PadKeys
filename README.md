@@ -48,7 +48,10 @@ its internal state, which is more fragile than the small cursor we have.
 3. In game, type `/padkeys preview` to see which keys would change, then
    `/padkeys apply`. `/padkeys restore` puts your old keys back.
 4. Turn on **Action Bar 2** and **Action Bar 3** (Options or Edit Mode). The
-   Alt and Shift layers fire those bars, so their buttons must exist.
+   Cmd and Shift layers fire those bars, so their buttons must exist.
+5. **On a Mac: turn on Options → Mac → "Disable OS shortcuts"** and allow
+   WoW the macOS permission it asks for. Otherwise Cmd+Q (Action Bar 2,
+   slot 5) **quits the game**, and other Cmd shortcuts go to macOS.
 
 Everything is set in `Config.lua`: edit it and `/reload`.
 
@@ -57,7 +60,7 @@ Everything is set in `Config.lua`: edit it and `/reload`.
 Eight "face buttons", each with a layer per modifier, like the eight
 gamepad action buttons plus the shoulder buttons.
 
-| Keys | Plain | Alt | Shift | Ctrl |
+| Keys | Plain | Cmd | Shift | Ctrl |
 |---|---|---|---|---|
 | 1 2 3 4 Q E R T | Action Bar 1, slots 1–8 | Action Bar 2, slots 1–8 | Action Bar 3, slots 1–8 | Pet bar, slots 1–8 |
 
@@ -68,7 +71,7 @@ gamepad action buttons plus the shoulder buttons.
 | F | **Interact** with what you face: loot, NPCs, herbs, ore. Smart quest steps while a quest window is open (below). |
 | Shift+F | Assist: target your target's target (cycles rewards while a quest window is open) |
 | Ctrl+F | Last target: swap back to your previous target |
-| Alt+F | Last hostile target |
+| Cmd+F | Last hostile target |
 | Tab / Shift+Tab | Next / previous enemy |
 | Ctrl+Tab / Ctrl+Shift+Tab | Next / previous party or raid member, in raid frame order (works in combat) |
 | Z (hold) | Blizzard's main-menu radial |
@@ -84,12 +87,13 @@ auto loot.
 What you lose from the defaults:
 - Q/E strafe (now on A/D) and R reply to whisper (type `/r`);
 - T attack (soft targeting starts attacks) and Z sheathe;
-- G target last hostile (now Alt+F) and Ctrl+Tab nearest friend;
+- G target last hostile (now Cmd+F) and Ctrl+Tab nearest friend;
 - F1–F5 targeting yourself and party members;
-- Shift+1–6 bar paging;
-- Alt as the self-cast modifier on the eight face keys.
+- Shift+1–6 bar paging.
 
-The pet bar stays on Ctrl, as in the defaults.
+The pet bar stays on Ctrl, as in the defaults, and Alt stays free for
+self-cast. The layouts are for a Mac, where Cmd is `META` in WoW's key
+names; on Windows set `MOD = "ALT-"` at the top of `Config.lua`.
 
 ## 2. Main-menu radial (Blizzard's)
 
@@ -165,7 +169,8 @@ Each press does exactly one step; nothing is automated.
    `/dump select(4, GetBuildInfo())` and update `## Interface:` in
    `PadKeys.toc`.
 2. **Layout**: `/padkeys apply`, then check Options → Keybindings. Press 1–T
-   on their own and with Alt, Shift and Ctrl.
+   on their own and with Cmd, Shift and Ctrl. Check that Cmd+Q casts
+   instead of quitting (the Mac setting in install step 5).
 3. **Interact**: face a corpse or an NPC and press F.
 4. **Radial**: hold Z, move the mouse, switch pages with Q/E and the wheel,
    release on a segment. Watch for Lua errors when it opens: it is

@@ -1,15 +1,20 @@
 -- PadKeys settings. Edit this file to change the key layout, the UI cursor
 -- keys and the radial rings, then /reload. Key names are WoW binding strings:
--- "Q", "SHIFT-1", "CTRL-SPACE", "`", "BACKSPACE", "UP".
+-- "Q", "SHIFT-1", "CTRL-SPACE", "`", "BACKSPACE", "UP". On a Mac, Cmd is
+-- "META" ("META-1").
 
 local _, ns = ...
+
+-- Modifier for Action Bar 2 and last hostile target: "META-" is Cmd on a
+-- Mac. Use "ALT-" on Windows.
+local MOD = "META-"
 
 -- Eight "face buttons", like the eight gamepad action buttons Forever's
 -- gamepad bar has. Each modifier is a layer, like the gamepad shoulders.
 local FACE_KEYS = { "1", "2", "3", "4", "Q", "E", "R", "T" }
 local LAYERS = {
   [""] = "ACTIONBUTTON",                -- main bar (Action Bar 1)
-  ["ALT-"] = "MULTIACTIONBAR1BUTTON",   -- Action Bar 2
+  [MOD] = "MULTIACTIONBAR1BUTTON",      -- Action Bar 2 (Cmd)
   ["SHIFT-"] = "MULTIACTIONBAR2BUTTON", -- Action Bar 3
   ["CTRL-"] = "BONUSACTIONBUTTON",      -- pet bar
 }
@@ -24,7 +29,7 @@ local bindings = {
   F = "INTERACTTARGET",
   ["SHIFT-F"] = "ASSISTTARGET",       -- target your target's target
   ["CTRL-F"] = "TARGETLASTTARGET",    -- swap back to your previous target
-  ["ALT-F"] = "TARGETLASTHOSTILE",    -- last enemy you targeted
+  [MOD .. "F"] = "TARGETLASTHOSTILE", -- last enemy you targeted (Cmd+F)
   -- Tab cluster: cycle enemies, and cycle your party or raid in frame order
   -- (works in combat).
   TAB = "TARGETNEARESTENEMY",
