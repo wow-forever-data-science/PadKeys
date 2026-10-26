@@ -27,6 +27,7 @@ Expect small fixes on launch day; see the checklist at the end.
 | Pings | The ping system (`TOGGLEPINGLISTENER` binding, `Blizzard_PingUI`), including its ping wheel | none, only the key |
 | Quest steps | `QuestFrame_GeneralProgressAction`, the gamepad's own accept/continue/complete action | gossip and greeting lists, and the reward choice |
 | Key layout | Blizzard's binding actions | apply/restore of the bindings |
+| Aura inspection | the aura icons' own tooltip code (`AuraButtonMixin:OnEnter`) | ~50 lines choosing which icon is next |
 | Group cycling | none: Blizzard's party/raid targeting only runs in gamepad mode | a secure button that targets the next group member |
 | UI cursor | none: Blizzard's SmartNavigation only runs in gamepad mode | our own cursor |
 
@@ -76,6 +77,8 @@ gamepad action buttons plus the shoulder buttons.
 | Ctrl+Tab / Ctrl+Shift+Tab | Next / previous party or raid member, in raid frame order (works in combat) |
 | Z (hold) | Blizzard's main-menu radial |
 | G (hold) | Blizzard's ping system |
+| X / Shift+X | Inspect next / previous **debuff** (tooltip), in combat too |
+| Ctrl+X | Inspect next buff |
 | \` | Toggle the keyboard UI cursor |
 
 F1–F5 are unbound.
@@ -86,6 +89,7 @@ auto loot.
 
 What you lose from the defaults:
 - Q/E strafe (now on A/D) and R reply to whisper (type `/r`);
+- X sit/stand (type `/sit`);
 - T attack (soft targeting starts attacks) and Z sheathe;
 - G target last hostile (now Cmd+F) and Ctrl+Tab nearest friend;
 - F1–F5 targeting yourself and party members;
@@ -153,7 +157,20 @@ Clicks go through a secure button bound to the key, so they count as real
 key presses, and spells and items work. Moving the cursor is blocked in
 combat, so it only works out of combat.
 
-## 5. Smart interact (quests)
+## 5. Inspecting debuffs and buffs (works in combat)
+
+| Key | Does |
+|---|---|
+| X | Tooltip of your next debuff |
+| Shift+X | Tooltip of your previous debuff |
+| Ctrl+X | Tooltip of your next buff |
+
+Each press moves to the next icon in Blizzard's debuff (or buff) row, in
+the order they're shown, and shows its tooltip at the icon, exactly as if
+you hovered it with the mouse. Pressing past the last one hides the
+tooltip. Tooltips aren't restricted in combat, so this works mid-fight.
+
+## 6. Smart interact (quests)
 
 While a quest giver's window is open, each press of **F** does the next step:
 
@@ -183,13 +200,15 @@ Each press does exactly one step; nothing is automated.
    Blizzard's gamepad frame running in keyboard mode.
 5. **Cursor**: open the spellbook, press \`, move with WASD, Space on a spell.
    Then try the bags with Shift+Space.
-6. **Buffs**: hold Z, left page, pick Buffs. The cursor should land on your
+6. **Debuffs in combat**: on a training dummy or mob that debuffs you,
+   press X a few times, then Shift+X, then X past the last one.
+7. **Buffs**: hold Z, left page, pick Buffs. The cursor should land on your
    buffs; check the tooltips and cancel one with Shift+Space.
-7. **Quests**: talk to a quest giver with F and keep pressing F.
-8. **Targeting** (in a group): Ctrl+Tab through the party, Ctrl+F back to
+8. **Quests**: talk to a quest giver with F and keep pressing F.
+9. **Targeting** (in a group): Ctrl+Tab through the party, Ctrl+F back to
    the previous target, Shift+F to assist. Press \` and move over the raid
    frames.
-9. **Pings** (in a group): hold G and click a mob, then drag for the wheel.
+10. **Pings** (in a group): hold G and click a mob, then drag for the wheel.
 
 Known risks:
 - The radial is Blizzard's gamepad frame. If it errors in keyboard mode, its

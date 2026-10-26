@@ -12,3 +12,4 @@ Cursor.lua
 Quest.lua
 Radial.lua
 Targeting.lua
+Auras.lua

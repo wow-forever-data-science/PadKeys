@@ -6,6 +6,9 @@ PadKeys = ns
 BINDING_HEADER_PADKEYS = "PadKeys"
 BINDING_NAME_PADKEYS_CURSOR = "Toggle keyboard UI cursor"
 BINDING_NAME_PADKEYS_RADIAL = "Main menu radial (hold)"
+BINDING_NAME_PADKEYS_DEBUFF_NEXT = "Inspect next debuff"
+BINDING_NAME_PADKEYS_DEBUFF_PREV = "Inspect previous debuff"
+BINDING_NAME_PADKEYS_BUFF_NEXT = "Inspect next buff"
 _G["BINDING_NAME_CLICK PadKeysGroupCycle:LeftButton"] = "Next party/raid member"
 _G["BINDING_NAME_CLICK PadKeysGroupCycle:RightButton"] = "Previous party/raid member"
 

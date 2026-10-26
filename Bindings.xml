@@ -5,6 +5,15 @@
 	<Binding name="PADKEYS_RADIAL" runOnUp="true">
 		PadKeys.radial_key(keystate);
 	</Binding>
+	<Binding name="PADKEYS_DEBUFF_NEXT">
+		PadKeys.next_debuff();
+	</Binding>
+	<Binding name="PADKEYS_DEBUFF_PREV">
+		PadKeys.previous_debuff();
+	</Binding>
+	<Binding name="PADKEYS_BUFF_NEXT">
+		PadKeys.next_buff();
+	</Binding>
 	<Binding name="CLICK PadKeysGroupCycle:LeftButton"/>
 	<Binding name="CLICK PadKeysGroupCycle:RightButton"/>
 </Bindings>

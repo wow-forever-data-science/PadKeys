@@ -42,6 +42,11 @@ local bindings = {
   -- Hold for Blizzard's ping system: click a spot or unit to ping it, or
   -- drag for Blizzard's ping wheel.
   G = "TOGGLEPINGLISTENER",
+  -- Inspect your auras, in combat too: each press shows the next tooltip,
+  -- pressing past the last hides it.
+  X = "PADKEYS_DEBUFF_NEXT",
+  ["SHIFT-X"] = "PADKEYS_DEBUFF_PREV",
+  ["CTRL-X"] = "PADKEYS_BUFF_NEXT",
   -- Move a cursor through open windows with the keyboard.
   ["`"] = "PADKEYS_CURSOR",
 }
