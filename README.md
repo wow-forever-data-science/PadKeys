@@ -77,8 +77,9 @@ gamepad action buttons plus the shoulder buttons.
 | Ctrl+Tab / Ctrl+Shift+Tab | Next / previous party or raid member, in raid frame order (works in combat) |
 | Z (hold) | Blizzard's main-menu radial |
 | G (hold) | Blizzard's ping system |
-| X / Shift+X | Inspect next / previous **debuff** (tooltip), in combat too |
-| Ctrl+X | Inspect next buff |
+| X | Inspect your **debuffs**: next tooltip each press, in combat too |
+| Alt+X | Inspect your buffs |
+| Esc | Closes the debuff/buff tooltip view (only while it's open) |
 | \` | Toggle the keyboard UI cursor |
 
 F1–F5 are unbound.
@@ -162,13 +163,19 @@ combat, so it only works out of combat.
 | Key | Does |
 |---|---|
 | X | Tooltip of your next debuff |
-| Shift+X | Tooltip of your previous debuff |
-| Ctrl+X | Tooltip of your next buff |
+| Alt+X (Option+X on a Mac) | Tooltip of your next buff |
+| Esc | Close the tooltip view |
 
 Each press moves to the next icon in Blizzard's debuff (or buff) row, in
-the order they're shown, and shows its tooltip at the icon, exactly as if
-you hovered it with the mouse. Pressing past the last one hides the
-tooltip. Tooltips aren't restricted in combat, so this works mid-fight.
+the order they're shown, wrapping around, and shows its tooltip at the
+icon, exactly as if you hovered it with the mouse. Tooltips aren't
+restricted in combat, so this works mid-fight.
+
+**Esc** closes the tooltip view, in combat too. X and Alt+X take over Esc
+through a secure snippet (the only way to change a key in combat), and Esc
+gives it back, so outside the tooltip view Esc opens the game menu as
+usual. If you had no debuffs when you pressed X, the next Esc only gives
+Esc back; press it again for the game menu.
 
 ## 6. Smart interact (quests)
 
@@ -200,8 +207,8 @@ Each press does exactly one step; nothing is automated.
    Blizzard's gamepad frame running in keyboard mode.
 5. **Cursor**: open the spellbook, press \`, move with WASD, Space on a spell.
    Then try the bags with Shift+Space.
-6. **Debuffs in combat**: on a training dummy or mob that debuffs you,
-   press X a few times, then Shift+X, then X past the last one.
+6. **Debuffs in combat**: on a mob that debuffs you, press X a few times,
+   then Alt+X, then Esc to close; Esc again should open the game menu.
 7. **Buffs**: hold Z, left page, pick Buffs. The cursor should land on your
    buffs; check the tooltips and cancel one with Shift+Space.
 8. **Quests**: talk to a quest giver with F and keep pressing F.
