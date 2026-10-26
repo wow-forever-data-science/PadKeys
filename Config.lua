@@ -30,8 +30,10 @@ local bindings = {
   ["SHIFT-F"] = "ASSISTTARGET",       -- target your target's target
   ["CTRL-F"] = "TARGETLASTTARGET",    -- swap back to your previous target
   [MOD .. "F"] = "TARGETLASTHOSTILE", -- last enemy you targeted (Cmd+F)
-  -- Tab cluster: cycle enemies, and cycle your party or raid in frame order
-  -- (works in combat).
+  -- Tab cluster: ` toggles friendly/enemy mode; Tab / Shift+Tab cycle
+  -- enemies (or friends in friendly mode); Ctrl+Tab cycles your party or
+  -- raid in frame order. All work in combat.
+  ["`"] = "CLICK PadKeysTargetMode:LeftButton",
   TAB = "TARGETNEARESTENEMY",
   ["SHIFT-TAB"] = "TARGETPREVIOUSENEMY",
   ["CTRL-TAB"] = "CLICK PadKeysGroupCycle:LeftButton",
@@ -47,15 +49,18 @@ local bindings = {
   X = "CLICK PadKeysAuraDebuff:LeftButton",
   ["ALT-X"] = "CLICK PadKeysAuraBuff:LeftButton",
   -- Move a cursor through open windows with the keyboard.
-  ["`"] = "PADKEYS_CURSOR",
+  ["SHIFT-`"] = "PADKEYS_CURSOR",
+  -- This key map (like Blizzard's Controller Map).
+  F1 = "PADKEYS_KEYMAP",
 }
 for prefix, command in pairs(LAYERS) do
   for i, key in ipairs(FACE_KEYS) do
     bindings[prefix .. key] = command .. i
   end
 end
--- false unbinds a key: F1-F5 target yourself and party members by default.
-for i = 1, 5 do
+-- false unbinds a key: F2-F5 target party members by default (F1 is the
+-- key map).
+for i = 2, 5 do
   bindings["F" .. i] = false
 end
 
@@ -88,6 +93,9 @@ ns.config = {
       -- gamepad B: leave cursor mode. Escape is only taken over while the
       -- cursor is on; otherwise it opens the game menu as usual.
       back = { "ESCAPE", "BACKSPACE" },
+      -- Jump to the next / previous open window (gamepad "Next Frame").
+      next_window = { "TAB" },
+      previous_window = { "SHIFT-TAB" },
     },
     -- Start the cursor by itself when these windows open (talk to an NPC
     -- with F, then pick an option with W/S and Space).
@@ -96,6 +104,9 @@ ns.config = {
       "StaticPopup1",
     },
   },
+
+  -- Keys that cycle targets; friendly mode points them at friends.
+  target_mode = { next = "TAB", previous = "SHIFT-TAB" },
 
   quest = {
     -- While a quest giver's window is open: take the next step (turn in,

@@ -145,14 +145,23 @@ local function root_names()
   return names
 end
 
+-- Which window (root) each candidate button belongs to, for next/previous
+-- window. Rebuilt by candidates().
+local root_of = {}
+
 local function candidates()
   local out, seen = {}, {}
+  root_of = {}
   for _, name in ipairs(root_names()) do
     local frame = _G[name]
     if type(frame) == "table" and frame.IsVisible and not seen[frame] and
       frame:IsVisible() then
       seen[frame] = true
+      local start = #out
       collect(frame, out, 0)
+      for i = start + 1, #out do
+        root_of[out[i]] = frame
+      end
     end
   end
   return out
@@ -279,6 +288,37 @@ nav_button("PadKeysNavRight", function() move("right") end)
 nav_button("PadKeysNavPickup", pickup)
 nav_button("PadKeysNavBack", stop)
 
+-- Jump to the first button of the next (delta 1) or previous (-1) window,
+-- like the gamepad's "Next Frame" in UI mode.
+local function jump_window(delta)
+  if not active or InCombatLockdown() then
+    return
+  end
+  local cands = candidates()
+  local roots, index = {}, {}
+  for _, frame in ipairs(cands) do
+    local root = root_of[frame]
+    if root and not index[root] then
+      roots[#roots + 1] = root
+      index[root] = #roots
+    end
+  end
+  if #roots == 0 then
+    return
+  end
+  local here = current and index[root_of[current]] or 0
+  local target = roots[(here - 1 + delta) % #roots + 1]
+  local in_root = {}
+  for _, frame in ipairs(cands) do
+    if root_of[frame] == target then
+      in_root[#in_root + 1] = frame
+    end
+  end
+  select_button(first(in_root))
+end
+nav_button("PadKeysNavNextWindow", function() jump_window(1) end)
+nav_button("PadKeysNavPrevWindow", function() jump_window(-1) end)
+
 local function bind(keys, name, mouse_button)
   for _, key in ipairs(keys or {}) do
     SetOverrideBindingClick(owner, true, key, name, mouse_button)
@@ -319,6 +359,8 @@ local function start(by_hand, root)
   bind(keys.rightclick, "PadKeysCursorClick", "RightButton")
   bind(keys.pickup, "PadKeysNavPickup")
   bind(keys.back, "PadKeysNavBack")
+  bind(keys.next_window, "PadKeysNavNextWindow")
+  bind(keys.previous_window, "PadKeysNavPrevWindow")
   local in_root = {}
   for _, frame in ipairs(cands) do
     if root and inside(frame, root) then

@@ -6,6 +6,8 @@ PadKeys = ns
 BINDING_HEADER_PADKEYS = "PadKeys"
 BINDING_NAME_PADKEYS_CURSOR = "Toggle keyboard UI cursor"
 BINDING_NAME_PADKEYS_RADIAL = "Main menu radial (hold)"
+BINDING_NAME_PADKEYS_KEYMAP = "Show key map"
+_G["BINDING_NAME_CLICK PadKeysTargetMode:LeftButton"] = "Toggle friendly / enemy targeting"
 _G["BINDING_NAME_CLICK PadKeysAuraDebuff:LeftButton"] = "Inspect next debuff"
 _G["BINDING_NAME_CLICK PadKeysAuraBuff:LeftButton"] = "Inspect next buff"
 _G["BINDING_NAME_CLICK PadKeysGroupCycle:LeftButton"] = "Next party/raid member"
@@ -20,6 +22,7 @@ local HELP = {
   "/padkeys apply - set the key layout and settings from Config.lua",
   "/padkeys restore - put back the keys and settings you had before",
   "/padkeys cursor - toggle the keyboard UI cursor",
+  "/padkeys map - show the key map",
 }
 
 SLASH_PADKEYS1 = "/padkeys"
@@ -33,6 +36,8 @@ SlashCmdList.PADKEYS = function(msg)
     ns.restore_layout()
   elseif cmd == "cursor" then
     ns.toggle_cursor()
+  elseif cmd == "map" then
+    ns.toggle_key_map()
   else
     for _, line in ipairs(HELP) do
       ns.say(line)

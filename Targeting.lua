@@ -1,3 +1,10 @@
+-- Targeting, the keyboard version of the gamepad's targeting buttons.
+--
+-- Friendly/enemy mode (gamepad LB "Target Friendly" / RB "Target Hostile"):
+-- one key toggles the mode, and the next/previous target keys (Tab and
+-- Shift+Tab) cycle enemies or friends. The toggle is a secure button whose
+-- snippet rebinds those keys, so it works in combat.
+--
 -- Group cycling, the keyboard version of the gamepad's party/raid targeting:
 -- each press targets the next (left button) or previous (right button) group
 -- member, in raid frame order. It is a secure button whose wrapped OnClick
@@ -42,3 +49,43 @@ button:SetAttribute("type", "target")
 SecureHandlerWrapScript(button, "OnClick", header, ON_CLICK)
 
 ns.group_cycle = button
+
+-- Friendly/enemy toggle. In friendly mode the header owns override bindings
+-- that point the target keys at Blizzard's friendly targeting; enemy mode
+-- clears them, so the layout's normal enemy bindings apply again.
+local TOGGLE_MODE = [[
+  local friendly = not self:GetAttribute("friendly")
+  self:SetAttribute("friendly", friendly)
+  if friendly then
+    owner:SetBinding(true, self:GetAttribute("nextkey"), "TARGETNEARESTFRIEND")
+    owner:SetBinding(true, self:GetAttribute("prevkey"), "TARGETPREVIOUSFRIEND")
+  else
+    owner:ClearBindings()
+  end
+]]
+
+local mode_header = CreateFrame("Frame", "PadKeysTargetModeHeader", UIParent,
+                                "SecureHandlerBaseTemplate")
+local mode = CreateFrame("Button", "PadKeysTargetMode", UIParent,
+                         "SecureActionButtonTemplate")
+mode:RegisterForClicks("AnyDown")
+mode:SetAttribute("nextkey", ns.config.target_mode.next)
+mode:SetAttribute("prevkey", ns.config.target_mode.previous)
+SecureHandlerWrapScript(mode, "OnClick", mode_header, TOGGLE_MODE)
+
+-- A small label while friendly mode is on, so you know which mode you're in.
+local label = UIParent:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+label:SetPoint("TOP", UIParent, "TOP", 0, -120)
+label:SetText("Friendly targeting")
+label:SetTextColor(0.3, 1, 0.3)
+label:Hide()
+mode:HookScript("OnClick", function(self)
+  local friendly = self:GetAttribute("friendly")
+  label:SetShown(friendly)
+  UIErrorsFrame:AddMessage(friendly and "Targeting: friendly" or
+                             "Targeting: enemy", 1, 0.82, 0)
+end)
+
+function ns.is_friendly_mode()
+  return mode:GetAttribute("friendly") and true or false
+end

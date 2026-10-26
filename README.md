@@ -27,6 +27,8 @@ Expect small fixes on launch day; see the checklist at the end.
 | Pings | The ping system (`TOGGLEPINGLISTENER` binding, `Blizzard_PingUI`), including its ping wheel | none, only the key |
 | Quest steps | `QuestFrame_GeneralProgressAction`, the gamepad's own accept/continue/complete action | gossip and greeting lists, and the reward choice |
 | Key layout | Blizzard's binding actions | apply/restore of the bindings |
+| Key map | Blizzard's `ButtonFrameTemplate` window, key names (`GetBindingText`) and action names (`BINDING_NAME_*`) | the list of sections |
+| Targeting modes | Blizzard's friendly/enemy targeting bindings | a secure toggle that swaps them on Tab |
 | Aura inspection | the aura icons' own tooltip code (`AuraButtonMixin:OnEnter`) | ~50 lines choosing which icon is next |
 | Group cycling | none: Blizzard's party/raid targeting only runs in gamepad mode | a secure button that targets the next group member |
 | UI cursor | none: Blizzard's SmartNavigation only runs in gamepad mode | our own cursor |
@@ -73,16 +75,18 @@ gamepad action buttons plus the shoulder buttons.
 | Shift+F | Assist: target your target's target (cycles rewards while a quest window is open) |
 | Ctrl+F | Last target: swap back to your previous target |
 | Cmd+F | Last hostile target |
-| Tab / Shift+Tab | Next / previous enemy |
+| \` | **Toggle friendly / enemy targeting** (works in combat) |
+| Tab / Shift+Tab | Next / previous enemy, or friend in friendly mode |
 | Ctrl+Tab / Ctrl+Shift+Tab | Next / previous party or raid member, in raid frame order (works in combat) |
 | Z (hold) | Blizzard's main-menu radial |
 | G (hold) | Blizzard's ping system |
 | X | Inspect your **debuffs**: next tooltip each press, in combat too |
 | Alt+X | Inspect your buffs |
 | Esc | Closes the debuff/buff tooltip view (only while it's open) |
-| \` | Toggle the keyboard UI cursor |
+| Shift+\` | Toggle the keyboard UI cursor |
+| F1 | **Key map**: what every key does |
 
-F1–F5 are unbound.
+F2–F5 are unbound.
 
 `/padkeys apply` also switches on soft targeting for keyboard
 (`SoftTargetInteract` and `SoftTargetEnemy` set to 3), key-down casting and
@@ -93,7 +97,7 @@ What you lose from the defaults:
 - X sit/stand (type `/sit`);
 - T attack (soft targeting starts attacks) and Z sheathe;
 - G target last hostile (now Cmd+F) and Ctrl+Tab nearest friend;
-- F1–F5 targeting yourself and party members;
+- F1–F5 targeting yourself and party members (F1 is now the key map);
 - Shift+1–6 bar paging.
 
 The pet bar stays on Ctrl, as in the defaults, and Alt stays free for
@@ -131,7 +135,7 @@ way, Assist). This is Blizzard's code and art.
 
 ## 4. Keyboard UI cursor
 
-Press \` with any window open. The cursor also starts by itself when a
+Press **Shift+\`** with any window open. The cursor also starts by itself when a
 gossip, quest, merchant, loot window or a popup opens.
 
 | Key | Does |
@@ -140,13 +144,14 @@ gossip, quest, merchant, loot window or a popup opens.
 | Space / Enter | Click (cast from the spellbook, pick a gossip line) |
 | Shift+Space | Right-click (use or sell an item) |
 | Ctrl+Space | Pick up the spell or item (then move to an action bar slot and click to place it) |
+| Tab / Shift+Tab | Jump to the next / previous open window (the gamepad's "Next Frame") |
 | Esc / Backspace | Leave cursor mode (a second Esc then closes windows or opens the game menu as usual) |
 
 While the cursor is on, W/A/S/D move the cursor, not you, like the gamepad's
 UI focus mode. These keys (and Esc) are only taken over while the cursor is
 on; your spell keys and Esc work normally the rest of the time. It switches off when combat starts.
 
-- **Started with \`:** it also reaches the player, target and focus frames
+- **Started with Shift+\`:** it also reaches the player, target and focus frames
   and the party and raid frames, where Space targets that unit, and your
   **buffs and debuffs**: the highlighted one shows its tooltip, and
   **Shift+Space cancels a buff** (the same right-click Blizzard's gamepad
@@ -158,7 +163,30 @@ Clicks go through a secure button bound to the key, so they count as real
 key presses, and spells and items work. Moving the cursor is blocked in
 combat, so it only works out of combat.
 
-## 5. Inspecting debuffs and buffs (works in combat)
+## 5. Targeting modes (works in combat)
+
+The gamepad has a "Target Friendly" and a "Target Hostile" button. PadKeys
+turns that into a mode:
+
+- **\`** toggles between enemy mode (default) and friendly mode. Friendly
+  mode shows "Friendly targeting" near the top of the screen.
+- **Tab / Shift+Tab** cycle the nearest enemies, or the nearest friendly
+  players and NPCs in friendly mode (Blizzard's `TARGETNEARESTFRIEND`).
+- **Ctrl+Tab / Ctrl+Shift+Tab** always cycle your party or raid.
+
+The toggle is a secure button that rebinds Tab and Shift+Tab, so it works
+in combat. If the cursor or a quest window is using Tab at the same time,
+the one that took Tab last wins.
+
+## 6. Key map (F1)
+
+Press **F1** (or `/padkeys map`) for a key map, like Blizzard's Controller
+Map: action bars, movement, targeting, menus, and the keys inside the
+cursor, radial, quests and aura view. It reads your live keybindings each
+time it opens, with Blizzard's own key and action names, so it always shows
+your real setup. Esc closes it.
+
+## 7. Inspecting debuffs and buffs (works in combat)
 
 | Key | Does |
 |---|---|
@@ -177,7 +205,7 @@ gives it back, so outside the tooltip view Esc opens the game menu as
 usual. If you had no debuffs when you pressed X, the next Esc only gives
 Esc back; press it again for the game menu.
 
-## 6. Smart interact (quests)
+## 8. Smart interact (quests)
 
 While a quest giver's window is open, each press of **F** does the next step:
 
@@ -201,21 +229,24 @@ Each press does exactly one step; nothing is automated.
 2. **Layout**: `/padkeys apply`, then check Options → Keybindings. Press 1–T
    on their own and with Cmd, Shift and Ctrl. Check that Cmd+Q casts
    instead of quitting (the Mac setting in install step 5).
-3. **Interact**: face a corpse or an NPC and press F.
-4. **Radial**: hold Z, move the mouse, switch pages with Q/E and the wheel,
+3. **Key map**: press F1 and check it matches what the keys do.
+4. **Interact**: face a corpse or an NPC and press F.
+5. **Radial**: hold Z, move the mouse, switch pages with Q/E and the wheel,
    release on a segment. Watch for Lua errors when it opens: it is
    Blizzard's gamepad frame running in keyboard mode.
-5. **Cursor**: open the spellbook, press \`, move with WASD, Space on a spell.
+6. **Cursor**: open the spellbook and bags, press Shift+\`, move with WASD,
+   Tab to jump between them, Space on a spell.
    Then try the bags with Shift+Space.
-6. **Debuffs in combat**: on a mob that debuffs you, press X a few times,
+7. **Debuffs in combat**: on a mob that debuffs you, press X a few times,
    then Alt+X, then Esc to close; Esc again should open the game menu.
-7. **Buffs**: hold Z, left page, pick Buffs. The cursor should land on your
+8. **Buffs**: hold Z, left page, pick Buffs. The cursor should land on your
    buffs; check the tooltips and cancel one with Shift+Space.
-8. **Quests**: talk to a quest giver with F and keep pressing F.
-9. **Targeting** (in a group): Ctrl+Tab through the party, Ctrl+F back to
-   the previous target, Shift+F to assist. Press \` and move over the raid
+9. **Quests**: talk to a quest giver with F and keep pressing F.
+10. **Targeting** (in a group): Ctrl+Tab through the party, Ctrl+F back to
+   the previous target, Shift+F to assist, \` then Tab for friends, \` back
+   for enemies (also in combat). Press Shift+\` and move over the raid
    frames.
-10. **Pings** (in a group): hold G and click a mob, then drag for the wheel.
+11. **Pings** (in a group): hold G and click a mob, then drag for the wheel.
 
 Known risks:
 - The radial is Blizzard's gamepad frame. If it errors in keyboard mode, its
