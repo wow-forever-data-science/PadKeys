@@ -25,7 +25,10 @@ Expect small fixes on launch day; see the checklist at the end.
 
 ## Key map
 
-Press **F1** in game for this list, read from your live bindings.
+Press **F1** in game for this list, read from your live bindings. For a
+visual version, open `keymap.html` (in this folder) in a browser: a Mac
+keyboard with each layer's keys. It's also published at
+<https://claude.ai/artifact/6CMswZFmZY5ys9Go17pcsa> (private to the owner).
 
 | Key | Does | Key | Does |
 |---|---|---|---|

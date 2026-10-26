@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- Source of the published key map: https://claude.ai/artifact/6CMswZFmZY5ys9Go17pcsa
+     Open this file in a browser. Keep it in sync with Config.lua when keys change. -->
+<title>PadKeys Key Map</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&family=Alegreya+Sans:wght@400;500;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: a parchment "controller map" sheet — keyboard diagram on top, a layer switch, then
+   the selected layer's key list and the four context cards. */
+:root {
+  --bg: #e9dfc8;
+  --sheet: #f4ecd9;
+  --ink: #2e2416;
+  --muted: #6e5d44;
+  --line: #c9b896;
+  --key: #fbf6ea;
+  --key-edge: #b9a57f;
+  --bars: #a0522d;
+  --move: #4f6b3a;
+  --target: #8a2f3c;
+  --menu: #2f5d7c;
+  --act: #8a6a12;
+  --display: "IM Fell English SC", "Iowan Old Style", Georgia, serif;
+  --body: "Alegreya Sans", "Gill Sans", "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1d1812; --sheet: #2a2219; --ink: #efe4cc; --muted: #b5a385; --line: #4a3d2c;
+    --key: #362c20; --key-edge: #5c4c37; --bars: #e08a5c; --move: #9cc27a; --target: #e47b8b;
+    --menu: #79b2d8; --act: #e0bd52; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1d1812; --sheet: #2a2219; --ink: #efe4cc; --muted: #b5a385; --line: #4a3d2c;
+  --key: #362c20; --key-edge: #5c4c37; --bars: #e08a5c; --move: #9cc27a; --target: #e47b8b;
+  --menu: #79b2d8; --act: #e0bd52; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.45;
+  padding-block: 24px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.sheet {
+  max-width: 1080px; margin: 0 auto; background: var(--sheet); border: 1px solid var(--line);
+  border-radius: 6px; padding-block: 28px; padding-inline: clamp(16px, 4vw, 40px);
+  display: flex; flex-direction: column; gap: 28px;
+}
+header { display: flex; flex-direction: column; gap: 6px; border-bottom: 1px solid var(--line); padding-bottom: 18px; }
+h1 { font-family: var(--display); font-weight: 400; font-size: clamp(30px, 5vw, 44px); margin: 0; letter-spacing: 0.02em; text-wrap: balance; }
+.lede { margin: 0; color: var(--muted); max-width: 65ch; }
+h2 { font-family: var(--display); font-weight: 400; font-size: 24px; margin: 0; }
+.layers { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.layers span { color: var(--muted); font-size: 14px; letter-spacing: 0.06em; text-transform: uppercase; margin-right: 4px; }
+.layers button {
+  font: 500 15px var(--body); color: var(--ink); background: var(--key); border: 1px solid var(--key-edge);
+  border-radius: 999px; padding: 6px 14px; cursor: pointer;
+}
+.layers button[aria-pressed="true"] { background: var(--ink); color: var(--sheet); border-color: var(--ink); }
+.layers button:focus-visible, .k:focus-visible { outline: 2px solid var(--menu); outline-offset: 2px; }
+.kb-wrap { overflow-x: auto; padding-bottom: 6px; }
+.kb { display: flex; flex-direction: column; gap: 6px; width: max-content; margin: 0 auto; }
+.row { display: flex; gap: 6px; }
+.row.fn .k { height: 38px; }
+.k {
+  --u: 58px; width: calc(var(--u) * var(--w, 1) + 6px * (var(--w, 1) - 1)); height: 58px;
+  background: var(--key); border: 1px solid var(--key-edge); border-bottom-width: 3px; border-radius: 7px;
+  padding: 5px 6px; display: flex; flex-direction: column; justify-content: space-between;
+  font: inherit; color: var(--ink); text-align: left; position: relative;
+}
+.k .cap { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.k .act { font-size: 11.5px; line-height: 1.15; font-weight: 700; }
+.k.mod { cursor: pointer; }
+.k.mod.on { background: var(--ink); }
+.k.mod.on .cap { color: var(--sheet); }
+.k[data-cat] { border-color: var(--c); box-shadow: inset 0 -3px 0 var(--c); }
+.k[data-cat] .act { color: var(--c); }
+.k.hold::after {
+  content: "hold"; position: absolute; top: 5px; right: 6px; font: 10px var(--mono); color: var(--c);
+  letter-spacing: 0.04em;
+}
+[data-cat="bars"] { --c: var(--bars); } [data-cat="move"] { --c: var(--move); }
+[data-cat="target"] { --c: var(--target); } [data-cat="menu"] { --c: var(--menu); } [data-cat="act"] { --c: var(--act); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 14px; color: var(--muted); }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; background: var(--c); margin-right: 6px; vertical-align: -1px; }
+.split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 28px; }
+@media (max-width: 760px) { .split { grid-template-columns: minmax(0, 1fr); } }
+.list { display: flex; flex-direction: column; gap: 10px; }
+.list dl { margin: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 14px; align-items: baseline; }
+.list dt { font-family: var(--mono); font-size: 13px; white-space: nowrap; color: var(--c, var(--ink)); }
+.list dd { margin: 0; }
+.cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 520px) { .cards { grid-template-columns: minmax(0, 1fr); } }
+.card { border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.card h3 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 19px; }
+.card p { margin: 0; color: var(--muted); font-size: 14px; }
+.card dl { margin: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 12px; font-size: 14.5px; }
+.card dt { font-family: var(--mono); font-size: 12.5px; white-space: nowrap; }
+.card dd { margin: 0; }
+footer { border-top: 1px solid var(--line); padding-top: 16px; color: var(--muted); font-size: 14px; display: flex; flex-direction: column; gap: 4px; }
+footer p { margin: 0; max-width: 75ch; }
+.combat { font-size: 11px; font-family: var(--mono); color: var(--move); margin-left: 6px; letter-spacing: 0.03em; }
+</style>
+</head>
+<body>
+
+<div class="sheet">
+  <header>
+    <h1>PadKeys Key Map</h1>
+    <p class="lede">Every key the PadKeys addon sets for WoW: Forever, on a Mac keyboard. Pick a layer to see what each key does with that modifier held. In game, F1 shows the same map read from your live bindings.</p>
+  </header>
+
+  <section style="display:flex;flex-direction:column;gap:14px">
+    <div class="layers" role="group" aria-label="Modifier layer">
+      <span>Layer</span>
+      <button type="button" id="layer-plain" data-layer="plain" aria-pressed="true">No modifier</button>
+      <button type="button" id="layer-shift" data-layer="shift" aria-pressed="false">Shift</button>
+      <button type="button" id="layer-ctrl" data-layer="ctrl" aria-pressed="false">Control</button>
+      <button type="button" id="layer-opt" data-layer="opt" aria-pressed="false">Option</button>
+      <button type="button" id="layer-cmd" data-layer="cmd" aria-pressed="false">Command</button>
+    </div>
+    <div class="kb-wrap"><div class="kb" id="kb" aria-label="Keyboard"></div></div>
+    <div class="legend">
+      <span data-cat="bars"><i></i>Action bars</span>
+      <span data-cat="move"><i></i>Movement</span>
+      <span data-cat="target"><i></i>Targeting</span>
+      <span data-cat="act"><i></i>Interact and inspect</span>
+      <span data-cat="menu"><i></i>Menus and pings</span>
+    </div>
+  </section>
+
+  <section class="split">
+    <div class="list">
+      <h2 id="list-title">No modifier</h2>
+      <dl id="list"></dl>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;min-width:0">
+      <h2>While something is open</h2>
+      <div class="cards">
+        <div class="card">
+          <h3>UI cursor</h3>
+          <p>Shift+` or a gossip, quest, vendor or loot window. Out of combat.</p>
+          <dl>
+            <dt>W A S D</dt><dd>Move between buttons</dd>
+            <dt>Space</dt><dd>Click</dd>
+            <dt>Shift+Space</dt><dd>Right-click: use, sell, cancel buff</dd>
+            <dt>Ctrl+Space</dt><dd>Pick up spell or item</dd>
+            <dt>Tab / ⇧Tab</dt><dd>Next / previous window</dd>
+            <dt>Esc</dt><dd>Leave</dd>
+          </dl>
+        </div>
+        <div class="card">
+          <h3>Main-menu radial</h3>
+          <p>Hold Z. Blizzard's gamepad radial, three pages.</p>
+          <dl>
+            <dt>Mouse</dt><dd>Point at a segment</dd>
+            <dt>Q / E</dt><dd>Previous / next page</dd>
+            <dt>Wheel</dt><dd>Previous / next page</dd>
+            <dt>Release Z</dt><dd>Open the highlighted segment</dd>
+          </dl>
+        </div>
+        <div class="card">
+          <h3>Quest giver</h3>
+          <p>Each press does one step.</p>
+          <dl>
+            <dt>F</dt><dd>Turn in, accept, continue, complete, close</dd>
+            <dt>Tab</dt><dd>Cycle reward choices</dd>
+            <dt>Shift+F</dt><dd>Cycle reward choices</dd>
+          </dl>
+        </div>
+        <div class="card">
+          <h3>Aura tooltips</h3>
+          <p>Works in combat.</p>
+          <dl>
+            <dt>X</dt><dd>Next debuff</dd>
+            <dt>Option+X</dt><dd>Next buff</dd>
+            <dt>Esc</dt><dd>Close the tooltip view</dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>Gamepad equivalents: the eight action keys are the D-pad and face buttons; Command, Shift and Control are the skill-panel triggers; ` is Target Friendly / Target Hostile; Z is the Menu button; Shift+` is Change Focus Frame.</p>
+    <p>Before playing on a Mac, turn on Options → Mac → "Disable OS shortcuts", or Command+Q quits the game.</p>
+  </footer>
+</div>
+
+<script>
+// [cap, width units, modifier layer id or null]
+const ROWS = [
+  { cls: "fn", keys: [["esc",1],["F1",1],["F2",1],["F3",1],["F4",1],["F5",1],["F6",1],["F7",1],["F8",1],["F9",1],["F10",1],["F11",1],["F12",1]] },
+  { keys: [["`",1],["1",1],["2",1],["3",1],["4",1],["5",1],["6",1],["7",1],["8",1],["9",1],["0",1],["-",1],["=",1],["delete",1.6]] },
+  { keys: [["tab",1.6],["Q",1],["W",1],["E",1],["R",1],["T",1],["Y",1],["U",1],["I",1],["O",1],["P",1],["[",1],["]",1],["\\",1]] },
+  { keys: [["caps",1.9],["A",1],["S",1],["D",1],["F",1],["G",1],["H",1],["J",1],["K",1],["L",1],[";",1],["'",1],["return",1.7]] },
+  { keys: [["shift",2.4,"shift"],["Z",1],["X",1],["C",1],["V",1],["B",1],["N",1],["M",1],[",",1],[".",1],["/",1],["shift",2.2,"shift"]] },
+  { keys: [["fn",1],["control",1.25,"ctrl"],["option",1.25,"opt"],["command",1.5,"cmd"],["space",5.2],["command",1.5,"cmd"],["option",1.25,"opt"],["←",1],["↓",1],["→",1]] },
+];
+
+const FACE = ["1","2","3","4","Q","E","R","T"];
+function bar(name, short) {
+  const out = {};
+  FACE.forEach((k, i) => { out[k] = { a: `${short} ${i + 1}`, c: "bars", long: `${name}, slot ${i + 1}` }; });
+  return out;
+}
+
+// What each key does per layer. a = label on the key, long = list text.
+const MAP = {
+  plain: {
+    ...bar("Action Bar 1", "Bar1"),
+    "`": { a: "Friend / foe", c: "target", long: "Toggle friendly / enemy targeting", combat: true },
+    tab: { a: "Next target", c: "target", long: "Next enemy (friend in friendly mode)", combat: true },
+    W: { a: "Forward", c: "move", long: "Move forward" },
+    S: { a: "Back", c: "move", long: "Move back" },
+    A: { a: "Strafe", c: "move", long: "Strafe left" },
+    D: { a: "Strafe", c: "move", long: "Strafe right" },
+    space: { a: "Jump", c: "move", long: "Jump" },
+    F: { a: "Interact", c: "act", long: "Interact; quest step in a quest window" },
+    X: { a: "Debuffs", c: "act", long: "Next debuff tooltip", combat: true },
+    Z: { a: "Radial", c: "menu", long: "Main-menu radial", hold: true },
+    G: { a: "Ping", c: "menu", long: "Blizzard's ping system", hold: true },
+    F1: { a: "Key map", c: "menu", long: "This key map, in game" },
+    esc: { a: "Back", c: "menu", long: "Game menu; closes the cursor or aura view first" },
+  },
+  shift: {
+    ...bar("Action Bar 3", "Bar3"),
+    "`": { a: "Cursor", c: "menu", long: "Keyboard UI cursor" },
+    tab: { a: "Prev target", c: "target", long: "Previous enemy (friend in friendly mode)", combat: true },
+    F: { a: "Assist", c: "target", long: "Assist: your target's target" },
+  },
+  ctrl: {
+    ...bar("Pet bar", "Pet"),
+    tab: { a: "Next group", c: "target", long: "Next party or raid member (with Shift: previous)", combat: true },
+    F: { a: "Last target", c: "target", long: "Back to your previous target" },
+  },
+  opt: {
+    X: { a: "Buffs", c: "act", long: "Next buff tooltip", combat: true },
+  },
+  cmd: {
+    ...bar("Action Bar 2", "Bar2"),
+    F: { a: "Last hostile", c: "target", long: "Last hostile target" },
+  },
+};
+const LAYER_NAMES = { plain: "No modifier", shift: "Shift", ctrl: "Control", opt: "Option", cmd: "Command" };
+const MOD_LABEL = { plain: "", shift: "Shift+", ctrl: "Ctrl+", opt: "Option+", cmd: "Cmd+" };
+
+let layer = "plain";
+const kb = document.getElementById("kb");
+
+function render() {
+  kb.textContent = "";
+  for (const row of ROWS) {
+    const r = document.createElement("div");
+    r.className = "row" + (row.cls ? " " + row.cls : "");
+    for (const [cap, w, mod] of row.keys) {
+      const k = document.createElement(mod ? "button" : "div");
+      k.className = "k";
+      k.style.setProperty("--w", w);
+      const capEl = document.createElement("span");
+      capEl.className = "cap";
+      capEl.textContent = cap;
+      k.appendChild(capEl);
+      if (mod) {
+        k.type = "button";
+        k.classList.add("mod");
+        if (mod === layer) k.classList.add("on");
+        k.setAttribute("aria-label", `${cap} layer`);
+        k.addEventListener("click", () => setLayer(mod === layer ? "plain" : mod));
+      } else {
+        const info = MAP[layer][cap];
+        if (info) {
+          k.dataset.cat = info.c;
+          if (info.hold) k.classList.add("hold");
+          const act = document.createElement("span");
+          act.className = "act";
+          act.textContent = info.a;
+          k.appendChild(act);
+          k.title = info.long;
+        }
+      }
+      r.appendChild(k);
+    }
+    kb.appendChild(r);
+  }
+  document.getElementById("list-title").textContent = LAYER_NAMES[layer];
+  const list = document.getElementById("list");
+  list.textContent = "";
+  const rows = Object.entries(MAP[layer]);
+  // Group the eight bar keys into one line.
+  const barKeys = rows.filter(([, v]) => v.c === "bars");
+  const others = rows.filter(([, v]) => v.c !== "bars");
+  const add = (keyText, info, text) => {
+    const dt = document.createElement("dt");
+    dt.dataset.cat = info.c;
+    dt.textContent = keyText;
+    const dd = document.createElement("dd");
+    dd.textContent = text;
+    if (info.combat) {
+      const tag = document.createElement("span");
+      tag.className = "combat";
+      tag.textContent = "in combat";
+      dd.appendChild(tag);
+    }
+    list.append(dt, dd);
+  };
+  if (barKeys.length) {
+    add(MOD_LABEL[layer] + "1 2 3 4 Q E R T", barKeys[0][1], barKeys[0][1].long.replace(/, slot 1$/, ", slots 1–8"));
+  }
+  for (const [k, v] of others) add(MOD_LABEL[layer] + (k === "`" ? "`" : k[0].toUpperCase() + k.slice(1)), v, v.long);
+}
+
+function setLayer(next) {
+  layer = next;
+  document.querySelectorAll(".layers button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.layer === layer)));
+  render();
+}
+document.querySelectorAll(".layers button").forEach(b => b.addEventListener("click", () => setLayer(b.dataset.layer)));
+render();
+</script>
+</body>
+</html>
