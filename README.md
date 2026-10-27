@@ -15,7 +15,8 @@ without a gamepad, and adds its own code only where Blizzard's doesn't:
 - a **smart interact** key that walks through quest dialogs;
 - an in-game **key map** (F1), like Blizzard's Controller Map.
 
-It is not part of the R package (`tools/` is in `.Rbuildignore`).
+It started in the wowforevR R package repository and moved here as a
+standalone addon; the history came along.
 
 **Status: untested in game.** It was written before launch against
 Forever's UI source (Gethe's mirror, branch `forever`, build 1.60.1 (70532):
@@ -56,8 +57,8 @@ keyboard with each layer's keys. It's also published at
    "PadKeys (latest)". It's rebuilt every time the addon changes on `main`.
    Unzip it into `<WoW install>/<Forever client folder>/Interface/AddOns/`,
    so you end up with `Interface/AddOns/PadKeys/PadKeys.toc`. (Without the
-   release: download the repository as a ZIP and copy `tools/PadKeys`
-   there instead.)
+   release: download the repository as a ZIP, unzip it into `AddOns` and
+   rename the folder from `PadKeys-main` to `PadKeys`.)
 2. Enable *PadKeys* at character select (tick **Load out of date AddOns** if
    it is listed as out of date).
 3. In game, type `/padkeys preview` to see which keys would change, then

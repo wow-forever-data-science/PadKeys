@@ -1,7 +1,7 @@
 ## Interface: 11507, 16001
 ## Title: PadKeys
 ## Notes: Gamepad-style play on keyboard: key layout, keyboard UI cursor and radial menus. Type /padkeys.
-## Author: wowforevR
+## Author: wow-forever-data-science
 ## Version: 0.1.0
 ## SavedVariables: PadKeysDB
 
