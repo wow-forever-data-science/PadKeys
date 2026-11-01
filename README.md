@@ -112,7 +112,10 @@ action buttons plus the shoulder buttons:
 Movement is W/S, with **A/D strafing** (turn with the mouse or the arrow
 keys). **F interacts** with whatever you face: loot, NPCs, herbs, ore.
 
-F needs soft targeting on for keyboard. PadKeys sets only key bindings;
+F needs soft targeting on for keyboard. The F binding itself is in both
+places: PadKeys binds it, and `wow-settings` binds it too
+(`settings/account/bindings-cache.wtf`), so F interacts even with PadKeys
+disabled. PadKeys sets only key bindings;
 the console settings live in the `wow-settings` repository
 (`settings/account/config-cache.wtf`, applied with `./wow.sh apply`):
 `SoftTargetInteract` and `SoftTargetEnemy` at 3 (Blizzard's "Enable
