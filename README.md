@@ -138,7 +138,8 @@ What you lose from WoW's defaults:
 - G target last hostile (now Cmd+F) and Ctrl+Tab nearest friend (now
   friendly mode);
 - F1–F5 targeting yourself and party members (F1 is now the key map);
-- Shift+1–6 bar paging.
+- Shift+1–4 jumping to bar pages 1–4 (Shift+5/6, Shift+mouse wheel and
+  the page arrows still page the main bar).
 
 The pet bar stays on Ctrl, as in the defaults, and Alt stays free for
 self-cast. Cmd is `META` in WoW's key names.
