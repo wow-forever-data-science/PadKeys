@@ -1,0 +1,5 @@
+<Bindings>
+	<Binding name="CLICK PadKeysTargetMode:LeftButton" header="PADKEYS_TARGETING"/>
+	<Binding name="CLICK PadKeysGroupCycle:LeftButton"/>
+	<Binding name="CLICK PadKeysGroupCycle:RightButton"/>
+</Bindings>

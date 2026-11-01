@@ -1,0 +1,10 @@
+## Interface: 11507, 16001
+## Title: PadKeys - Cursor
+## Notes: Keyboard UI cursor through windows, and NPC dialogs as on the gamepad (F = A, Esc = B). Needs PadKeys.
+## Author: wow-forever-data-science
+## Version: 0.2.0
+## Dependencies: PadKeys
+
+Config.lua
+Cursor.lua
+Dialogs.lua

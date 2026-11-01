@@ -16,6 +16,17 @@ without a gamepad, and adds its own code only where Blizzard's doesn't:
   and F takes it, accepts, continues or completes;
 - an in-game **key map** (F1), like Blizzard's Controller Map.
 
+It comes as five addons, so you can switch them on one at a time and an
+error points at one part:
+
+| Addon | What it adds | Needs |
+|---|---|---|
+| **PadKeys** | Key layout (action bars, movement, F interact, X sit, G pings, targeting keys), soft targeting, F1 key map, `/padkeys` | — |
+| **PadKeys_Cursor** | UI cursor (windows, unit frames, buffs) and NPC dialogs (F = A, Esc = B) | PadKeys |
+| **PadKeys_Auras** | Debuff (C) and buff (Option+C) tooltips | PadKeys |
+| **PadKeys_Targeting** | Friendly/enemy toggle (\`) and party/raid cycling (Ctrl+Tab) | PadKeys |
+| **PadKeys_Radial** | Blizzard's main-menu radial (hold Z) | PadKeys |
+
 It started in the wowforevR R package repository and moved here as a
 standalone addon; the history came along.
 
@@ -27,7 +38,8 @@ Expect small fixes on launch day; see the checklist at the end.
 
 ## Key map
 
-Press **F1** in game for this list, read from your live bindings. For a
+Press **F1** in game for this list, read from your live bindings (it lists
+only the addons you have loaded). For a
 visual version, open `keymap.html` (in this folder) in a browser: a Mac
 keyboard with each layer's keys. It's also published at
 <https://claude.ai/artifact/6CMswZFmZY5ys9Go17pcsa> (private to the owner).
@@ -58,22 +70,30 @@ keyboard with each layer's keys. It's also published at
 1. Download **PadKeys.zip** from the repository's **Releases** page, release
    "PadKeys (latest)". It's rebuilt every time the addon changes on `main`.
    Unzip it into `<WoW install>/<Forever client folder>/Interface/AddOns/`,
-   so you end up with `Interface/AddOns/PadKeys/PadKeys.toc`. (Without the
-   release: download the repository as a ZIP, unzip it into `AddOns` and
-   rename the folder from `PadKeys-main` to `PadKeys`.)
-2. Enable *PadKeys* at character select (tick **Load out of date AddOns** if
-   it is listed as out of date).
+   so you end up with `Interface/AddOns/PadKeys/PadKeys.toc` and the
+   `PadKeys_*` folders next to it. If you installed an older PadKeys, delete
+   its `PadKeys` folder first. (Without the release: download the
+   repository as a ZIP and copy its `PadKeys` and `PadKeys_*` folders into
+   `AddOns`.)
+2. At character select, enable **PadKeys** (tick **Load out of date
+   AddOns** if it is listed as out of date). Enable the `PadKeys_*` addons
+   too, or add them one at a time (see the checklist at the end).
 3. In game, type `/padkeys preview` to see which keys would change, then
-   `/padkeys apply`. `/padkeys restore` puts your old keys back.
+   `/padkeys apply`. `/padkeys restore` puts your old keys back. **Run
+   `/padkeys apply` again whenever you enable or disable a `PadKeys_*`
+   addon**: it binds the keys of the loaded ones and gives back the keys of
+   ones you turned off.
 4. Turn on **Action Bar 2** and **Action Bar 3** (Options or Edit Mode). The
    Cmd and Shift layers fire those bars, so their buttons must exist.
 5. **On a Mac: turn on Options → Mac → "Disable OS shortcuts"** and allow
    WoW the macOS permission it asks for. Otherwise Cmd+Q (Action Bar 2,
    slot 5) **quits the game**, and other Cmd shortcuts go to macOS.
 
-Commands: `/padkeys preview`, `apply`, `restore`, `cursor`, `map`.
-Everything is set in `Config.lua`: edit it and `/reload`. On Windows, set
-`MOD = "ALT-"` at the top of `Config.lua` to use Alt instead of Cmd.
+Commands: `/padkeys preview`, `apply`, `restore`, `cursor`, `map`,
+`status` (which PadKeys addons are loaded).
+Each addon has its own `Config.lua` with its keys and settings: edit it,
+`/reload` and `/padkeys apply`. On Windows, set `MOD = "ALT-"` at the top
+of `PadKeys/Config.lua` to use Alt instead of Cmd.
 
 ## Key layout
 
@@ -244,31 +264,52 @@ more fragile than the small versions here.
 
 ## Launch-day checklist (Nov 4)
 
-1. **Loads?** Enable it and `/reload`, and watch for Lua errors (`/console
-   scriptErrors 1`). If it says out of date, check the interface number with
-   `/dump select(4, GetBuildInfo())` and update `## Interface:` in
-   `PadKeys.toc`.
+Install in stages: enable one addon, `/reload`, `/padkeys apply`, test it,
+then add the next. Turn on Lua errors first with `/console scriptErrors 1`.
+An error names the file and its folder, so you know which addon broke;
+disable that one and carry on with the rest. `/padkeys status` shows what
+is loaded.
+
+**Stage 1: PadKeys only**
+
+1. **Loads?** If it says out of date, check the interface number with
+   `/dump select(4, GetBuildInfo())` and update `## Interface:` in every
+   `.toc` file.
 2. **Layout**: `/padkeys apply`, then press 1–T on their own and with Cmd,
    Shift and Ctrl. Check that Cmd+Q casts instead of quitting (install
-   step 5).
-3. **Key map**: press F1 and check it matches what the keys do.
-4. **Interact**: face a corpse or an NPC and press F.
-5. **Radial**: hold Z, move the mouse, switch pages with Q/E and the wheel,
-   release on a segment. Watch for Lua errors when it opens.
+   step 5). X sits.
+3. **Interact and soft targeting**: an icon should show over the NPC, herb
+   or chest in front of you; press F. Tab / Shift+Tab cycle enemies,
+   Shift+F assists, Ctrl+F and Cmd+F go back to earlier targets.
+4. **Key map**: press F1 and check it matches what the keys do.
+5. **Pings** (in a group): hold G and click a mob, then drag for the wheel.
+
+**Stage 2: + PadKeys_Cursor**
+
 6. **Cursor**: open the spellbook and bags, press Shift+\`, move with WASD,
-   Tab between the windows, Space on a spell, Shift+Space on a bag item.
-7. **Aura tooltips in combat**: on a mob that debuffs you, press C a few
-   times, then Option+C, then Esc; Esc again should open the game menu.
-8. **Buffs**: hold Z, left page, pick Buffs. The cursor should land on your
-   buffs; cancel one with Shift+Space.
-9. **NPC dialogs**: talk to a quest giver with F and keep pressing F; pick a
+   Tab between the windows, Space on a spell, Shift+Space on a bag item,
+   Esc to close the window.
+7. **NPC dialogs**: talk to a quest giver with F and keep pressing F; pick a
    reward with S and F. Talk to an innkeeper or banker, move to an option
    with S and press F. Esc closes.
-10. **Targeting** (in a group, also in combat): Ctrl+Tab through the party,
-    Ctrl+F back to the previous target, Shift+F to assist, \` then Tab for
-    friends, \` again for enemies. Press Shift+\` and move over the raid
-    frames.
-11. **Pings** (in a group): hold G and click a mob, then drag for the wheel.
+
+**Stage 3: + PadKeys_Auras**
+
+8. **Aura tooltips in combat**: on a mob that debuffs you, press C a few
+   times, then Option+C, then Esc; Esc again should open the game menu.
+
+**Stage 4: + PadKeys_Targeting**
+
+9. **Targeting** (in a group, also in combat): Ctrl+Tab through the party,
+   \` then Tab for friends, \` again for enemies. With PadKeys_Cursor on,
+   press Shift+\` and move over the raid frames.
+
+**Stage 5: + PadKeys_Radial**
+
+10. **Radial**: hold Z, move the mouse, switch pages with Q/E and the wheel,
+    release on a segment. Watch for Lua errors when it opens.
+11. **Buffs** (with PadKeys_Cursor on): hold Z, left page, pick Buffs. The
+    cursor should land on your buffs; cancel one with Shift+Space.
 
 Known risks:
 - The radial is Blizzard's gamepad frame running in keyboard mode. If it
@@ -276,18 +317,19 @@ Known risks:
   running; send the error and it can be fixed or worked around.
 - Tooltips while the cursor moves come from calling Blizzard's own OnEnter
   handlers. If that causes "action blocked" errors, set `tooltips = false`
-  under `cursor` in `Config.lua`.
+  under `cursor` in `PadKeys_Cursor/Config.lua`.
 - Tab is used by targeting and the cursor. If both take Tab at the same
   moment (e.g. toggling friendly mode while the cursor is on), the one that
   took it last wins.
 - The cursor finds windows from `UIPanelWindows`, `UISpecialFrames` and a
   short list of names. A window it misses can be added to `EXTRA_ROOTS` in
-  `Cursor.lua`.
+  `PadKeys_Cursor/Cursor.lua`.
 - Long scroll lists aren't scrolled by the cursor yet; use the mouse wheel.
 
 ## Related branch
 
-`feat/padkeys-custom-rings` adds our own secure rings on top of this:
+`feat/padkeys-custom-rings` adds our own secure rings on top of this
+(to become a sixth addon, PadKeys_Rings):
 a Utility ring (Hearthstone, macros, your own spells and items) and a Ping
 ring that pings your target in combat without clicking. Blizzard has no ring
 for your own spells and items, so those need our code.

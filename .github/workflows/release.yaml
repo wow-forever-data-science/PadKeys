@@ -1,4 +1,5 @@
-# Packages the addon as PadKeys.zip (a PadKeys/ folder for Interface/AddOns).
+# Packages the addons as PadKeys.zip: the PadKeys/ base folder and the
+# PadKeys_*/ folders, side by side for Interface/AddOns.
 # Pull requests: syntax-check the Lua and build the zip as a check.
 # Pushes to main: also publish the zip on the "padkeys-latest" release, so
 # installing is: download PadKeys.zip, unzip into Interface/AddOns.
@@ -23,17 +24,17 @@ jobs:
       - name: Check Lua syntax
         run: |
           sudo apt-get install -y -q lua5.1
-          for f in *.lua; do luac5.1 -p "$f"; done
+          for f in PadKeys*/*.lua; do luac5.1 -p "$f"; done
 
       - name: Build PadKeys.zip
-        run: git archive --format=zip --prefix=PadKeys/ -o PadKeys.zip HEAD
+        run: git archive --format=zip -o PadKeys.zip HEAD $(ls -d PadKeys*/)
 
       - name: Publish the latest release
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          notes="PadKeys from main at ${GITHUB_SHA::7}. Install: download PadKeys.zip and unzip it into <WoW>/<Forever client folder>/Interface/AddOns/, so you get Interface/AddOns/PadKeys/PadKeys.toc. Setup steps: README.md."
+          notes="PadKeys from main at ${GITHUB_SHA::7}. Install: download PadKeys.zip and unzip it into <WoW>/<Forever client folder>/Interface/AddOns/, so you get Interface/AddOns/PadKeys/PadKeys.toc and the PadKeys_* folders next to it. Enable PadKeys first, then the PadKeys_* addons one at a time. Setup steps: README.md."
           if gh release view padkeys-latest > /dev/null 2>&1; then
             gh release upload padkeys-latest PadKeys.zip --clobber
             gh release edit padkeys-latest --notes "$notes"

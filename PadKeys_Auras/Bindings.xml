@@ -1,0 +1,4 @@
+<Bindings>
+	<Binding name="CLICK PadKeysAuraDebuff:LeftButton" header="PADKEYS_AURAS"/>
+	<Binding name="CLICK PadKeysAuraBuff:LeftButton"/>
+</Bindings>

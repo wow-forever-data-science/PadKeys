@@ -10,7 +10,12 @@
 -- member, in raid frame order. It is a secure button whose wrapped OnClick
 -- picks the next unit that exists, so it works in combat.
 
-local _, ns = ...
+local ns = PadKeys
+
+BINDING_HEADER_PADKEYS_TARGETING = "PadKeys: targeting"
+_G["BINDING_NAME_CLICK PadKeysTargetMode:LeftButton"] = "Toggle friendly / enemy targeting"
+_G["BINDING_NAME_CLICK PadKeysGroupCycle:LeftButton"] = "Next party/raid member"
+_G["BINDING_NAME_CLICK PadKeysGroupCycle:RightButton"] = "Previous party/raid member"
 
 -- Runs in the restricted environment, with self = the cycle button.
 local ON_CLICK = [[

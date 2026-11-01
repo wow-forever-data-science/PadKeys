@@ -9,7 +9,11 @@
 -- button, and the close button clears it again. Outside the tooltip view,
 -- Escape works as usual.
 
-local _, ns = ...
+local ns = PadKeys
+
+BINDING_HEADER_PADKEYS_AURAS = "PadKeys: auras"
+_G["BINDING_NAME_CLICK PadKeysAuraDebuff:LeftButton"] = "Inspect next debuff"
+_G["BINDING_NAME_CLICK PadKeysAuraBuff:LeftButton"] = "Inspect next buff"
 
 local current = {}
 

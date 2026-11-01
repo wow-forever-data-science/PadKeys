@@ -16,7 +16,7 @@
 -- Space does the same as F on list entries, since both are the cursor's
 -- click. With no dialog open, F is the normal "Interact with Target".
 
-local _, ns = ...
+local ns = PadKeys
 
 local owner = CreateFrame("Frame", "PadKeysQuestOwner", UIParent)
 

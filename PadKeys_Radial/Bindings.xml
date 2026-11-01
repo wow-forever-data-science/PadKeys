@@ -1,0 +1,5 @@
+<Bindings>
+	<Binding name="PADKEYS_RADIAL" header="PADKEYS_RADIAL" runOnUp="true">
+		PadKeys.radial_key(keystate);
+	</Binding>
+</Bindings>

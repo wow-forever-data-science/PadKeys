@@ -1,13 +1,23 @@
 -- Key layout: preview, apply and restore the bindings and console variables
--- in Config.lua. The first apply saves what each key and setting was, so
+-- in Config.lua, plus the keys of the loaded PadKeys_* addons. The first apply saves what each key and setting was, so
 -- restore can put it back. Binding changes are blocked in combat.
 
 local _, ns = ...
 
+-- One row per key: the action it gets (false unbinds) and what it has now.
+-- Keys an earlier apply took for an addon that is no longer loaded get
+-- their saved binding back (released = true), so a disabled PadKeys_*
+-- addon leaves no dead keys.
 local function planned_changes()
   local rows = {}
   for key, action in pairs(ns.config.bindings) do
     rows[#rows + 1] = { key = key, action = action, old = GetBindingAction(key) }
+  end
+  for key, saved in pairs(ns.db.keys or {}) do
+    if ns.config.bindings[key] == nil then
+      rows[#rows + 1] = { key = key, action = saved ~= "" and saved or false,
+                          old = GetBindingAction(key), released = true }
+    end
   end
   table.sort(rows, function(a, b) return a.key < b.key end)
   return rows
@@ -40,7 +50,9 @@ function ns.apply_layout()
   ns.db.cvars = ns.db.cvars or {}
 
   for _, row in ipairs(planned_changes()) do
-    if ns.db.keys[row.key] == nil then
+    if row.released then
+      ns.db.keys[row.key] = nil
+    elseif ns.db.keys[row.key] == nil then
       ns.db.keys[row.key] = row.old
     end
     if row.action then

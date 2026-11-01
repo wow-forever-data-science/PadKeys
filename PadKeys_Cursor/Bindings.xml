@@ -1,0 +1,5 @@
+<Bindings>
+	<Binding name="PADKEYS_CURSOR" header="PADKEYS_CURSOR">
+		PadKeys.toggle_cursor();
+	</Binding>
+</Bindings>

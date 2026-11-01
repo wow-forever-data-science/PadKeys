@@ -7,7 +7,10 @@
 -- items in bags used. Pointing the proxy at a new button is blocked in
 -- combat, so the cursor switches off when combat starts.
 
-local _, ns = ...
+local ns = PadKeys
+
+BINDING_HEADER_PADKEYS_CURSOR = "PadKeys: cursor"
+BINDING_NAME_PADKEYS_CURSOR = "Toggle keyboard UI cursor"
 
 local EXTRA_ROOTS = {
   "LootFrame", "GossipFrame", "QuestFrame", "MerchantFrame",

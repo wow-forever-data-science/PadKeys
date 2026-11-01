@@ -2,8 +2,9 @@
 -- each key does. Global keys are read from the live bindings each time it
 -- opens (GetBindingKey), so it shows your real setup, with Blizzard's own key
 -- names (GetBindingText: "Shift-Tab", "Cmd-1" on a Mac) and action names
--- (BINDING_NAME_*). Context keys (cursor, radial, quests) come from
--- Config.lua. Uses Blizzard's ButtonFrameTemplate window; Esc closes it.
+-- (BINDING_NAME_*). Context keys (cursor, radial) come from the
+-- addons' Config.lua files. Uses Blizzard's ButtonFrameTemplate window;
+-- Esc closes it.
 
 local _, ns = ...
 
@@ -37,15 +38,22 @@ local function config_keys(list)
   return table.concat(out, ", ")
 end
 
+local IsAddOnLoaded = C_AddOns and C_AddOns.IsAddOnLoaded or IsAddOnLoaded
+local function loaded(addon)
+  return IsAddOnLoaded(addon) and true or false
+end
+
 local function action_row(action, label)
   return { label or _G["BINDING_NAME_" .. action] or action, keys_for(action) }
 end
 
--- Sections in display order. Built when the map opens.
+-- Sections in display order, built when the map opens. Sections and rows
+-- for PadKeys_* addons only appear when that addon is loaded.
 local function sections()
   local c = ns.config
-  local friendly = ns.is_friendly_mode and ns.is_friendly_mode()
-  return {
+  local targeting = ns.is_friendly_mode ~= nil
+  local friendly = targeting and ns.is_friendly_mode()
+  local list = {
     { "Action bars", {
       { "Action Bar 1", bar_keys("ACTIONBUTTON") },
       { "Action Bar 2", bar_keys("MULTIACTIONBAR1BUTTON") },
@@ -58,45 +66,71 @@ local function sections()
       action_row("JUMP"), action_row("INTERACTTARGET"),
       action_row("SITORSTAND"),
     } },
-    { "Targeting" .. (friendly and " (friendly mode on)" or ""), {
-      action_row("CLICK PadKeysTargetMode:LeftButton",
-                 "Toggle friendly / enemy targeting"),
-      { friendly and "Next / previous friend" or "Next / previous enemy",
-        keys_for("TARGETNEARESTENEMY") .. " / " ..
-          keys_for("TARGETPREVIOUSENEMY") },
-      action_row("CLICK PadKeysGroupCycle:LeftButton", "Next group member"),
-      action_row("CLICK PadKeysGroupCycle:RightButton",
-                 "Previous group member"),
-      action_row("ASSISTTARGET"), action_row("TARGETLASTTARGET"),
-      action_row("TARGETLASTHOSTILE"),
-    } },
-    { "Menus and info", {
-      action_row("PADKEYS_RADIAL"), action_row("TOGGLEPINGLISTENER"),
-      action_row("PADKEYS_CURSOR"),
-      action_row("CLICK PadKeysAuraDebuff:LeftButton"),
-      action_row("CLICK PadKeysAuraBuff:LeftButton"),
-      action_row("PADKEYS_KEYMAP"),
-    } },
-    { "In the UI cursor", {
-      { "Move", config_keys(c.cursor.keys.up) .. " / " ..
-          config_keys(c.cursor.keys.left) .. " / " ..
-          config_keys(c.cursor.keys.down) .. " / " ..
-          config_keys(c.cursor.keys.right) },
-      { "Click", config_keys(c.cursor.keys.click) },
-      { "Right-click (use, sell, cancel buff)",
-        config_keys(c.cursor.keys.rightclick) },
-      { "Pick up", config_keys(c.cursor.keys.pickup) },
-      { "Next / previous window", config_keys(c.cursor.keys.next_window) ..
-          " / " .. config_keys(c.cursor.keys.previous_window) },
-      { "Close window / leave", config_keys(c.cursor.keys.back) },
-    } },
-    { "In the radial, NPC dialogs and aura view", {
-      { "Radial pages", config_keys(c.radial.page_keys.previous) .. " / " ..
-          config_keys(c.radial.page_keys.next) },
-      { "NPC dialog: choose / accept / complete", config_keys(c.quest.step) },
-      { "Close aura view", key_text("ESCAPE") },
-    } },
   }
+
+  local target_rows = {}
+  if targeting then
+    target_rows[#target_rows + 1] = action_row(
+      "CLICK PadKeysTargetMode:LeftButton", "Toggle friendly / enemy targeting")
+  end
+  target_rows[#target_rows + 1] = {
+    friendly and "Next / previous friend" or "Next / previous enemy",
+    keys_for("TARGETNEARESTENEMY") .. " / " .. keys_for("TARGETPREVIOUSENEMY") }
+  if targeting then
+    target_rows[#target_rows + 1] = action_row(
+      "CLICK PadKeysGroupCycle:LeftButton", "Next group member")
+    target_rows[#target_rows + 1] = action_row(
+      "CLICK PadKeysGroupCycle:RightButton", "Previous group member")
+  end
+  target_rows[#target_rows + 1] = action_row("ASSISTTARGET")
+  target_rows[#target_rows + 1] = action_row("TARGETLASTTARGET")
+  target_rows[#target_rows + 1] = action_row("TARGETLASTHOSTILE")
+  list[#list + 1] = {
+    "Targeting" .. (friendly and " (friendly mode on)" or ""), target_rows }
+
+  local menu_rows = {}
+  if c.radial then
+    menu_rows[#menu_rows + 1] = action_row("PADKEYS_RADIAL")
+  end
+  menu_rows[#menu_rows + 1] = action_row("TOGGLEPINGLISTENER")
+  if c.cursor then
+    menu_rows[#menu_rows + 1] = action_row("PADKEYS_CURSOR")
+  end
+  if loaded("PadKeys_Auras") then
+    menu_rows[#menu_rows + 1] = action_row("CLICK PadKeysAuraDebuff:LeftButton")
+    menu_rows[#menu_rows + 1] = action_row("CLICK PadKeysAuraBuff:LeftButton")
+  end
+  menu_rows[#menu_rows + 1] = action_row("PADKEYS_KEYMAP")
+  list[#list + 1] = { "Menus and info", menu_rows }
+
+  if c.cursor then
+    local k = c.cursor.keys
+    list[#list + 1] = { "In the UI cursor", {
+      { "Move", config_keys(k.up) .. " / " .. config_keys(k.left) .. " / " ..
+          config_keys(k.down) .. " / " .. config_keys(k.right) },
+      { "Click", config_keys(k.click) },
+      { "Right-click (use, sell, cancel buff)", config_keys(k.rightclick) },
+      { "Pick up", config_keys(k.pickup) },
+      { "Next / previous window", config_keys(k.next_window) .. " / " ..
+          config_keys(k.previous_window) },
+      { "Close window / leave", config_keys(k.back) },
+      { "NPC dialog: choose / accept / complete", config_keys(c.quest.step) },
+    } }
+  end
+
+  local other = {}
+  if c.radial then
+    other[#other + 1] = { "Radial pages",
+      config_keys(c.radial.page_keys.previous) .. " / " ..
+        config_keys(c.radial.page_keys.next) }
+  end
+  if loaded("PadKeys_Auras") then
+    other[#other + 1] = { "Close aura view", key_text("ESCAPE") }
+  end
+  if #other > 0 then
+    list[#list + 1] = { "In the radial and aura view", other }
+  end
+  return list
 end
 
 local frame = CreateFrame("Frame", "PadKeysKeyMap", UIParent,

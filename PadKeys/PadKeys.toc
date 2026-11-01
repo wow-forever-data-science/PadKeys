@@ -1,0 +1,11 @@
+## Interface: 11507, 16001
+## Title: PadKeys
+## Notes: Gamepad-style play on keyboard: key layout, soft targeting and key map. Add the PadKeys_* addons one at a time for the rest. Type /padkeys.
+## Author: wow-forever-data-science
+## Version: 0.2.0
+## SavedVariables: PadKeysDB
+
+Config.lua
+Core.lua
+Layout.lua
+KeyMap.lua

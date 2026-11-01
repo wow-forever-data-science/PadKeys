@@ -1,0 +1,9 @@
+## Interface: 11507, 16001
+## Title: PadKeys - Radial
+## Notes: Blizzard's gamepad main-menu radial on the keyboard (hold Z). Needs PadKeys.
+## Author: wow-forever-data-science
+## Version: 0.2.0
+## Dependencies: PadKeys
+
+Config.lua
+Radial.lua

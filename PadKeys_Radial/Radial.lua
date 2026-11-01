@@ -12,7 +12,10 @@
 --
 -- It opens windows, so like on a gamepad it is meant for out of combat.
 
-local _, ns = ...
+local ns = PadKeys
+
+BINDING_HEADER_PADKEYS_RADIAL = "PadKeys: radial"
+BINDING_NAME_PADKEYS_RADIAL = "Main menu radial (hold)"
 
 local owner = CreateFrame("Frame", "PadKeysRadialOwner", UIParent)
 local origin_x, origin_y

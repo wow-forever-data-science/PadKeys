@@ -1,5 +1,6 @@
--- PadKeys settings. Edit this file to change the key layout, the UI cursor
--- keys and the radial rings, then /reload. Key names are WoW binding strings:
+-- PadKeys base settings: the key layout and console variables. Each
+-- PadKeys_* addon has its own Config.lua for its keys. Edit, then /reload
+-- and /padkeys apply. Key names are WoW binding strings:
 -- "Q", "SHIFT-1", "CTRL-SPACE", "`", "BACKSPACE", "UP". On a Mac, Cmd is
 -- "META" ("META-1").
 
@@ -30,29 +31,15 @@ local bindings = {
   ["SHIFT-F"] = "ASSISTTARGET",       -- target your target's target
   ["CTRL-F"] = "TARGETLASTTARGET",    -- swap back to your previous target
   [MOD .. "F"] = "TARGETLASTHOSTILE", -- last enemy you targeted (Cmd+F)
-  -- Tab cluster: ` toggles friendly/enemy mode; Tab / Shift+Tab cycle
-  -- enemies (or friends in friendly mode); Ctrl+Tab cycles your party or
-  -- raid in frame order. All work in combat.
-  ["`"] = "CLICK PadKeysTargetMode:LeftButton",
+  -- Next / previous nearest enemy. PadKeys_Targeting adds ` to switch
+  -- these to friends, and Ctrl+Tab for your group.
   TAB = "TARGETNEARESTENEMY",
   ["SHIFT-TAB"] = "TARGETPREVIOUSENEMY",
-  ["CTRL-TAB"] = "CLICK PadKeysGroupCycle:LeftButton",
-  ["CTRL-SHIFT-TAB"] = "CLICK PadKeysGroupCycle:RightButton",
-  -- Hold for Blizzard's gamepad main-menu radial; point with the mouse,
-  -- release to open. Q/E or the mouse wheel switch between its 3 pages.
-  Z = "PADKEYS_RADIAL",
   -- Hold for Blizzard's ping system: click a spot or unit to ping it, or
   -- drag for Blizzard's ping wheel.
   G = "TOGGLEPINGLISTENER",
   -- Sit / stand, as in WoW's defaults.
   X = "SITORSTAND",
-  -- Inspect your auras, in combat too: each press shows the next tooltip
-  -- (wrapping around); Escape closes the tooltip view. C replaces the
-  -- character window (it's on the radial's centre page).
-  C = "CLICK PadKeysAuraDebuff:LeftButton",
-  ["ALT-C"] = "CLICK PadKeysAuraBuff:LeftButton",
-  -- Move a cursor through open windows with the keyboard.
-  ["SHIFT-`"] = "PADKEYS_CURSOR",
   -- This key map (like Blizzard's Controller Map).
   F1 = "PADKEYS_KEYMAP",
 }
@@ -100,53 +87,13 @@ ns.config = {
   },
 
   bindings = bindings,
+}
 
-  cursor = {
-    -- Show each button's tooltip as the cursor reaches it. Set to false if
-    -- it causes "action blocked" errors.
-    tooltips = true,
-    -- While the cursor is active these keys drive it instead of moving you,
-    -- like the gamepad's "UI focus" mode.
-    keys = {
-      up = { "W", "UP" },
-      down = { "S", "DOWN" },
-      left = { "A", "LEFT" },
-      right = { "D", "RIGHT" },
-      click = { "SPACE", "ENTER" },          -- gamepad A
-      rightclick = { "SHIFT-SPACE" },        -- use item, sell to vendor
-      pickup = { "CTRL-SPACE" },             -- drag a spell or item
-      -- gamepad B: leave cursor mode. Escape is only taken over while the
-      -- cursor is on; otherwise it opens the game menu as usual.
-      back = { "ESCAPE", "BACKSPACE" },
-      -- Jump to the next / previous open window (gamepad "Next Frame").
-      next_window = { "TAB" },
-      previous_window = { "SHIFT-TAB" },
-    },
-    -- Start the cursor by itself when these windows open (talk to an NPC
-    -- with F, then pick an option with W/S and Space).
-    autoFrames = {
-      "GossipFrame", "QuestFrame", "MerchantFrame", "LootFrame",
-      "StaticPopup1",
-    },
-  },
-
-  -- Keys that cycle targets; friendly mode points them at friends.
-  target_mode = { next = "TAB", previous = "SHIFT-TAB" },
-
-  quest = {
-    -- While an NPC's gossip or quest window is open, the gamepad's A button:
-    -- click the entry under the cursor, or Accept / Continue / Complete.
-    -- Same key as Interact.
-    step = { "F" },
-  },
-
-  radial = {
-    -- Mouse distance (pixels) that counts as pushing the stick all the way.
-    reach = 120,
-    -- Page keys while the radial is open, like the gamepad shoulders.
-    page_keys = {
-      previous = { "Q", "MOUSEWHEELUP" },
-      next = { "E", "MOUSEWHEELDOWN" },
-    },
-  },
+-- Addons that add to the layout. Each loaded one adds its own keys to
+-- ns.config.bindings from its Config.lua; /padkeys status lists them.
+ns.modules = {
+  { addon = "PadKeys_Cursor", does = "UI cursor and NPC dialogs" },
+  { addon = "PadKeys_Auras", does = "Debuff and buff tooltips (C)" },
+  { addon = "PadKeys_Targeting", does = "Friendly/enemy toggle, group cycling" },
+  { addon = "PadKeys_Radial", does = "Blizzard's main-menu radial (Z)" },
 }
