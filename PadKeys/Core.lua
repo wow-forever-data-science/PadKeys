@@ -13,8 +13,8 @@ end
 
 local HELP = {
   "/padkeys preview - list the key changes /padkeys apply would make",
-  "/padkeys apply - set the key layout and settings from Config.lua",
-  "/padkeys restore - put back the keys and settings you had before",
+  "/padkeys apply - set the key layout from Config.lua",
+  "/padkeys restore - put back the keys you had before",
   "/padkeys cursor - toggle the keyboard UI cursor (PadKeys_Cursor)",
   "/padkeys map - show the key map",
   "/padkeys status - which PadKeys addons are loaded",

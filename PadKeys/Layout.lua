@@ -1,6 +1,8 @@
--- Key layout: preview, apply and restore the bindings and console variables
--- in Config.lua, plus the keys of the loaded PadKeys_* addons. The first apply saves what each key and setting was, so
--- restore can put it back. Binding changes are blocked in combat.
+-- Key layout: preview, apply and restore the bindings in Config.lua, plus
+-- the keys of the loaded PadKeys_* addons. The first apply saves what each
+-- key was, so restore can put it back. Binding changes are blocked in
+-- combat. Console variables (soft targeting and so on) are not set here:
+-- they are defaults in the wow-settings repository.
 
 local _, ns = ...
 
@@ -47,7 +49,6 @@ function ns.apply_layout()
     return
   end
   ns.db.keys = ns.db.keys or {}
-  ns.db.cvars = ns.db.cvars or {}
 
   for _, row in ipairs(planned_changes()) do
     if row.released then
@@ -62,13 +63,6 @@ function ns.apply_layout()
     end
   end
   SaveBindings(GetCurrentBindingSet())
-
-  for name, value in pairs(ns.config.cvars) do
-    if ns.db.cvars[name] == nil then
-      ns.db.cvars[name] = C_CVar.GetCVar(name) or ""
-    end
-    C_CVar.SetCVar(name, tostring(value))
-  end
   ns.say("layout applied. /padkeys restore undoes it.")
 end
 
@@ -89,12 +83,6 @@ function ns.restore_layout()
     end
   end
   SaveBindings(GetCurrentBindingSet())
-
-  for name, old in pairs(ns.db.cvars or {}) do
-    if old ~= "" then
-      C_CVar.SetCVar(name, old)
-    end
-  end
-  ns.db.keys, ns.db.cvars = nil, nil
-  ns.say("previous keys and settings restored.")
+  ns.db.keys = nil
+  ns.say("previous keys restored.")
 end

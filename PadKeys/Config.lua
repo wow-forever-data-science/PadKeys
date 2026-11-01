@@ -1,4 +1,6 @@
--- PadKeys base settings: the key layout and console variables. Each
+-- PadKeys base settings: the key layout. Console variables (soft
+-- targeting, key-down casting, auto loot) are defaults in the wow-settings
+-- repository, not set by this addon. Each
 -- PadKeys_* addon has its own Config.lua for its keys. Edit, then /reload
 -- and /padkeys apply. Key names are WoW binding strings:
 -- "Q", "SHIFT-1", "CTRL-SPACE", "`", "BACKSPACE", "UP". On a Mac, Cmd is
@@ -55,37 +57,6 @@ for i = 2, 5 do
 end
 
 ns.config = {
-  -- Console variables set by /padkeys apply (and undone by /padkeys restore).
-  cvars = {
-    -- Soft targeting: 0 off, 1 gamepad only, 2 keyboard/mouse only, 3 both.
-    -- Interact is Options > Controls "Enable Interact Key" (what makes F
-    -- work); Enemy is Options > Combat "Action Targeting".
-    SoftTargetInteract = 3,
-    SoftTargetEnemy = 3,
-    -- The rest are the values Blizzard's gamepad mode sets
-    -- (Blizzard_Gamepad/Core.lua, SetupCVarsForInputMode), so soft
-    -- targeting behaves as on the gamepad. Camera settings are left alone.
-    SoftTargetFriend = 0,
-    SoftTargetWithLocked = 1,
-    SoftTargetMatchLocked = 1,
-    SoftTargetForce = 0,
-    SoftTargetInteractRange = 20,  -- how far F reaches
-    SoftTargetInteractArc = 1,     -- cone in front of you that F checks
-    SoftTargetEnemyArc = 1,
-    SoftTargetFriendArc = 2,
-    SoftTargetIconInteract = 1,    -- icon over the NPC F will use
-    SoftTargetIconGameObject = 1,  -- icon over herbs, ore, chests, mail
-    SoftTargetIconEnemy = 0,
-    SoftTargetIconFriend = 0,
-    SoftTargetNameplateEnemy = 0,
-    SoftTargetNameplateInteract = 0,
-    SoftTargetNameplateSize = 20,
-    SoftTargetTooltipEnemy = 0,
-    SoftTargetTooltipFriend = 0,
-    ActionButtonUseKeyDown = 1,
-    autoLootDefault = 1,
-  },
-
   bindings = bindings,
 }
 

@@ -75,17 +75,22 @@ keyboard with each layer's keys. It's also published at
    its `PadKeys` folder first. (Without the release: download the
    repository as a ZIP and copy its `PadKeys` and `PadKeys_*` folders into
    `AddOns`.)
-2. At character select, enable **PadKeys** (tick **Load out of date
+2. With the game closed, apply your `wow-settings` (`./wow.sh apply
+   <flavor>`): it sets soft targeting (what makes F work), key-down
+   casting, auto loot and turns on Action Bars 2 and 3. New characters need
+   one more apply after their first login.
+3. At character select, enable **PadKeys** (tick **Load out of date
    AddOns** if it is listed as out of date). Enable the `PadKeys_*` addons
    too, or add them one at a time (see the checklist at the end).
-3. In game, type `/padkeys preview` to see which keys would change, then
+4. In game, type `/padkeys preview` to see which keys would change, then
    `/padkeys apply`. `/padkeys restore` puts your old keys back. **Run
    `/padkeys apply` again whenever you enable or disable a `PadKeys_*`
    addon**: it binds the keys of the loaded ones and gives back the keys of
    ones you turned off.
-4. Turn on **Action Bar 2** and **Action Bar 3** (Options or Edit Mode). The
-   Cmd and Shift layers fire those bars, so their buttons must exist.
-5. **On a Mac: turn on Options → Mac → "Disable OS shortcuts"** and allow
+5. Check that **Action Bar 2** and **Action Bar 3** are on (Options or
+   Edit Mode; `wow-settings` turns them on). The Cmd and Shift layers fire
+   those bars, so their buttons must exist.
+6. **On a Mac: turn on Options → Mac → "Disable OS shortcuts"** and allow
    WoW the macOS permission it asks for. Otherwise Cmd+Q (Action Bar 2,
    slot 5) **quits the game**, and other Cmd shortcuts go to macOS.
 
@@ -107,18 +112,21 @@ action buttons plus the shoulder buttons:
 Movement is W/S, with **A/D strafing** (turn with the mouse or the arrow
 keys). **F interacts** with whatever you face: loot, NPCs, herbs, ore.
 
-`/padkeys apply` also switches on soft targeting for keyboard
-(`SoftTargetInteract` and `SoftTargetEnemy` set to 3, which is Blizzard's
-"Enable Interact Key" and "Action Targeting" options), key-down casting and
-auto loot. It sets the rest of the soft-targeting settings to the values
-Blizzard's gamepad mode uses: F reaches 20 yards in a cone in front of you,
-and an icon shows over the NPC, herb, ore or chest it will use. Camera
-settings are left alone.
+F needs soft targeting on for keyboard. PadKeys sets only key bindings;
+the console settings live in the `wow-settings` repository
+(`settings/account/config-cache.wtf`, applied with `./wow.sh apply`):
+`SoftTargetInteract` and `SoftTargetEnemy` at 3 (Blizzard's "Enable
+Interact Key" and "Action Targeting" options), the other soft-targeting
+settings at the values Blizzard's gamepad mode uses (F reaches 20 yards in
+a cone in front of you, and an icon shows over the NPC, herb, ore or chest
+it will use), key-down casting and auto loot. Without `wow-settings`, tick
+Options → Controls → **Enable Interact Key** and Options → Combat →
+**Action Targeting**.
 
 What you lose from WoW's defaults:
 - Q/E strafe (now A/D) and R reply to whisper (type `/r`);
 - T attack (soft targeting starts attacks), Z sheathe, and C character
-  window (it's on the radial);
+  window (it's on the radial, and `wow-settings` binds it to Shift+C);
 - G target last hostile (now Cmd+F) and Ctrl+Tab nearest friend (now
   friendly mode);
 - F1–F5 targeting yourself and party members (F1 is now the key map);
@@ -277,9 +285,11 @@ is loaded.
    `.toc` file.
 2. **Layout**: `/padkeys apply`, then press 1–T on their own and with Cmd,
    Shift and Ctrl. Check that Cmd+Q casts instead of quitting (install
-   step 5). X sits.
+   step 6). X sits.
 3. **Interact and soft targeting**: an icon should show over the NPC, herb
-   or chest in front of you; press F. Tab / Shift+Tab cycle enemies,
+   or chest in front of you; press F. No icon and F does nothing: the
+   `wow-settings` apply didn't take (`/dump GetCVar("SoftTargetInteract")`
+   should print 3). Tab / Shift+Tab cycle enemies,
    Shift+F assists, Ctrl+F and Cmd+F go back to earlier targets.
 4. **Key map**: press F1 and check it matches what the keys do.
 5. **Pings** (in a group): hold G and click a mob, then drag for the wheel.
