@@ -40,16 +40,17 @@ keyboard with each layer's keys. It's also published at
 | \` | Friendly ↔ enemy targeting | Shift+F | Assist |
 | Tab / Shift+Tab | Next / previous target (in mode) | Ctrl+F | Last target |
 | Ctrl+Tab / Ctrl+Shift+Tab | Next / previous group member | Cmd+F | Last hostile target |
-| Z (hold) | Main-menu radial | X | Next debuff tooltip |
-| G (hold) | Pings | Option+X | Next buff tooltip |
-| Shift+\` | UI cursor | F1 | Key map |
+| Z (hold) | Main-menu radial | C | Next debuff tooltip |
+| G (hold) | Pings | Option+C | Next buff tooltip |
+| Shift+\` | UI cursor | X | Sit / stand |
+| F1 | Key map | | |
 
 | Context | Keys |
 |---|---|
 | UI cursor | WASD / arrows move · Space click · Shift+Space right-click · Ctrl+Space pick up · Tab / Shift+Tab next / previous window · Esc leave |
 | Radial | Q / E or mouse wheel: pages · release Z: open |
 | Quest window | F next step · Tab or Shift+F cycle rewards |
-| Aura tooltips | X / Option+X next · Esc close |
+| Aura tooltips | C / Option+C next · Esc close |
 
 ## Install
 
@@ -91,8 +92,8 @@ auto loot.
 
 What you lose from WoW's defaults:
 - Q/E strafe (now A/D) and R reply to whisper (type `/r`);
-- T attack (soft targeting starts attacks), Z sheathe and X sit (type
-  `/sit`);
+- T attack (soft targeting starts attacks), Z sheathe, and C character
+  window (it's on the radial);
 - G target last hostile (now Cmd+F) and Ctrl+Tab nearest friend (now
   friendly mode);
 - F1–F5 targeting yourself and party members (F1 is now the key map);
@@ -178,16 +179,16 @@ combat, so it switches off when combat starts.
 
 | Key | Does |
 |---|---|
-| X | Tooltip of your next debuff |
-| Option+X | Tooltip of your next buff |
+| C | Tooltip of your next debuff |
+| Option+C | Tooltip of your next buff |
 | Esc | Close the tooltip view |
 
 Each press moves to the next icon in Blizzard's debuff (or buff) row, in
 display order, wrapping around, and shows its tooltip at the icon exactly
-as if you hovered it. X and Option+X take over Esc through a secure snippet
+as if you hovered it. C and Option+C take over Esc through a secure snippet
 (the only way to change a key in combat), and Esc gives it back, so outside
 the tooltip view Esc opens the game menu as usual. If you had no debuffs
-when you pressed X, the next Esc only gives Esc back; press it again for
+when you pressed C, the next Esc only gives Esc back; press it again for
 the game menu.
 
 ## Smart interact (quests)
@@ -245,8 +246,8 @@ more fragile than the small versions here.
    release on a segment. Watch for Lua errors when it opens.
 6. **Cursor**: open the spellbook and bags, press Shift+\`, move with WASD,
    Tab between the windows, Space on a spell, Shift+Space on a bag item.
-7. **Aura tooltips in combat**: on a mob that debuffs you, press X a few
-   times, then Option+X, then Esc; Esc again should open the game menu.
+7. **Aura tooltips in combat**: on a mob that debuffs you, press C a few
+   times, then Option+C, then Esc; Esc again should open the game menu.
 8. **Buffs**: hold Z, left page, pick Buffs. The cursor should land on your
    buffs; cancel one with Shift+Space.
 9. **Quests**: talk to a quest giver with F and keep pressing F.

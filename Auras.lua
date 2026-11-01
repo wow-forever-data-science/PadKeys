@@ -1,11 +1,11 @@
--- Inspect your debuffs (X) and buffs (Alt+X) with keys, in combat too. Each
+-- Inspect your debuffs (C) and buffs (Alt+C) with keys, in combat too. Each
 -- press shows the tooltip of the next aura icon in Blizzard's DebuffFrame or
 -- BuffFrame, in display order and wrapping around, by calling the icon's own
 -- OnEnter (AuraButtonMixin), so it looks exactly like hovering it.
 --
 -- Escape closes the tooltip view. Override bindings can't be changed by
 -- addon code in combat, but a secure snippet reacting to a key press can:
--- the X/Alt+X buttons bind Escape (owned by a secure header) to a close
+-- the C/Alt+C buttons bind Escape (owned by a secure header) to a close
 -- button, and the close button clears it again. Outside the tooltip view,
 -- Escape works as usual.
 

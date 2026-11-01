@@ -56,6 +56,7 @@ local function sections()
       action_row("MOVEFORWARD"), action_row("MOVEBACKWARD"),
       action_row("STRAFELEFT"), action_row("STRAFERIGHT"),
       action_row("JUMP"), action_row("INTERACTTARGET"),
+      action_row("SITORSTAND"),
     } },
     { "Targeting" .. (friendly and " (friendly mode on)" or ""), {
       action_row("CLICK PadKeysTargetMode:LeftButton",

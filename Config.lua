@@ -44,10 +44,13 @@ local bindings = {
   -- Hold for Blizzard's ping system: click a spot or unit to ping it, or
   -- drag for Blizzard's ping wheel.
   G = "TOGGLEPINGLISTENER",
+  -- Sit / stand, as in WoW's defaults.
+  X = "SITORSTAND",
   -- Inspect your auras, in combat too: each press shows the next tooltip
-  -- (wrapping around); Escape closes the tooltip view.
-  X = "CLICK PadKeysAuraDebuff:LeftButton",
-  ["ALT-X"] = "CLICK PadKeysAuraBuff:LeftButton",
+  -- (wrapping around); Escape closes the tooltip view. C replaces the
+  -- character window (it's on the radial's centre page).
+  C = "CLICK PadKeysAuraDebuff:LeftButton",
+  ["ALT-C"] = "CLICK PadKeysAuraBuff:LeftButton",
   -- Move a cursor through open windows with the keyboard.
   ["SHIFT-`"] = "PADKEYS_CURSOR",
   -- This key map (like Blizzard's Controller Map).

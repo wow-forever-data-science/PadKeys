@@ -180,8 +180,8 @@ footer p { margin: 0; max-width: 75ch; }
           <h3>Aura tooltips</h3>
           <p>Works in combat.</p>
           <dl>
-            <dt>X</dt><dd>Next debuff</dd>
-            <dt>Option+X</dt><dd>Next buff</dd>
+            <dt>C</dt><dd>Next debuff</dd>
+            <dt>Option+C</dt><dd>Next buff</dd>
             <dt>Esc</dt><dd>Close the tooltip view</dd>
           </dl>
         </div>
@@ -225,7 +225,8 @@ const MAP = {
     D: { a: "Strafe", c: "move", long: "Strafe right" },
     space: { a: "Jump", c: "move", long: "Jump" },
     F: { a: "Interact", c: "act", long: "Interact; quest step in a quest window" },
-    X: { a: "Debuffs", c: "act", long: "Next debuff tooltip", combat: true },
+    X: { a: "Sit", c: "move", long: "Sit / stand" },
+    C: { a: "Debuffs", c: "act", long: "Next debuff tooltip", combat: true },
     Z: { a: "Radial", c: "menu", long: "Main-menu radial", hold: true },
     G: { a: "Ping", c: "menu", long: "Blizzard's ping system", hold: true },
     F1: { a: "Key map", c: "menu", long: "This key map, in game" },
@@ -243,7 +244,7 @@ const MAP = {
     F: { a: "Last target", c: "target", long: "Back to your previous target" },
   },
   opt: {
-    X: { a: "Buffs", c: "act", long: "Next buff tooltip", combat: true },
+    C: { a: "Buffs", c: "act", long: "Next buff tooltip", combat: true },
   },
   cmd: {
     ...bar("Action Bar 2", "Bar2"),
