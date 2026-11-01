@@ -88,13 +88,12 @@ local function sections()
       { "Pick up", config_keys(c.cursor.keys.pickup) },
       { "Next / previous window", config_keys(c.cursor.keys.next_window) ..
           " / " .. config_keys(c.cursor.keys.previous_window) },
-      { "Leave", config_keys(c.cursor.keys.back) },
+      { "Close window / leave", config_keys(c.cursor.keys.back) },
     } },
-    { "In the radial, quests and aura view", {
+    { "In the radial, NPC dialogs and aura view", {
       { "Radial pages", config_keys(c.radial.page_keys.previous) .. " / " ..
           config_keys(c.radial.page_keys.next) },
-      { "Quest: next step", config_keys(c.quest.step) },
-      { "Quest: cycle rewards", config_keys(c.quest.cycle) },
+      { "NPC dialog: choose / accept / complete", config_keys(c.quest.step) },
       { "Close aura view", key_text("ESCAPE") },
     } },
   }

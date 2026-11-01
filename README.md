@@ -12,7 +12,8 @@ without a gamepad, and adds its own code only where Blizzard's doesn't:
 - a **keyboard UI cursor** that moves through open windows, unit frames and
   your buffs;
 - **aura inspection**: step through your debuff and buff tooltips in combat;
-- a **smart interact** key that walks through quest dialogs;
+- **NPC dialogs** as on the gamepad: the cursor lands on the first option
+  and F takes it, accepts, continues or completes;
 - an in-game **key map** (F1), like Blizzard's Controller Map.
 
 It started in the wowforevR R package repository and moved here as a
@@ -36,7 +37,7 @@ keyboard with each layer's keys. It's also published at
 | 1 2 3 4 Q E R T | Action Bar 1 | W / S | Forward / back |
 | Cmd + those | Action Bar 2 | A / D | Strafe |
 | Shift + those | Action Bar 3 | Space | Jump |
-| Ctrl + those | Pet bar | F | Interact / quest step |
+| Ctrl + those | Pet bar | F | Interact / choose in NPC dialogs |
 | \` | Friendly ↔ enemy targeting | Shift+F | Assist |
 | Tab / Shift+Tab | Next / previous target (in mode) | Ctrl+F | Last target |
 | Ctrl+Tab / Ctrl+Shift+Tab | Next / previous group member | Cmd+F | Last hostile target |
@@ -49,7 +50,7 @@ keyboard with each layer's keys. It's also published at
 |---|---|
 | UI cursor | WASD / arrows move · Space click · Shift+Space right-click · Ctrl+Space pick up · Tab / Shift+Tab next / previous window · Esc leave |
 | Radial | Q / E or mouse wheel: pages · release Z: open |
-| Quest window | F next step · Tab or Shift+F cycle rewards |
+| NPC dialog | W / S move to an option or reward · F choose, accept, continue, complete · Esc close |
 | Aura tooltips | C / Option+C next · Esc close |
 
 ## Install
@@ -159,7 +160,7 @@ merchant or loot window or a popup opens.
 | Shift+Space | Right-click: use or sell an item, cancel a buff |
 | Ctrl+Space | Pick up a spell or item; move to an action bar slot and click to place it |
 | Tab / Shift+Tab | Jump to the next / previous open window (the gamepad's "Next Frame") |
-| Esc / Backspace | Leave the cursor. A second Esc closes windows or opens the game menu as usual. |
+| Esc / Backspace | Close the window the cursor is in (the gamepad's B). Where there's nothing to close (unit frames, auras, popups), leave the cursor. |
 
 While the cursor is on, these keys drive it instead of moving you, like the
 gamepad's UI focus mode. They're only taken over while it's on.
@@ -191,19 +192,25 @@ the tooltip view Esc opens the game menu as usual. If you had no debuffs
 when you pressed C, the next Esc only gives Esc back; press it again for
 the game menu.
 
-## Smart interact (quests)
+## NPC dialogs (gossip and quests)
 
-While a quest giver's window is open, each press of **F** does the next step:
+These work as in Forever's gamepad UI, with F as the gamepad's A button.
+Face an NPC and press **F** to talk. Then:
 
-1. In the gossip list: pick a quest you can turn in, else a new quest, else
-   the only chat option, else close.
-2. On a quest page: **Accept** → **Continue** → **Complete**, using
-   Blizzard's gamepad action.
-3. With several rewards, the first press selects one and shows its tooltip.
-   **Tab** or **Shift+F** cycles through them, and F takes the one shown.
-4. When nothing is left, F closes the window.
+1. When the window shows a list (gossip options and quests, several
+   quests, or quest rewards), the UI cursor lands on its **first entry**,
+   as Blizzard's gamepad code does. Move with **W / S**.
+2. **F** takes the entry under the cursor: a quest, or any option (vendor,
+   trainer, innkeeper, banker, flight master, directions). Space does the
+   same.
+3. On a quest page **F** is Blizzard's own gamepad action: **Accept** →
+   **Continue** → **Complete**. If you lack the quest items, F does nothing
+   and Esc leaves.
+4. With several rewards, move the cursor to one (its tooltip shows) and
+   press **F** to choose it; F again completes the quest.
+5. **Esc** closes the window.
 
-Each press does exactly one step; nothing is automated.
+Vendor, trainer, bank and similar windows are driven with the UI cursor.
 
 ## Key map (F1)
 
@@ -217,7 +224,7 @@ action names, so it always shows your real setup. Esc closes it.
 |---|---|---|
 | Menu radial | `GamepadRadial` (`Blizzard_Gamepad/UI/Radials`): art, pages, segments and actions | feeding it the mouse as the "stick", page keys and release |
 | Pings | the ping system (`TOGGLEPINGLISTENER`, `Blizzard_PingUI`) and its wheel | none, only the key |
-| Quest steps | `QuestFrame_GeneralProgressAction`, the gamepad's accept/continue/complete | gossip and greeting lists, and the reward choice |
+| NPC dialogs | `QuestFrame_GeneralProgressAction` (accept/continue/complete) and the gamepad's rules: cursor on the first entry, A clicks it, B closes | our cursor in place of SmartNavigation |
 | Key layout | Blizzard's binding actions | apply/restore of the bindings |
 | Targeting modes | Blizzard's friendly/enemy targeting bindings | a secure toggle that swaps them on Tab |
 | Aura tooltips | the aura icons' own tooltip code (`AuraButtonMixin:OnEnter`) | choosing which icon is next |
@@ -250,7 +257,9 @@ more fragile than the small versions here.
    times, then Option+C, then Esc; Esc again should open the game menu.
 8. **Buffs**: hold Z, left page, pick Buffs. The cursor should land on your
    buffs; cancel one with Shift+Space.
-9. **Quests**: talk to a quest giver with F and keep pressing F.
+9. **NPC dialogs**: talk to a quest giver with F and keep pressing F; pick a
+   reward with S and F. Talk to an innkeeper or banker, move to an option
+   with S and press F. Esc closes.
 10. **Targeting** (in a group, also in combat): Ctrl+Tab through the party,
     Ctrl+F back to the previous target, Shift+F to assist, \` then Tab for
     friends, \` again for enemies. Press Shift+\` and move over the raid
@@ -264,9 +273,9 @@ Known risks:
 - Tooltips while the cursor moves come from calling Blizzard's own OnEnter
   handlers. If that causes "action blocked" errors, set `tooltips = false`
   under `cursor` in `Config.lua`.
-- Tab is used by targeting, the cursor and quest rewards. If two of them
-  take Tab at the same moment (e.g. toggling friendly mode while the cursor
-  is on), the one that took it last wins.
+- Tab is used by targeting and the cursor. If both take Tab at the same
+  moment (e.g. toggling friendly mode while the cursor is on), the one that
+  took it last wins.
 - The cursor finds windows from `UIPanelWindows`, `UISpecialFrames` and a
   short list of names. A window it misses can be added to `EXTRA_ROOTS` in
   `Cursor.lua`.

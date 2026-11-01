@@ -154,7 +154,7 @@ footer p { margin: 0; max-width: 75ch; }
             <dt>Shift+Space</dt><dd>Right-click: use, sell, cancel buff</dd>
             <dt>Ctrl+Space</dt><dd>Pick up spell or item</dd>
             <dt>Tab / ⇧Tab</dt><dd>Next / previous window</dd>
-            <dt>Esc</dt><dd>Leave</dd>
+            <dt>Esc</dt><dd>Close the window (or leave)</dd>
           </dl>
         </div>
         <div class="card">
@@ -168,12 +168,12 @@ footer p { margin: 0; max-width: 75ch; }
           </dl>
         </div>
         <div class="card">
-          <h3>Quest giver</h3>
-          <p>Each press does one step.</p>
+          <h3>NPC dialog</h3>
+          <p>As on the gamepad: the cursor lands on the first entry.</p>
           <dl>
-            <dt>F</dt><dd>Turn in, accept, continue, complete, close</dd>
-            <dt>Tab</dt><dd>Cycle reward choices</dd>
-            <dt>Shift+F</dt><dd>Cycle reward choices</dd>
+            <dt>F</dt><dd>Choose the entry; accept, continue, complete</dd>
+            <dt>W / S</dt><dd>Move to an option or reward</dd>
+            <dt>Esc</dt><dd>Close</dd>
           </dl>
         </div>
         <div class="card">
@@ -224,7 +224,7 @@ const MAP = {
     A: { a: "Strafe", c: "move", long: "Strafe left" },
     D: { a: "Strafe", c: "move", long: "Strafe right" },
     space: { a: "Jump", c: "move", long: "Jump" },
-    F: { a: "Interact", c: "act", long: "Interact; quest step in a quest window" },
+    F: { a: "Interact", c: "act", long: "Interact; in an NPC dialog, choose / accept / complete" },
     X: { a: "Sit", c: "move", long: "Sit / stand" },
     C: { a: "Debuffs", c: "act", long: "Next debuff tooltip", combat: true },
     Z: { a: "Radial", c: "menu", long: "Main-menu radial", hold: true },

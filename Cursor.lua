@@ -1,6 +1,6 @@
 -- Keyboard UI cursor, modelled on Forever's gamepad "SmartNavigation": while
 -- it is active the movement keys move a highlight between the buttons of the
--- open windows and Space clicks the highlighted one.
+-- open windows, Space clicks the highlighted one and Esc closes its window.
 --
 -- Clicks go through a secure proxy button bound with an override binding,
 -- so they count as real key presses: spells in the spellbook can be cast and
@@ -286,7 +286,41 @@ nav_button("PadKeysNavDown", function() move("down") end)
 nav_button("PadKeysNavLeft", function() move("left") end)
 nav_button("PadKeysNavRight", function() move("right") end)
 nav_button("PadKeysNavPickup", pickup)
-nav_button("PadKeysNavBack", stop)
+
+-- The window's close button, found as Blizzard's gamepad "back" finds it
+-- (SmartNavigationMixin:AttemptClose): its CloseButton key, else a visible
+-- button named "...CloseButton".
+local function close_button(root)
+  local button = root.CloseButton
+  if button and button.IsVisible and button:IsVisible() then
+    return button
+  end
+  for frame, frame_root in pairs(root_of) do
+    local name = frame_root == root and frame:GetName()
+    if name and name:match("CloseButton") and frame:IsVisible() then
+      return frame
+    end
+  end
+end
+
+-- Gamepad B: close the window the cursor is in. With no close button (unit
+-- frames, auras, popups) it leaves the cursor instead.
+local function back()
+  if not active or InCombatLockdown() or not current then
+    stop()
+    return
+  end
+  candidates()
+  local root = root_of[current]
+  local button = root and close_button(root)
+  if button then
+    button:Click()
+    C_Timer.After(0.1, refresh)
+  else
+    stop()
+  end
+end
+nav_button("PadKeysNavBack", back)
 
 -- Jump to the first button of the next (delta 1) or previous (-1) window,
 -- like the gamepad's "Next Frame" in UI mode.
@@ -368,6 +402,33 @@ local function start(by_hand, root)
     end
   end
   select_button(first(#in_root > 0 and in_root or cands))
+end
+
+-- For the NPC dialogs (Quest.lua), like Blizzard's gamepad code calling
+-- SmartNavigation:SelectButton / GetCurrentButton.
+function ns.cursor_current()
+  return active and current or nil
+end
+
+-- Put the cursor on the first (top-left) button inside root, starting the
+-- cursor if it is off.
+function ns.cursor_focus_in(root)
+  if InCombatLockdown() or not (root and root:IsVisible()) then
+    return
+  end
+  if not active then
+    start(false, root)
+    return
+  end
+  local in_root = {}
+  for _, frame in ipairs(candidates()) do
+    if inside(frame, root) then
+      in_root[#in_root + 1] = frame
+    end
+  end
+  if #in_root > 0 then
+    select_button(first(in_root))
+  end
 end
 
 function ns.toggle_cursor()

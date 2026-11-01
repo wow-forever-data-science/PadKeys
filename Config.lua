@@ -112,11 +112,10 @@ ns.config = {
   target_mode = { next = "TAB", previous = "SHIFT-TAB" },
 
   quest = {
-    -- While a quest giver's window is open: take the next step (turn in,
-    -- accept, continue, complete, close). Same key as Interact.
+    -- While an NPC's gossip or quest window is open, the gamepad's A button:
+    -- click the entry under the cursor, or Accept / Continue / Complete.
+    -- Same key as Interact.
     step = { "F" },
-    -- Cycle through the reward choices on the turn-in page.
-    cycle = { "SHIFT-F", "TAB" },
   },
 
   radial = {
