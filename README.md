@@ -88,8 +88,12 @@ Movement is W/S, with **A/D strafing** (turn with the mouse or the arrow
 keys). **F interacts** with whatever you face: loot, NPCs, herbs, ore.
 
 `/padkeys apply` also switches on soft targeting for keyboard
-(`SoftTargetInteract` and `SoftTargetEnemy` set to 3), key-down casting and
-auto loot.
+(`SoftTargetInteract` and `SoftTargetEnemy` set to 3, which is Blizzard's
+"Enable Interact Key" and "Action Targeting" options), key-down casting and
+auto loot. It sets the rest of the soft-targeting settings to the values
+Blizzard's gamepad mode uses: F reaches 20 yards in a cone in front of you,
+and an icon shows over the NPC, herb, ore or chest it will use. Camera
+settings are left alone.
 
 What you lose from WoW's defaults:
 - Q/E strafe (now A/D) and R reply to whisper (type `/r`);
