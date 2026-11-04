@@ -190,7 +190,7 @@ footer p { margin: 0; max-width: 75ch; }
   </section>
 
   <footer>
-    <p>Gamepad equivalents: the eight action keys are the D-pad and face buttons; Command, Shift and Control are the skill-panel triggers; ` is Target Friendly / Target Hostile; Z is the Menu button; Shift+` is Change Focus Frame.</p>
+    <p>Gamepad equivalents: the eight action keys are the D-pad and face buttons; Command, Shift, Option and Control are the skill-panel triggers; ` is Target Friendly / Target Hostile; Z is the Menu button; Shift+` is Change Focus Frame.</p>
     <p>Before playing on a Mac, turn on Options → Mac → "Disable OS shortcuts", or Command+Q quits the game.</p>
   </footer>
 </div>
@@ -207,9 +207,10 @@ const ROWS = [
 ];
 
 const FACE = ["1","2","3","4","Q","E","R","T"];
-function bar(name, short) {
+// Bar slots for some of the face keys (default all eight), numbered from 1.
+function bar(name, short, keys = FACE) {
   const out = {};
-  FACE.forEach((k, i) => { out[k] = { a: `${short} ${i + 1}`, c: "bars", long: `${name}, slot ${i + 1}` }; });
+  keys.forEach((k, i) => { out[k] = { a: `${short} ${i + 1}`, c: "bars", bar: name, long: `${name}, slot ${i + 1}` }; });
   return out;
 }
 
@@ -239,11 +240,13 @@ const MAP = {
     F: { a: "Assist", c: "target", long: "Assist: your target's target" },
   },
   ctrl: {
-    ...bar("Pet bar", "Pet"),
+    ...bar("Pet bar", "Pet", ["1","2","3","4"]),
+    ...bar("Action Bar 4", "Bar4", ["Q","E","R","T"]),
     tab: { a: "Next group", c: "target", long: "Next party or raid member (with Shift: previous)", combat: true },
     F: { a: "Last target", c: "target", long: "Back to your previous target" },
   },
   opt: {
+    ...bar("Action Bar 5", "Bar5"),
     C: { a: "Buffs", c: "act", long: "Next buff tooltip", combat: true },
   },
   cmd: {
@@ -296,8 +299,9 @@ function render() {
   const list = document.getElementById("list");
   list.textContent = "";
   const rows = Object.entries(MAP[layer]);
-  // Group the eight bar keys into one line.
+  // Group each bar's keys into one line.
   const barKeys = rows.filter(([, v]) => v.c === "bars");
+  const bars = [...new Set(barKeys.map(([, v]) => v.bar))];
   const others = rows.filter(([, v]) => v.c !== "bars");
   const add = (keyText, info, text) => {
     const dt = document.createElement("dt");
@@ -313,8 +317,9 @@ function render() {
     }
     list.append(dt, dd);
   };
-  if (barKeys.length) {
-    add(MOD_LABEL[layer] + "1 2 3 4 Q E R T", barKeys[0][1], barKeys[0][1].long.replace(/, slot 1$/, ", slots 1–8"));
+  for (const name of bars) {
+    const keys = barKeys.filter(([, v]) => v.bar === name);
+    add(MOD_LABEL[layer] + keys.map(([k]) => k).join(" "), keys[0][1], `${name}, slots 1–${keys.length}`);
   }
   for (const [k, v] of others) add(MOD_LABEL[layer] + (k === "`" ? "`" : k[0].toUpperCase() + k.slice(1)), v, v.long);
 }

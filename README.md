@@ -49,8 +49,10 @@ keyboard with each layer's keys. It's also published at
 | 1 2 3 4 Q E R T | Action Bar 1 | W / S | Forward / back |
 | Cmd + those | Action Bar 2 | A / D | Strafe |
 | Shift + those | Action Bar 3 | Space | Jump |
-| Ctrl + those | Pet bar | F | Interact / choose in NPC dialogs |
-| \` | Friendly ↔ enemy targeting | Shift+F | Assist |
+| Option + those | Action Bar 5 (Mac only) | F | Interact / choose in NPC dialogs |
+| Ctrl + 1 2 3 4 | Pet bar, slots 1–4 | Shift+F | Assist |
+| Ctrl + Q E R T | Action Bar 4, slots 1–4 | | |
+| \` | Friendly ↔ enemy targeting | | |
 | Tab / Shift+Tab | Next / previous target (in mode) | Ctrl+F | Last target |
 | Ctrl+Tab / Ctrl+Shift+Tab | Next / previous group member | Cmd+F | Last hostile target |
 | Z (hold) | Main-menu radial | C | Next debuff tooltip |
@@ -77,7 +79,7 @@ keyboard with each layer's keys. It's also published at
    `AddOns`.)
 2. With the game closed, apply your `wow-settings` (`./wow.sh apply
    <flavor>`): it sets soft targeting (what makes F work), key-down
-   casting, auto loot and turns on Action Bars 2 and 3. New characters need
+   casting, auto loot and turns on Action Bars 2 to 5. New characters need
    one more apply after their first login.
 3. At character select, enable **PadKeys** (tick **Load out of date
    AddOns** if it is listed as out of date). Enable the `PadKeys_*` addons
@@ -87,9 +89,11 @@ keyboard with each layer's keys. It's also published at
    `/padkeys apply` again whenever you enable or disable a `PadKeys_*`
    addon**: it binds the keys of the loaded ones and gives back the keys of
    ones you turned off.
-5. Check that **Action Bar 2** and **Action Bar 3** are on (Options or
-   Edit Mode; `wow-settings` turns them on). The Cmd and Shift layers fire
-   those bars, so their buttons must exist.
+5. Check that **Action Bars 2, 3, 4 and 5** are on (Options or Edit Mode;
+   `wow-settings` turns them on). The Cmd, Shift, Ctrl and Option layers
+   fire those bars, so their buttons must exist. Only the first four
+   buttons of Bar 4 have keys, so you can shrink it to 4 buttons in Edit
+   Mode.
 6. **On a Mac: turn on Options → Mac → "Disable OS shortcuts"** and allow
    WoW the macOS permission it asks for. Otherwise Cmd+Q (Action Bar 2,
    slot 5) **quits the game**, and other Cmd shortcuts go to macOS.
@@ -98,16 +102,29 @@ Commands: `/padkeys preview`, `apply`, `restore`, `cursor`, `map`,
 `status` (which PadKeys addons are loaded).
 Each addon has its own `Config.lua` with its keys and settings: edit it,
 `/reload` and `/padkeys apply`. On Windows, set `MOD = "ALT-"` at the top
-of `PadKeys/Config.lua` to use Alt instead of Cmd.
+of `PadKeys/Config.lua` to use Alt instead of Cmd. Windows has no fifth
+modifier, so there's no Action Bar 5 layer there.
 
 ## Key layout
 
 Eight action keys, each with a layer per modifier, like the eight gamepad
 action buttons plus the shoulder buttons:
 
-| Keys | Plain | Cmd | Shift | Ctrl |
-|---|---|---|---|---|
-| 1 2 3 4 Q E R T | Action Bar 1, slots 1–8 | Action Bar 2, slots 1–8 | Action Bar 3, slots 1–8 | Pet bar, slots 1–8 |
+| Keys | Plain | Cmd | Shift | Option | Ctrl |
+|---|---|---|---|---|---|
+| 1 2 3 4 | Action Bar 1, slots 1–4 | Action Bar 2, slots 1–4 | Action Bar 3, slots 1–4 | Action Bar 5, slots 1–4 | Pet bar, slots 1–4 |
+| Q E R T | Action Bar 1, slots 5–8 | Action Bar 2, slots 5–8 | Action Bar 3, slots 5–8 | Action Bar 5, slots 5–8 | Action Bar 4, slots 1–4 |
+
+That's 36 slots for your own spells and items, and the pet on four fixed
+keys for every class. Pet bar buttons can be dragged around: put Attack,
+Follow and the pet abilities you press in slots 1–4, and leave Stay, the
+stance buttons and autocast abilities in slots 5–10 to click. (A priest's
+Mind Control also puts the controlled mob's spells on the pet bar.)
+
+**Option** is a fifth modifier that only a Mac has (WoW can't bind the
+Windows key, and Windows uses Alt where the Mac uses Cmd). It suits rank 1
+spells: put a buff on 1 and its rank 1 on Option+1, the same spot with one
+more key held.
 
 Movement is W/S, with **A/D strafing** (turn with the mouse or the arrow
 keys). **F interacts** with whatever you face: loot, NPCs, herbs, ore.
@@ -115,7 +132,7 @@ keys). **F interacts** with whatever you face: loot, NPCs, herbs, ore.
 The keys bound to Blizzard's own actions are in both places: PadKeys binds
 them, and `wow-settings` binds them too
 (`settings/account/bindings-cache.wtf`), so they work even with PadKeys
-disabled. That's the plain, Shift and Ctrl layers, F, Shift+F, Ctrl+F,
+disabled. That's the plain, Shift, Option and Ctrl layers, F, Shift+F, Ctrl+F,
 Cmd+F, Tab / Shift+Tab, A/D, X and G. Only PadKeys binds the Cmd layer
 (Cmd+Q quits the game until install step 6 is done), F2–F5 and the keys
 for PadKeys' own actions.
@@ -141,8 +158,11 @@ What you lose from WoW's defaults:
 - Shift+1–4 jumping to bar pages 1–4 (Shift+5/6, Shift+mouse wheel and
   the page arrows still page the main bar).
 
-The pet bar stays on Ctrl, as in the defaults, and Alt stays free for
-self-cast. Cmd is `META` in WoW's key names.
+The pet bar stays on Ctrl, as in the defaults. Option takes the place of
+WoW's "hold Alt to self-cast" key, so the self-cast key must be off:
+`wow-settings` turns it off, and without it set Options → Combat → **Self
+Cast Key** to None. Otherwise friendly spells on Bar 5 always land on you.
+Cmd is `META` and Option is `ALT` in WoW's key names.
 
 ## Targeting (works in combat)
 
@@ -293,7 +313,7 @@ is loaded.
    `/dump select(4, GetBuildInfo())` and update `## Interface:` in every
    `.toc` file.
 2. **Layout**: `/padkeys apply`, then press 1–T on their own and with Cmd,
-   Shift and Ctrl. Check that Cmd+Q casts instead of quitting (install
+   Shift, Option and Ctrl (Ctrl+1–4 is the pet bar, Ctrl+Q–T Bar 4). Check that Cmd+Q casts instead of quitting (install
    step 6). X sits.
 3. **Interact and soft targeting**: an icon should show over the NPC, herb
    or chest in front of you; press F. No icon and F does nothing: the

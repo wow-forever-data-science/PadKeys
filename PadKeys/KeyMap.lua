@@ -21,10 +21,10 @@ local function keys_for(action)
   return key_text(k1) .. (k2 and (", " .. key_text(k2)) or "")
 end
 
--- Live keys for slots 1-8 of a bar, e.g. "1 2 3 4 Q E R T".
-local function bar_keys(prefix)
+-- Live keys for slots 1-n of a bar (default 8), e.g. "1 2 3 4 Q E R T".
+local function bar_keys(prefix, n)
   local out = {}
-  for i = 1, 8 do
+  for i = 1, n or 8 do
     out[i] = key_text((GetBindingKey(prefix .. i)))
   end
   return table.concat(out, " ")
@@ -58,7 +58,9 @@ local function sections()
       { "Action Bar 1", bar_keys("ACTIONBUTTON") },
       { "Action Bar 2", bar_keys("MULTIACTIONBAR1BUTTON") },
       { "Action Bar 3", bar_keys("MULTIACTIONBAR2BUTTON") },
-      { "Pet bar", bar_keys("BONUSACTIONBUTTON") },
+      { "Action Bar 4 (slots 1-4)", bar_keys("MULTIACTIONBAR3BUTTON", 4) },
+      { "Action Bar 5", bar_keys("MULTIACTIONBAR4BUTTON") },
+      { "Pet bar (slots 1-4)", bar_keys("BONUSACTIONBUTTON", 4) },
     } },
     { "Moving and interacting", {
       action_row("MOVEFORWARD"), action_row("MOVEBACKWARD"),

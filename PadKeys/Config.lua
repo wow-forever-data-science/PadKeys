@@ -19,7 +19,21 @@ local LAYERS = {
   [""] = "ACTIONBUTTON",                -- main bar (Action Bar 1)
   [MOD] = "MULTIACTIONBAR1BUTTON",      -- Action Bar 2 (Cmd)
   ["SHIFT-"] = "MULTIACTIONBAR2BUTTON", -- Action Bar 3
-  ["CTRL-"] = "BONUSACTIONBUTTON",      -- pet bar
+}
+-- Option is a fifth modifier only a Mac has (on Windows, Alt is MOD): it
+-- fires Action Bar 5. WoW's "hold Alt to self-cast" must be off for this
+-- layer (wow-settings sets it to None).
+if MOD ~= "ALT-" then
+  LAYERS["ALT-"] = "MULTIACTIONBAR4BUTTON"
+end
+-- Ctrl is split: Ctrl+1-4 fire pet bar slots 1-4 on every class (drag
+-- Attack, Follow and the pet abilities you press into those slots), and
+-- Ctrl+Q E R T fire Action Bar 4, slots 1-4.
+local CTRL_KEYS = {
+  ["1"] = "BONUSACTIONBUTTON1", ["2"] = "BONUSACTIONBUTTON2",
+  ["3"] = "BONUSACTIONBUTTON3", ["4"] = "BONUSACTIONBUTTON4",
+  Q = "MULTIACTIONBAR3BUTTON1", E = "MULTIACTIONBAR3BUTTON2",
+  R = "MULTIACTIONBAR3BUTTON3", T = "MULTIACTIONBAR3BUTTON4",
 }
 
 local bindings = {
@@ -49,6 +63,9 @@ for prefix, command in pairs(LAYERS) do
   for i, key in ipairs(FACE_KEYS) do
     bindings[prefix .. key] = command .. i
   end
+end
+for key, command in pairs(CTRL_KEYS) do
+  bindings["CTRL-" .. key] = command
 end
 -- false unbinds a key: F2-F5 target party members by default (F1 is the
 -- key map).
