@@ -73,11 +73,14 @@ keyboard with each layer's keys. It's also published at
 ## Install
 
 1. Download **PadKeys.zip** from the repository's **Releases** page, release
-   "PadKeys (latest)". It's rebuilt every time the addon changes on `main`.
-   Unzip it into `<WoW install>/<Forever client folder>/Interface/AddOns/`,
-   so you end up with `Interface/AddOns/PadKeys/PadKeys.toc` and the
-   `PadKeys_*` folders next to it. If you installed an older PadKeys, delete
-   its `PadKeys` folder first. (Without the release: download the
+   "PadKeys (latest)". It's rebuilt every time the addon changes on `main`,
+   and every day with the newest stable **SpellActivationOverlay**, which
+   comes in the zip (see below). Unzip it into
+   `<WoW install>/<Forever client folder>/Interface/AddOns/`, so you end up
+   with `Interface/AddOns/PadKeys/PadKeys.toc` and the `PadKeys_*` and
+   `SpellActivationOverlay` folders next to it. To update, delete those
+   folders and unzip the new release the same way. If you installed an
+   older PadKeys, delete its `PadKeys` folder first. (Without the release: download the
    repository as a ZIP and copy its `PadKeys` and `PadKeys_*` folders into
    `AddOns`.)
 2. With the game closed, apply your `wow-settings` (`./wow.sh apply
@@ -87,6 +90,8 @@ keyboard with each layer's keys. It's also published at
 3. At character select, enable **PadKeys** (tick **Load out of date
    AddOns** if it is listed as out of date). Enable the `PadKeys_*` addons
    too, or add them one at a time (see the checklist at the end).
+   **SpellActivationOverlay** is optional: enable it if you want its proc
+   glows and effects, or leave it off.
 4. In game, type `/padkeys preview` to see which keys would change, then
    `/padkeys apply`. `/padkeys restore` puts your old keys back. **Run
    `/padkeys apply` again whenever you enable or disable a `PadKeys_*`
@@ -192,8 +197,14 @@ and a pulsing gold ring otherwise. Turn it off with `glow = false` in
 `PadKeys_Bar/Config.lua`. Pet buttons don't glow.
 
 SpellActivationOverlay is **optional**: PadKeys_Bar works without it, and
-Blizzard's own proc alerts still glow. Install it separately if you want
-its procs and custom events on the bar.
+Blizzard's own proc alerts still glow. It comes in `PadKeys.zip` for
+convenience: the release is rebuilt daily with its newest stable version
+(not alphas or betas), so reinstalling PadKeys also updates it. Enable or
+disable it at character select. It is ennvina's addon
+(<https://github.com/ennvina/spellactivationoverlay>, MIT licence, the
+licence file is in its folder), set up in its own options
+(`/sao`); bugs in it go to that project. The release notes name the
+version included.
 
 It reads your live key bindings, so it follows whatever you bind, and it
 only **shows** the actions: your keys still press Blizzard's buttons. That
@@ -447,6 +458,9 @@ ring that pings your target in combat without clicking. Blizzard has no ring
 for your own spells and items, so those need our code.
 
 ## Terms of service
+
+PadKeys.zip also carries SpellActivationOverlay unchanged, under its MIT
+licence; the rest of this section is about PadKeys.
 
 It only uses Blizzard's public UI API. Every key press does one thing, and
 nothing runs on its own, reads game memory or automates play. That's in
