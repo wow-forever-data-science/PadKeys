@@ -28,7 +28,7 @@ error points at one part:
 | **PadKeys_Auras** | Debuff (C) and buff (Option+C) tooltips | PadKeys |
 | **PadKeys_Targeting** | Friendly/enemy toggle (\`) and party/raid cycling (Ctrl+Tab) | PadKeys |
 | **PadKeys_Radial** | Blizzard's main-menu radial (hold Z) | PadKeys |
-| **PadKeys_Bar** | One bar that shows the layer you hold (Cmd, Shift, Option, Ctrl) | PadKeys |
+| **PadKeys_Bar** | One bar that shows the layer you hold (Cmd, Shift, Option, Ctrl) | PadKeys (SpellActivationOverlay optional, for its proc glows) |
 
 It started in the wowforevR R package repository and moved here as a
 standalone addon; the history came along.
@@ -190,6 +190,10 @@ Those addons keep lighting up Blizzard's buttons while their bars are
 hidden; the bar copies the glow, with LibButtonGlow's look when it's loaded
 and a pulsing gold ring otherwise. Turn it off with `glow = false` in
 `PadKeys_Bar/Config.lua`. Pet buttons don't glow.
+
+SpellActivationOverlay is **optional**: PadKeys_Bar works without it, and
+Blizzard's own proc alerts still glow. Install it separately if you want
+its procs and custom events on the bar.
 
 It reads your live key bindings, so it follows whatever you bind, and it
 only **shows** the actions: your keys still press Blizzard's buttons. That
@@ -408,7 +412,8 @@ is loaded.
 13. **Hidden bars**: hide all of Blizzard's bars in Edit Mode, then press
     keys on every layer: they should still cast. Drag a spell from the
     spellbook: the hidden bars should appear until you drop it.
-14. **Proc glow** (with SpellActivationOverlay): trigger a proc it tracks
+14. **Proc glow** (optional, only if you installed SpellActivationOverlay;
+    skip it otherwise): trigger a proc it tracks
     for a spell on Bar 2, hold Cmd: that button should glow on the bar.
 
 Known risks:
