@@ -17,4 +17,7 @@ ns.config.bar = {
   show_layer = true,
   -- Name of the macro on each button, as on Blizzard's bars.
   show_macro_names = true,
+  -- Light up a button when the Blizzard button behind it glows: procs from
+  -- SpellActivationOverlay or other glow addons, and Blizzard's own.
+  glow = true,
 }

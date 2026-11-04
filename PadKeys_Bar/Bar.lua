@@ -183,8 +183,67 @@ for i, key in ipairs(FACE_KEYS) do
   b.name:SetPoint("BOTTOMRIGHT", -2, 2)
   b.name:SetHeight(10)
 
+  -- Fallback proc glow, for when no addon has loaded LibButtonGlow: a
+  -- pulsing gold ring.
+  b.glow = top:CreateTexture(nil, "OVERLAY")
+  b.glow:SetTexture("Interface\\Buttons\\UI-ActionButton-Border")
+  b.glow:SetBlendMode("ADD")
+  b.glow:SetVertexColor(1, 0.85, 0.2)
+  b.glow:SetPoint("CENTER")
+  b.glow:SetSize(c.size * 1.8, c.size * 1.8)
+  b.glow:Hide()
+  b.pulse = b.glow:CreateAnimationGroup()
+  b.pulse:SetLooping("BOUNCE")
+  local fade = b.pulse:CreateAnimation("Alpha")
+  fade:SetFromAlpha(1)
+  fade:SetToAlpha(0.3)
+  fade:SetDuration(0.5)
+
   b.key = key
   buttons[i] = b
+end
+
+-- Proc glow. SpellActivationOverlay (and other addons) light up Blizzard's
+-- buttons with LibButtonGlow (button.__LBGoverlay), and Blizzard's own proc
+-- alerts go through ActionButtonSpellAlertManager. Both work on buttons of
+-- hidden bars, so we copy the glow of the button a key presses. Our glow
+-- uses LibButtonGlow too when it's loaded, so it looks the same.
+local function source_glows(button)
+  if not button then
+    return false
+  end
+  local overlay = button.__LBGoverlay
+  if overlay and not (overlay.animOut and overlay.animOut:IsPlaying()) then
+    return true
+  end
+  local alerts = ActionButtonSpellAlertManager
+  if alerts and alerts.HasAlert and alerts:HasAlert(button) then
+    return true
+  end
+  return false
+end
+
+local function set_glow(b, on)
+  on = on and true or false
+  if b.glowing == on then
+    return
+  end
+  b.glowing = on
+  local lbg = LibStub and LibStub("LibButtonGlow-1.0", true)
+  if on and lbg then
+    lbg.ShowOverlayGlow(b)
+    b.lbg = lbg
+  elseif on then
+    b.glow:Show()
+    b.pulse:Play()
+  else
+    if b.lbg then
+      b.lbg.HideOverlayGlow(b)
+      b.lbg = nil
+    end
+    b.pulse:Stop()
+    b.glow:Hide()
+  end
 end
 
 local function set_border(b, r, g, bl)
@@ -212,6 +271,7 @@ local function clear(b)
   b.hotkey:SetTextColor(0.6, 0.6, 0.6)
   set_cooldown(b)
   set_border(b, 0, 0, 0)
+  set_glow(b, false)
 end
 
 local function show_action(b, action)
@@ -308,6 +368,7 @@ local function update()
       else
         set_border(b, 0, 0, 0)
       end
+      set_glow(b, c.glow and not src.pet and source_glows(src.button))
     end
   end
 end

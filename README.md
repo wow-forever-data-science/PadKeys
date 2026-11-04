@@ -182,6 +182,15 @@ key label when the target is out of range, a gold border while the action
 is active (casting, auto attack, a pet stance) and a white border while its
 key is down. Stance and form paging of Bar 1 carries over.
 
+**Proc glow:** when a Blizzard button lights up, the bar's button for that
+key lights up too, on whichever layer you hold. That covers
+**SpellActivationOverlay** and other addons that glow buttons with
+LibButtonGlow, including its custom events, and Blizzard's own proc alerts.
+Those addons keep lighting up Blizzard's buttons while their bars are
+hidden; the bar copies the glow, with LibButtonGlow's look when it's loaded
+and a pulsing gold ring otherwise. Turn it off with `glow = false` in
+`PadKeys_Bar/Config.lua`. Pet buttons don't glow.
+
 It reads your live key bindings, so it follows whatever you bind, and it
 only **shows** the actions: your keys still press Blizzard's buttons. That
 lets you hide Blizzard's bars:
@@ -333,7 +342,7 @@ action names, so it always shows your real setup. Esc closes it.
 | Key map | `ButtonFrameTemplate` window, `GetBindingText` key names, `BINDING_NAME_*` action names | the list of sections |
 | Group cycling | none: Blizzard's party/raid targeting only runs in gamepad mode | a secure button |
 | UI cursor | none: Blizzard's SmartNavigation only runs in gamepad mode | our own cursor |
-| One bar | the action API (`C_ActionBar`), the buttons' own `action` and pressed state, Edit Mode's "Hidden" bars | choosing which button each key presses with the held modifiers, and drawing it |
+| One bar | the action API (`C_ActionBar`), the buttons' own `action`, pressed state and proc glow (LibButtonGlow, `ActionButtonSpellAlertManager`), Edit Mode's "Hidden" bars | choosing which button each key presses with the held modifiers, and drawing it |
 
 Blizzard's menu cursor and group targeting depend on the gamepad frame
 manager, which only starts when the interface is in gamepad mode. Turning
@@ -399,8 +408,14 @@ is loaded.
 13. **Hidden bars**: hide all of Blizzard's bars in Edit Mode, then press
     keys on every layer: they should still cast. Drag a spell from the
     spellbook: the hidden bars should appear until you drop it.
+14. **Proc glow** (with SpellActivationOverlay): trigger a proc it tracks
+    for a spell on Bar 2, hold Cmd: that button should glow on the bar.
 
 Known risks:
+- SpellActivationOverlay only lights up buttons that are shown. Edit Mode
+  hides the bar, not its buttons, so it should still light them up; if
+  procs never glow with the bars hidden, set the bars to "Always" to
+  check, and send what you see.
 - PadKeys_Bar checks range from Blizzard's range events. If the key label
   never turns red out of range, the hidden bars may have stopped range
   checks; send what you see.
