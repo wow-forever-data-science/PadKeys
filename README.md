@@ -14,9 +14,11 @@ without a gamepad, and adds its own code only where Blizzard's doesn't:
 - **aura inspection**: step through your debuff and buff tooltips in combat;
 - **NPC dialogs** as on the gamepad: the cursor lands on the first option
   and F takes it, accepts, continues or completes;
-- an in-game **key map** (F1), like Blizzard's Controller Map.
+- an in-game **key map** (F1), like Blizzard's Controller Map;
+- **one action bar** that shows the layer you hold, like a gamepad's
+  skill panel, so Blizzard's bars can be hidden.
 
-It comes as five addons, so you can switch them on one at a time and an
+It comes as six addons, so you can switch them on one at a time and an
 error points at one part:
 
 | Addon | What it adds | Needs |
@@ -26,6 +28,7 @@ error points at one part:
 | **PadKeys_Auras** | Debuff (C) and buff (Option+C) tooltips | PadKeys |
 | **PadKeys_Targeting** | Friendly/enemy toggle (\`) and party/raid cycling (Ctrl+Tab) | PadKeys |
 | **PadKeys_Radial** | Blizzard's main-menu radial (hold Z) | PadKeys |
+| **PadKeys_Bar** | One bar that shows the layer you hold (Cmd, Shift, Option, Ctrl) | PadKeys |
 
 It started in the wowforevR R package repository and moved here as a
 standalone addon; the history came along.
@@ -98,7 +101,7 @@ keyboard with each layer's keys. It's also published at
    WoW the macOS permission it asks for. Otherwise Cmd+Q (Action Bar 2,
    slot 5) **quits the game**, and other Cmd shortcuts go to macOS.
 
-Commands: `/padkeys preview`, `apply`, `restore`, `cursor`, `map`,
+Commands: `/padkeys preview`, `apply`, `restore`, `cursor`, `map`, `bar`,
 `status` (which PadKeys addons are loaded).
 Each addon has its own `Config.lua` with its keys and settings: edit it,
 `/reload` and `/padkeys apply`. On Windows, set `MOD = "ALT-"` at the top
@@ -163,6 +166,43 @@ WoW's "hold Alt to self-cast" key, so the self-cast key must be off:
 `wow-settings` turns it off, and without it set Options → Combat → **Self
 Cast Key** to None. Otherwise friendly spells on Bar 5 always land on you.
 Cmd is `META` and Option is `ALT` in WoW's key names.
+
+## One bar for every layer (PadKeys_Bar)
+
+A single row of eight buttons, without art, that shows what 1 2 3 4 Q E R T
+do **with the modifiers you hold right now**: Bar 1 with none, Bar 2 while
+you hold Cmd, Bar 3 with Shift, Bar 5 with Option, and the pet bar plus
+Bar 4 with Ctrl. Like a gamepad's skill panel, the bar changes the moment
+you press or let go of a modifier, in combat too. The layer name ("Cmd")
+shows above it while a modifier is held.
+
+Each button shows the icon, cooldown, charges or item count, macro name,
+a dim icon when the spell can't be used now (blue: not enough mana), a red
+key label when the target is out of range, a gold border while the action
+is active (casting, auto attack, a pet stance) and a white border while its
+key is down. Stance and form paging of Bar 1 carries over.
+
+It reads your live key bindings, so it follows whatever you bind, and it
+only **shows** the actions: your keys still press Blizzard's buttons. That
+lets you hide Blizzard's bars:
+
+1. Enable PadKeys_Bar, `/reload`.
+2. Open **Edit Mode** and set **Bar Visible: Hidden** on every action bar
+   and the pet bar. The keys keep working: Blizzard's key handlers press
+   hidden buttons just the same.
+3. To put a spell on a bar, drag it out of the spellbook: Blizzard shows
+   the hidden bars while you drag. Drop it on the bar and slot the key
+   should fire (for example Bar 2, slot 5 for Cmd+Q).
+4. Log out and `./wow.sh snapshot <flavor>` in `wow-settings`, so every
+   character gets the same Edit Mode layout.
+
+`/padkeys bar` unlocks the bar so you can drag it; `/padkeys bar` again
+locks it, and the spot is saved. `/padkeys bar reset` goes back to the
+position in `PadKeys_Bar/Config.lua`, which also has the button size,
+spacing, scale, and switches for the layer name and macro names.
+
+You can't click it with the mouse: it is a display, so it can't be blocked
+in combat. Its tooltips and right-click menus are on Blizzard's bars.
 
 ## Targeting (works in combat)
 
@@ -293,6 +333,7 @@ action names, so it always shows your real setup. Esc closes it.
 | Key map | `ButtonFrameTemplate` window, `GetBindingText` key names, `BINDING_NAME_*` action names | the list of sections |
 | Group cycling | none: Blizzard's party/raid targeting only runs in gamepad mode | a secure button |
 | UI cursor | none: Blizzard's SmartNavigation only runs in gamepad mode | our own cursor |
+| One bar | the action API (`C_ActionBar`), the buttons' own `action` and pressed state, Edit Mode's "Hidden" bars | choosing which button each key presses with the held modifiers, and drawing it |
 
 Blizzard's menu cursor and group targeting depend on the gamepad frame
 manager, which only starts when the interface is in gamepad mode. Turning
@@ -350,7 +391,19 @@ is loaded.
 11. **Buffs** (with PadKeys_Cursor on): hold Z, left page, pick Buffs. The
     cursor should land on your buffs; cancel one with Shift+Space.
 
+**Stage 6: + PadKeys_Bar**
+
+12. **Bar**: hold Cmd, Shift, Option and Ctrl in turn; the bar should show
+    Bars 2, 3 and 5, then the pet bar and Bar 4. Cast something with a
+    cooldown on each layer and watch the swipe. `/padkeys bar` and drag it.
+13. **Hidden bars**: hide all of Blizzard's bars in Edit Mode, then press
+    keys on every layer: they should still cast. Drag a spell from the
+    spellbook: the hidden bars should appear until you drop it.
+
 Known risks:
+- PadKeys_Bar checks range from Blizzard's range events. If the key label
+  never turns red out of range, the hidden bars may have stopped range
+  checks; send what you see.
 - The radial is Blizzard's gamepad frame running in keyboard mode. If it
   errors, its open/close steps call gamepad managers that may not be
   running; send the error and it can be fixed or worked around.

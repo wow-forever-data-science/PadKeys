@@ -75,6 +75,7 @@ end
 
 ns.config = {
   bindings = bindings,
+  face_keys = FACE_KEYS,
 }
 
 -- Addons that add to the layout. Each loaded one adds its own keys to
@@ -84,4 +85,5 @@ ns.modules = {
   { addon = "PadKeys_Auras", does = "Debuff and buff tooltips (C)" },
   { addon = "PadKeys_Targeting", does = "Friendly/enemy toggle, group cycling" },
   { addon = "PadKeys_Radial", does = "Blizzard's main-menu radial (Z)" },
+  { addon = "PadKeys_Bar", does = "One bar that shows the layer you hold" },
 }

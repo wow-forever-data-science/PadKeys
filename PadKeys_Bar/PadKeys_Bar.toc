@@ -1,0 +1,9 @@
+## Interface: 11507, 16001
+## Title: PadKeys - Bar
+## Notes: One bar that shows the layer you hold (Cmd, Shift, Option, Ctrl), so you can hide Blizzard's bars. Needs PadKeys.
+## Author: wow-forever-data-science
+## Version: 0.2.0
+## Dependencies: PadKeys
+
+Config.lua
+Bar.lua

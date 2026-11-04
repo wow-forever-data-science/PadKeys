@@ -17,6 +17,7 @@ local HELP = {
   "/padkeys restore - put back the keys you had before",
   "/padkeys cursor - toggle the keyboard UI cursor (PadKeys_Cursor)",
   "/padkeys map - show the key map",
+  "/padkeys bar - unlock / lock the bar to drag it; bar reset (PadKeys_Bar)",
   "/padkeys status - which PadKeys addons are loaded",
 }
 
@@ -35,7 +36,7 @@ end
 
 SLASH_PADKEYS1 = "/padkeys"
 SlashCmdList.PADKEYS = function(msg)
-  local cmd = strtrim(msg or ""):lower()
+  local cmd, arg = strtrim(msg or ""):lower():match("^(%S*)%s*(.-)$")
   if cmd == "preview" then
     ns.preview_layout()
   elseif cmd == "apply" then
@@ -47,6 +48,12 @@ SlashCmdList.PADKEYS = function(msg)
       ns.toggle_cursor()
     else
       ns.say("the cursor is in PadKeys_Cursor, which isn't loaded.")
+    end
+  elseif cmd == "bar" then
+    if ns.toggle_bar_move then
+      ns.toggle_bar_move(arg)
+    else
+      ns.say("the bar is in PadKeys_Bar, which isn't loaded.")
     end
   elseif cmd == "status" then
     status()
