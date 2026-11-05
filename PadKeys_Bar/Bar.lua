@@ -252,15 +252,15 @@ local function set_border(b, r, g, bl)
   end
 end
 
-local function set_cooldown(b, start, duration, mod_rate)
-  if start and duration and duration > 0 then
-    if b.cd_start ~= start or b.cd_duration ~= duration then
-      b.cooldown:SetCooldown(start, duration, mod_rate or 1)
-      b.cd_start, b.cd_duration = start, duration
-    end
-  elseif b.cd_start then
+-- Cooldown numbers are secret values in combat: our code may hand them to
+-- the cooldown widget but not compare them (that errors). So, as in
+-- Blizzard's ActionButton_ApplyCooldown, a plain flag decides whether to
+-- show one, and the numbers go straight to SetCooldown.
+local function set_cooldown(b, show, start, duration, mod_rate)
+  if show then
+    b.cooldown:SetCooldown(start, duration, mod_rate or 1)
+  else
     b.cooldown:Clear()
-    b.cd_start, b.cd_duration = nil, nil
   end
 end
 
@@ -269,7 +269,7 @@ local function clear(b)
   b.count:SetText("")
   b.name:SetText("")
   b.hotkey:SetTextColor(0.6, 0.6, 0.6)
-  set_cooldown(b)
+  set_cooldown(b, false)
   set_border(b, 0, 0, 0)
   set_glow(b, false)
 end
@@ -294,13 +294,13 @@ local function show_action(b, action)
 
   local cd = ab.GetActionCooldown(action)
   local charges = ab.GetActionCharges and ab.GetActionCharges(action)
-  if cd and cd.duration and cd.duration > 0 and cd.isEnabled ~= false then
-    set_cooldown(b, cd.startTime, cd.duration, cd.modRate)
+  if cd and cd.isActive then
+    set_cooldown(b, true, cd.startTime, cd.duration, cd.modRate)
   elseif charges and charges.isActive then
-    set_cooldown(b, charges.cooldownStartTime, charges.cooldownDuration,
+    set_cooldown(b, true, charges.cooldownStartTime, charges.cooldownDuration,
                  charges.chargeModRate)
   else
-    set_cooldown(b)
+    set_cooldown(b, false)
   end
 
   b.count:SetText(ab.GetActionDisplayCount and
@@ -325,12 +325,10 @@ local function show_pet(b, slot)
   else
     b.icon:SetVertexColor(0.4, 0.4, 0.4)
   end
-  local start, duration, enable = GetPetActionCooldown(slot)
-  if enable and enable ~= 0 then
-    set_cooldown(b, start, duration)
-  else
-    set_cooldown(b)
-  end
+  -- The pet API has no plain flag; a duration of 0 shows no swipe, so the
+  -- numbers go to the widget unchecked.
+  local start, duration = GetPetActionCooldown(slot)
+  set_cooldown(b, type(start) == "number", start, duration)
   b.count:SetText("")
   b.name:SetText("")
   return is_active, checks_range and not in_range
