@@ -102,6 +102,7 @@ local function sections()
   menu_rows[#menu_rows + 1] = action_row("TOGGLESHEATH")
   if c.cursor then
     menu_rows[#menu_rows + 1] = action_row("PADKEYS_CURSOR")
+    menu_rows[#menu_rows + 1] = action_row("CLICK PadKeysBags:LeftButton")
   end
   if loaded("PadKeys_Auras") then
     menu_rows[#menu_rows + 1] = action_row("CLICK PadKeysAura:mydebuffs")
