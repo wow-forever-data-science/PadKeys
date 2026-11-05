@@ -340,7 +340,10 @@ combat, so it switches off when combat starts.
 Like hovering: the tooltip shows while you hold the key and goes away when
 you let go. Each press shows the next aura of that group, wrapping around, in
 Blizzard's aura tooltip (what hovering the aura shows), with a line such as
-"Target debuff 2/5". Another key starts its group at the first aura. The
+"Target debuff 2/5". Another key starts its group at the first aura.
+The shortest time left comes first (strong effects are usually short),
+auras without a duration last, and after 3 seconds without a press the next
+press starts at the first again; both are in `PadKeys_Auras/Config.lua`. The
 auras are read from the unit, not from the icons, so it works the same for
 you and your target. Esc is left alone.
 

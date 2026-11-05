@@ -12,3 +12,12 @@ b.C = "CLICK PadKeysAura:mydebuffs"
 b["CTRL-C"] = "CLICK PadKeysAura:mybuffs"
 b["ALT-C"] = "CLICK PadKeysAura:targetdebuffs"
 b[ns.config.mod .. "C"] = "CLICK PadKeysAura:targetbuffs"
+
+ns.config.auras = {
+  -- Shortest time left first, auras without a duration last. false keeps
+  -- Blizzard's order (roughly the order they were applied).
+  shortest_first = true,
+  -- Seconds without a press before the next press starts at the first
+  -- aura again.
+  reset_after = 3,
+}
