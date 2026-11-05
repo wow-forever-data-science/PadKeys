@@ -1,6 +1,6 @@
 ## Interface: 11507, 16001
 ## Title: PadKeys - Auras
-## Notes: Aura tooltips, in combat too: your debuffs (C) and buffs (Ctrl+C), target debuffs (Option+C) and buffs (Cmd+C). Needs PadKeys.
+## Notes: Aura tooltips, in combat too: target debuffs (C) and buffs (Cmd+C), your debuffs (Shift+C) and buffs (Ctrl+C). Needs PadKeys.
 ## Author: wow-forever-data-science
 ## Version: 0.3.0
 ## Dependencies: PadKeys

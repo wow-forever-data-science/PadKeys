@@ -180,10 +180,10 @@ footer p { margin: 0; max-width: 75ch; }
           <h3>Aura tooltips</h3>
           <p>Shows at the aura, fades after a few seconds. Works in combat.</p>
           <dl>
-            <dt>C</dt><dd>Your next debuff</dd>
-            <dt>Ctrl+C</dt><dd>Your next buff</dd>
-            <dt>Option+C</dt><dd>Target's next debuff</dd>
+            <dt>C</dt><dd>Target's next debuff</dd>
             <dt>Cmd+C</dt><dd>Target's next buff</dd>
+            <dt>Shift+C</dt><dd>Your next debuff</dd>
+            <dt>Ctrl+C</dt><dd>Your next buff</dd>
           </dl>
         </div>
       </div>
@@ -229,7 +229,7 @@ const MAP = {
     F: { a: "Interact", c: "act", long: "Interact; in an NPC dialog, choose / accept / complete" },
     X: { a: "Sit", c: "move", long: "Sit / stand" },
     B: { a: "Bags", c: "menu", long: "Bags, with the UI cursor inside" },
-    C: { a: "Debuffs", c: "act", long: "Your next debuff tooltip", combat: true },
+    C: { a: "Tgt debuffs", c: "act", long: "Target's next debuff tooltip", combat: true },
     Z: { a: "Sheathe", c: "move", long: "Sheathe / draw your weapon" },
     G: { a: "Actions", c: "menu", long: "Action radial: Action Bar 6, slots 1-8", hold: true, combat: true },
     F1: { a: "Key map", c: "menu", long: "This key map, in game" },
@@ -241,6 +241,7 @@ const MAP = {
     tab: { a: "Prev target", c: "target", long: "Previous enemy (friend in friendly mode)", combat: true },
     F: { a: "Assist", c: "target", long: "Assist: your target's target" },
     G: { a: "Markers", c: "menu", long: "Target marker radial", hold: true, combat: true },
+    C: { a: "Debuffs", c: "act", long: "Your next debuff tooltip", combat: true },
   },
   ctrl: {
     ...bar("Pet bar", "Pet", ["1","2","3","4"]),
@@ -252,7 +253,6 @@ const MAP = {
   },
   opt: {
     ...bar("Action Bar 5", "Bar5"),
-    C: { a: "Tgt debuffs", c: "act", long: "Target's next debuff tooltip", combat: true },
   },
   cmd: {
     ...bar("Action Bar 2", "Bar2"),

@@ -41,6 +41,10 @@ local MAX_AURAS = 40
 local shown_group, shown_place, shown_at, shown_owner
 -- Counts shows, so a fade timer only hides its own tooltip.
 local shows = 0
+-- The tooltip's owner, placed at the aura. Blizzard's aura icons refresh
+-- a tooltip they own every frame, which would undo the fade, so the icon
+-- is only the anchor.
+local tooltip_owner = CreateFrame("Frame", nil, UIParent)
 
 -- The unit's aura indexes in the order to show them, or nil when they
 -- can't be read: in combat auras are secret, and reading them errors.
@@ -92,26 +96,31 @@ local function find_icon(frame, index)
   end
 end
 
--- Where the tooltip goes: at your aura's icon, as Blizzard's hover puts
--- it, or under the target frame.
+-- Where the tooltip goes: at your aura's icon (below left, as Blizzard's
+-- hover puts it), or under the target frame.
 local function place_tooltip(group, index)
+  GameTooltip:SetOwner(tooltip_owner, "ANCHOR_NONE")
+  GameTooltip:ClearAllPoints()
   if group.unit == "player" then
     local found, icon = pcall(find_icon, _G[group.anchor], index)
     if found and icon then
-      GameTooltip:SetOwner(icon, "ANCHOR_BOTTOMLEFT")
-      return icon
+      GameTooltip:SetPoint("TOPRIGHT", icon, "BOTTOMLEFT")
+      return
     end
   end
-  local owner = _G[group.anchor] or UIParent
-  GameTooltip:SetOwner(owner, group.unit == "target" and "ANCHOR_BOTTOM" or "ANCHOR_BOTTOMLEFT")
-  return owner
+  local anchor = _G[group.anchor] or UIParent
+  if group.unit == "target" then
+    GameTooltip:SetPoint("TOP", anchor, "BOTTOM")
+  else
+    GameTooltip:SetPoint("TOPRIGHT", anchor, "BOTTOMLEFT")
+  end
 end
 
 -- Fill the tooltip with the aura at index; false if there is none there
 -- (or the tooltip may not show it). The tooltip reads the aura itself, so
 -- this also works in combat.
 local function fill_tooltip(group, index, label)
-  local owner = place_tooltip(group, index)
+  place_tooltip(group, index)
   local ok = pcall(GameTooltip.SetUnitAura, GameTooltip, group.unit, index, group.filter)
   if not (ok and GameTooltip:NumLines() > 0) then
     GameTooltip:Hide()
@@ -119,7 +128,7 @@ local function fill_tooltip(group, index, label)
   end
   GameTooltip:AddLine(label, 0.6, 0.6, 0.6)
   GameTooltip:Show()
-  shown_owner = owner
+  shown_owner = tooltip_owner
   return true
 end
 
