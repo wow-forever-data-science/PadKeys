@@ -1,7 +1,8 @@
 -- Inspect auras with keys, in combat too. One key per group (Config.lua):
 -- your debuffs, your buffs, your target's debuffs, your target's buffs.
--- Like hovering: the tooltip shows while the key is held and goes away on
--- release. Each press shows the next aura of that group, wrapping around,
+-- A press shows the tooltip at the aura, as hovering it would, and it fades
+-- after a few seconds (Config.lua). Each press shows the next aura of that
+-- group, wrapping around,
 -- in Blizzard's own aura tooltip (GameTooltip:SetUnitAura, what hovering
 -- an aura shows), with a line saying which one it is ("Target debuff 2/5").
 -- Out of combat the shortest time left comes first (the strong effects
@@ -12,8 +13,10 @@
 --
 -- It reads the auras from the unit, not from the aura icons, so it works
 -- the same for you and your target (Forever's target aura icons are
--- private frames). The key clicks a plain button: showing a tooltip
--- needs nothing secure.
+-- private frames). Your own auras' tooltips sit at their icon; the
+-- target's icons are forbidden frames, so its tooltips sit under the
+-- target frame. The key clicks a plain button: showing a tooltip needs
+-- nothing secure.
 
 local ns = PadKeys
 
@@ -33,9 +36,11 @@ local GROUPS = {
 
 local MAX_AURAS = 40
 
--- The last aura shown: its group, its place in the order and when. Kept
--- after release, so the next press of the same key steps on.
-local shown_group, shown_place, shown_at
+-- The last aura shown: its group, its place in the order, when, and the
+-- tooltip's owner. Kept after it fades, so the next press steps on.
+local shown_group, shown_place, shown_at, shown_owner
+-- Counts shows, so a fade timer only hides its own tooltip.
+local shows = 0
 
 -- The unit's aura indexes in the order to show them, or nil when they
 -- can't be read: in combat auras are secret, and reading them errors.
@@ -75,11 +80,38 @@ local function ordered_auras(unit, filter)
   return ok and sorted or list
 end
 
+-- Your aura's icon in BuffFrame / DebuffFrame (Blizzard's buttons keep
+-- the aura index in buttonInfo.index), or nil.
+local function find_icon(frame, index)
+  for _, icon in ipairs(frame and frame.auraFrames or {}) do
+    local info = icon.buttonInfo
+    if icon:IsShown() and info and icon.auraType ~= "TempEnchant"
+       and info.index == index then
+      return icon
+    end
+  end
+end
+
+-- Where the tooltip goes: at your aura's icon, as Blizzard's hover puts
+-- it, or under the target frame.
+local function place_tooltip(group, index)
+  if group.unit == "player" then
+    local found, icon = pcall(find_icon, _G[group.anchor], index)
+    if found and icon then
+      GameTooltip:SetOwner(icon, "ANCHOR_BOTTOMLEFT")
+      return icon
+    end
+  end
+  local owner = _G[group.anchor] or UIParent
+  GameTooltip:SetOwner(owner, group.unit == "target" and "ANCHOR_BOTTOM" or "ANCHOR_BOTTOMLEFT")
+  return owner
+end
+
 -- Fill the tooltip with the aura at index; false if there is none there
 -- (or the tooltip may not show it). The tooltip reads the aura itself, so
 -- this also works in combat.
 local function fill_tooltip(group, index, label)
-  GameTooltip:SetOwner(_G[group.anchor] or UIParent, "ANCHOR_BOTTOMLEFT")
+  local owner = place_tooltip(group, index)
   local ok = pcall(GameTooltip.SetUnitAura, GameTooltip, group.unit, index, group.filter)
   if not (ok and GameTooltip:NumLines() > 0) then
     GameTooltip:Hide()
@@ -87,18 +119,35 @@ local function fill_tooltip(group, index, label)
   end
   GameTooltip:AddLine(label, 0.6, 0.6, 0.6)
   GameTooltip:Show()
+  shown_owner = owner
   return true
 end
 
 local function hide()
-  if GameTooltip:GetOwner() == (shown_group and _G[GROUPS[shown_group].anchor]) then
+  if shown_owner and GameTooltip:GetOwner() == shown_owner then
     GameTooltip:Hide()
   end
 end
 
 local function close()
   hide()
-  shown_group, shown_place, shown_at = nil, nil, nil
+  shown_group, shown_place, shown_at, shown_owner = nil, nil, nil, nil
+end
+
+-- Fade the tooltip after show_for seconds, unless another press came.
+local function fade_later()
+  shows = shows + 1
+  local this_show = shows
+  C_Timer.After(ns.config.auras.show_for, function()
+    if this_show ~= shows or GameTooltip:GetOwner() ~= shown_owner then
+      return
+    end
+    if GameTooltip.FadeOut then
+      GameTooltip:FadeOut()
+    else
+      GameTooltip:Hide()
+    end
+  end)
 end
 
 -- The place shown, or nil if there was nothing to show.
@@ -149,6 +198,7 @@ local function show(group_name)
     return
   end
   shown_group, shown_place, shown_at = group_name, shown, now
+  fade_later()
 end
 
 -- A new target makes a target aura view stale.
@@ -160,13 +210,9 @@ events:SetScript("OnEvent", function()
   end
 end)
 
--- The click's button name is the group; key down shows, key up hides.
+-- The click's button name is the group.
 local button = CreateFrame("Button", "PadKeysAura", UIParent)
-button:RegisterForClicks("AnyDown", "AnyUp")
-button:SetScript("OnClick", function(_, group, down)
-  if down then
-    show(group)
-  else
-    hide()
-  end
+button:RegisterForClicks("AnyDown")
+button:SetScript("OnClick", function(_, group)
+  show(group)
 end)

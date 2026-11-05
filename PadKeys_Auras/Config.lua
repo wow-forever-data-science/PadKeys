@@ -2,8 +2,8 @@
 
 local ns = PadKeys
 
--- Inspect auras, in combat too: hold a key for the tooltip of the next aura
--- in that group (wrapping around), like hovering it. C
+-- Inspect auras, in combat too: a press shows the tooltip of the next aura
+-- in that group (wrapping around) at the aura, and it fades. C
 -- replaces the character window (it's on the menu radial, Ctrl+G). ALT is
 -- Option on a Mac; on Windows, where Cmd's layer is Alt, pick another key
 -- for target debuffs.
@@ -20,4 +20,6 @@ ns.config.auras = {
   -- Seconds without a press before the next press starts at the first
   -- aura again.
   reset_after = 3,
+  -- Seconds a tooltip stays before it fades.
+  show_for = 3,
 }

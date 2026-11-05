@@ -70,7 +70,7 @@ keyboard with each layer's keys. It's also published at
 | UI cursor | WASD / arrows move · Space click · Shift+Space right-click · Ctrl+Space pick up · Tab / Shift+Tab next / previous window · Esc leave |
 | Radials | point with the mouse · release G: run · Ctrl+G only: Q / E or mouse wheel page |
 | NPC dialog | W / S move to an option or reward · F choose, accept, continue, complete · Esc close |
-| Aura tooltips | hold C, Ctrl+C, Option+C, Cmd+C: next aura in that group, gone on release |
+| Aura tooltips | C, Ctrl+C, Option+C, Cmd+C: next aura in that group, fades after 3 s |
 
 ## Install
 
@@ -341,8 +341,10 @@ combat, so it switches off when combat starts.
 | Option+C | Your target's next debuff |
 | Cmd+C | Your target's next buff |
 
-Like hovering: the tooltip shows while you hold the key and goes away when
-you let go. Each press shows the next aura of that group, wrapping around, in
+A press shows the tooltip at the aura, as hovering it would, and it fades
+after 3 seconds. Your own auras' tooltips sit at their icon; your target's
+sit under the target frame (its icons are closed to addons). Each press
+shows the next aura of that group, wrapping around, in
 Blizzard's aura tooltip (what hovering the aura shows), with a line such as
 "Target debuff 2/5". Another key starts its group at the first aura.
 Out of combat the shortest time left comes first (strong effects are
@@ -451,7 +453,7 @@ is loaded.
 
 8. **Aura tooltips in combat**: on a mob that debuffs you, press C a few
    times, then Ctrl+C; target a mob with debuffs and press Option+C and
-   Cmd+C. Each tooltip should go away when you let go of the key.
+   Cmd+C. Your tooltips should sit at the aura icon and fade after 3 s.
 
 **Stage 4: + PadKeys_Targeting**
 
