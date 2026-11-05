@@ -65,6 +65,7 @@ function ns.create_wheel(name)
   local frame = CreateFrame("Frame", name, UIParent)
   frame:SetFrameStrata("DIALOG")
   frame:SetSize(WHEEL_SIZE, WHEEL_SIZE)
+  frame:SetClampedToScreen(true)
   frame:Hide()
   w.frame = frame
 
@@ -219,11 +220,16 @@ end
 function Wheel:open(title)
   local config = ns.config.radial
   local frame = self.frame
+  self.origin_x, self.origin_y = cursor()
+  -- On the mouse, the direction you point is the direction on screen.
   frame:ClearAllPoints()
-  frame:SetPoint("CENTER", UIParent, "CENTER", config.x, config.y)
+  if config.at_cursor then
+    frame:SetPoint("CENTER", UIParent, "BOTTOMLEFT", self.origin_x, self.origin_y)
+  else
+    frame:SetPoint("CENTER", UIParent, "CENTER", config.x, config.y)
+  end
   self.art:SetScale(config.scale)
   self.title:SetText(title)
-  self.origin_x, self.origin_y = cursor()
   self.current = nil
   self.highlight:Hide()
   self.label:SetText("")

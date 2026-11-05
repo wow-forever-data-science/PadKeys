@@ -252,9 +252,9 @@ next group member that exists.
 ## Radials (PadKeys_Radial)
 
 Hold **G** (with or without a modifier), point with the mouse, release G.
-The direction picks a segment as soon as the mouse leaves a small dead
-zone, and its name shows in the centre. The wheel is Blizzard's gamepad
-radial art at half size. The modifier you press with G picks the radial:
+The wheel opens centred on the mouse, the direction picks a segment as soon
+as the mouse leaves a small dead zone, and its name shows in the centre. The
+wheel is Blizzard's gamepad radial art at half size. The modifier you press with G picks the radial:
 
 | Key | Radial | In combat |
 |---|---|---|
