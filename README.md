@@ -26,7 +26,7 @@ error points at one part:
 |---|---|---|
 | **PadKeys** | Key layout (action bars, movement, F interact, X sit, G pings, targeting keys), soft targeting, F1 key map, `/padkeys` | — |
 | **PadKeys_Cursor** | UI cursor (windows, unit frames, buffs) and NPC dialogs (F = A, Esc = B) | PadKeys |
-| **PadKeys_Auras** | Debuff (C) and buff (Option+C) tooltips | PadKeys |
+| **PadKeys_Auras** | Aura tooltips: your debuffs (C) and buffs (Shift+C), target debuffs (Ctrl+C) and buffs (Cmd+C) | PadKeys |
 | **PadKeys_Targeting** | Friendly/enemy toggle (\`) and party/raid cycling (Ctrl+Tab) | PadKeys |
 | **PadKeys_Radial** | Radials: actions (G), pings (Cmd+G), markers (Shift+G), main menu (Ctrl+G) | PadKeys |
 | **PadKeys_Bar** | One bar that shows the layer you hold (Cmd, Shift, Option, Ctrl) | PadKeys (SpellActivationOverlay optional, for its proc glows) |
@@ -61,7 +61,7 @@ keyboard with each layer's keys. It's also published at
 | Tab / Shift+Tab | Next / previous target (in mode) | Ctrl+F | Last target |
 | Ctrl+Tab / Ctrl+Shift+Tab | Next / previous group member | Cmd+F | Last hostile target |
 | G (hold) | Action radial (Bar 6); with Cmd: pings, Shift: markers, Ctrl: main menu | C | Next debuff tooltip |
-| Z | Sheathe / draw weapon | Option+C | Next buff tooltip |
+| Z | Sheathe / draw weapon | Shift / Ctrl / Cmd+C | Your buff / target debuff / target buff |
 | Shift+\` | UI cursor | X | Sit / stand |
 | F1 | Key map | | |
 
@@ -70,7 +70,7 @@ keyboard with each layer's keys. It's also published at
 | UI cursor | WASD / arrows move · Space click · Shift+Space right-click · Ctrl+Space pick up · Tab / Shift+Tab next / previous window · Esc leave |
 | Radials | point with the mouse · release G: run · Ctrl+G only: Q / E or mouse wheel page, out of combat |
 | NPC dialog | W / S move to an option or reward · F choose, accept, continue, complete · Esc close |
-| Aura tooltips | C / Option+C next · Esc close |
+| Aura tooltips | C, Shift+C, Ctrl+C, Cmd+C next in that group · Esc close |
 
 ## Install
 
@@ -161,7 +161,8 @@ Options → Controls → **Enable Interact Key** and Options → Combat →
 What you lose from WoW's defaults:
 - Q/E strafe (now A/D) and R reply to whisper (type `/r`);
 - T attack (soft targeting starts attacks), Z sheathe, and C character
-  window (it's on the radial, and `wow-settings` binds it to Shift+C);
+  window (it's on the Ctrl+G menu radial; PadKeys_Auras takes Shift+C,
+  where `wow-settings` binds it);
 - G target last hostile (now Cmd+F) and Ctrl+Tab nearest friend (now
   friendly mode);
 - F1–F5 targeting yourself and party members (F1 is now the key map);
@@ -331,13 +332,17 @@ combat, so it switches off when combat starts.
 
 | Key | Does |
 |---|---|
-| C | Tooltip of your next debuff |
-| Option+C | Tooltip of your next buff |
+| C | Your next debuff |
+| Shift+C | Your next buff |
+| Ctrl+C | Your target's next debuff |
+| Cmd+C | Your target's next buff |
 | Esc | Close the tooltip view |
 
-Each press moves to the next icon in Blizzard's debuff (or buff) row, in
-display order, wrapping around, and shows its tooltip at the icon exactly
-as if you hovered it. C and Option+C take over Esc through a secure snippet
+Each press shows the next aura of that group, wrapping around, in
+Blizzard's aura tooltip (what hovering the aura shows), with a line such as
+"Target debuff 2/5". Another key starts its group at the first aura. The
+auras are read from the unit, not from the icons, so it works the same for
+you and your target. A new target closes a target aura tooltip. The keys take over Esc through a secure snippet
 (the only way to change a key in combat), and Esc gives it back, so outside
 the tooltip view Esc opens the game menu as usual. If you had no debuffs
 when you pressed C, the next Esc only gives Esc back; press it again for
@@ -439,7 +444,8 @@ is loaded.
 **Stage 3: + PadKeys_Auras**
 
 8. **Aura tooltips in combat**: on a mob that debuffs you, press C a few
-   times, then Option+C, then Esc; Esc again should open the game menu.
+   times, then Shift+C; target a mob with debuffs and press Ctrl+C and
+   Cmd+C; then Esc, and Esc again should open the game menu.
 
 **Stage 4: + PadKeys_Targeting**
 

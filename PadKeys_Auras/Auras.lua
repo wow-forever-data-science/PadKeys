@@ -1,66 +1,93 @@
--- Inspect your debuffs (C) and buffs (Alt+C) with keys, in combat too. Each
--- press shows the tooltip of the next aura icon in Blizzard's DebuffFrame or
--- BuffFrame, in display order and wrapping around, by calling the icon's own
--- OnEnter (AuraButtonMixin), so it looks exactly like hovering it.
+-- Inspect auras with keys, in combat too. One key per group (Config.lua):
+-- your debuffs, your buffs, your target's debuffs, your target's buffs.
+-- Each press shows the next aura of that group, wrapping around, in
+-- Blizzard's own aura tooltip (GameTooltip:SetUnitAura, what hovering an
+-- aura shows), with a line saying which one it is ("Target debuff 2/5").
+--
+-- It reads the auras from the unit, not from the aura icons, so it works
+-- the same for you and your target (Forever's target aura icons are
+-- private frames).
 --
 -- Escape closes the tooltip view. Override bindings can't be changed by
 -- addon code in combat, but a secure snippet reacting to a key press can:
--- the C/Alt+C buttons bind Escape (owned by a secure header) to a close
--- button, and the close button clears it again. Outside the tooltip view,
--- Escape works as usual.
+-- the aura key binds Escape (owned by a secure header) to a close button,
+-- and the close button clears it again. Outside the tooltip view, Escape
+-- works as usual.
 
 local ns = PadKeys
 
 BINDING_HEADER_PADKEYS_AURAS = "PadKeys: auras"
-_G["BINDING_NAME_CLICK PadKeysAuraDebuff:LeftButton"] = "Inspect next debuff"
-_G["BINDING_NAME_CLICK PadKeysAuraBuff:LeftButton"] = "Inspect next buff"
+_G["BINDING_NAME_CLICK PadKeysAura:mydebuffs"] = "Inspect your next debuff"
+_G["BINDING_NAME_CLICK PadKeysAura:mybuffs"] = "Inspect your next buff"
+_G["BINDING_NAME_CLICK PadKeysAura:targetdebuffs"] = "Inspect target's next debuff"
+_G["BINDING_NAME_CLICK PadKeysAura:targetbuffs"] = "Inspect target's next buff"
 
-local current = {}
+-- The click's button name is the group.
+local GROUPS = {
+  mydebuffs = { unit = "player", filter = "HARMFUL", name = "Your debuff", anchor = "DebuffFrame" },
+  mybuffs = { unit = "player", filter = "HELPFUL", name = "Your buff", anchor = "BuffFrame" },
+  targetdebuffs = { unit = "target", filter = "HARMFUL", name = "Target debuff", anchor = "TargetFrame" },
+  targetbuffs = { unit = "target", filter = "HELPFUL", name = "Target buff", anchor = "TargetFrame" },
+}
 
-local function shown_auras(frame)
-  local out = {}
-  for _, aura in ipairs(frame and frame.auraFrames or {}) do
-    if aura.hasValidInfo and aura:IsShown() then
-      out[#out + 1] = aura
-    end
-  end
-  return out
-end
+local MAX_AURAS = 40
 
-local function leave(frame)
-  local old = current[frame]
-  if old and old.OnLeave then
-    old:OnLeave()
-  end
-  current[frame] = nil
-  return old
-end
+-- What is showing: the group and the aura index in it.
+local shown_group, shown_index
 
-local function step(frame, other)
-  leave(other)
-  local old = leave(frame)
-  local auras = shown_auras(frame)
-  local n = #auras
-  if n == 0 then
-    UIErrorsFrame:AddMessage(frame == DebuffFrame and "No debuffs." or
-                               "No buffs.", 1, 0.82, 0)
-    return
+local function count_auras(unit, filter)
+  local n = 0
+  while n < MAX_AURAS and C_UnitAuras.GetAuraDataByIndex(unit, n + 1, filter) do
+    n = n + 1
   end
-  local pos = 0
-  for i, aura in ipairs(auras) do
-    if aura == old then
-      pos = i
-    end
-  end
-  pos = pos % n + 1
-  current[frame] = auras[pos]
-  auras[pos]:OnEnter()
+  return n
 end
 
 local function close()
-  leave(DebuffFrame)
-  leave(BuffFrame)
+  if shown_group then
+    GameTooltip:Hide()
+  end
+  shown_group, shown_index = nil, nil
 end
+
+local function show(group_name)
+  local group = GROUPS[group_name]
+  if not group then
+    return
+  end
+  if group.unit == "target" and not UnitExists("target") then
+    close()
+    UIErrorsFrame:AddMessage("No target.", 1, 0.82, 0)
+    return
+  end
+  local n = count_auras(group.unit, group.filter)
+  if n == 0 then
+    close()
+    UIErrorsFrame:AddMessage("No " .. group.name:lower() .. "s.", 1, 0.82, 0)
+    return
+  end
+  -- The same key steps on; another key starts its group at the first aura.
+  local index = 1
+  if shown_group == group_name and shown_index then
+    index = shown_index % n + 1
+  end
+  shown_group, shown_index = group_name, index
+
+  local anchor = _G[group.anchor] or UIParent
+  GameTooltip:SetOwner(anchor, "ANCHOR_BOTTOMLEFT")
+  GameTooltip:SetUnitAura(group.unit, index, group.filter)
+  GameTooltip:AddLine(format("%s %d/%d", group.name, index, n), 0.6, 0.6, 0.6)
+  GameTooltip:Show()
+end
+
+-- A new target makes a target aura view stale.
+local events = CreateFrame("Frame")
+events:RegisterEvent("PLAYER_TARGET_CHANGED")
+events:SetScript("OnEvent", function()
+  if shown_group and GROUPS[shown_group].unit == "target" then
+    close()
+  end
+end)
 
 local header = CreateFrame("Frame", "PadKeysAuraHeader", UIParent,
                            "SecureHandlerBaseTemplate")
@@ -78,8 +105,5 @@ end
 local CLAIM_ESCAPE = [[ owner:SetBindingClick(true, "ESCAPE", "PadKeysAuraClose") ]]
 local RELEASE_ESCAPE = [[ owner:ClearBindings() ]]
 
-key_button("PadKeysAuraDebuff", CLAIM_ESCAPE,
-           function() step(DebuffFrame, BuffFrame) end)
-key_button("PadKeysAuraBuff", CLAIM_ESCAPE,
-           function() step(BuffFrame, DebuffFrame) end)
+key_button("PadKeysAura", CLAIM_ESCAPE, function(_, group) show(group) end)
 key_button("PadKeysAuraClose", RELEASE_ESCAPE, close)
