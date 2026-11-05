@@ -115,6 +115,19 @@ local function set_macro(segment, macro)
   button:SetAttribute("*macrotext-" .. segment, macro)
 end
 
+-- The modifier that opened the menu (Ctrl) is still held while paging, so
+-- Q arrives as Ctrl+Q: bind each page key with every modifier too.
+local MODIFIERS = { "", "CTRL-", "SHIFT-", "ALT-", "META-" }
+local function with_modifiers(keys)
+  local out = {}
+  for _, key in ipairs(keys) do
+    for _, modifier in ipairs(MODIFIERS) do
+      out[#out + 1] = modifier .. key
+    end
+  end
+  return out
+end
+
 local function setup()
   local config = ring_config()
   local menu = ns.config.radial.menu
@@ -134,8 +147,8 @@ local function setup()
   end
   button:SetAttribute("menu-start", menu.start_page)
   button:SetAttribute("menu-pages", #menu.pages)
-  button:SetAttribute("menu-prev-keys", table.concat(menu.page_keys.previous, ","))
-  button:SetAttribute("menu-next-keys", table.concat(menu.page_keys.next, ","))
+  button:SetAttribute("menu-prev-keys", table.concat(with_modifiers(menu.page_keys.previous), ","))
+  button:SetAttribute("menu-next-keys", table.concat(with_modifiers(menu.page_keys.next), ","))
 end
 
 -- Wheel entries per page.

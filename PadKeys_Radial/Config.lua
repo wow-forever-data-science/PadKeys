@@ -14,7 +14,9 @@ b["CTRL-G"] = "CLICK PadKeysRing:menu"      -- Blizzard's main menu entries
 ns.config.radial = {
   -- Size against Blizzard's gamepad radial (1 = the same size).
   scale = 0.5,
-  -- Where the wheel's centre sits, from the screen centre.
+  -- Open centred on the mouse, so pointing at an icon picks it. false
+  -- opens at x, y from the screen centre.
+  at_cursor = true,
   x = 0,
   y = 0,
   -- Mouse distance before a direction picks a segment.
@@ -38,7 +40,8 @@ ns.config.radial = {
 
   -- The main-menu page (Menu.lua).
   menu = {
-    -- Page keys while it is open.
+    -- Page keys while it is open, also with a modifier held (Ctrl from
+    -- Ctrl+G).
     page_keys = {
       previous = { "Q", "MOUSEWHEELUP" },
       next = { "E", "MOUSEWHEELDOWN" },
