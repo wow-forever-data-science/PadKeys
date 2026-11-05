@@ -6,7 +6,8 @@
 -- * Vendor: the first F on an item marks it, the second buys one (the
 --   gamepad's A, MerchantFrame_SetupGamepad). On the Buyback tab the second
 --   F buys it back. Shift-Space still buys at once.
--- * Vendor: gear is repaired from your own money as the window opens.
+-- * Vendor: gear is repaired from your own money, and junk (grey items)
+--   is sold, as the window opens.
 -- * Trainer: the first F selects a skill and shows its cost, the second
 --   trains it (the gamepad's A, ClassTrainerFrameMixin:SetUpGamepad). The
 --   cursor then moves to the next skill you can learn.
@@ -101,6 +102,20 @@ local function repair()
   ns.say("repaired for " .. GetMoneyString(cost) .. ".")
 end
 
+-- What Blizzard's "Sell All Junk" does, without its confirmation.
+local function sell_junk()
+  local merchant = C_MerchantFrame
+  if not (ns.config.vendor.autoSellJunk and merchant and merchant.SellAllJunkItems) then
+    return
+  end
+  local count = merchant.GetNumJunkItems()
+  if count == 0 or not merchant.IsSellAllJunkEnabled() then
+    return
+  end
+  merchant.SellAllJunkItems()
+  ns.say(format("sold %d junk item%s.", count, count == 1 and "" or "s"))
+end
+
 -- After the cursor's own start on OnShow, as in Dialogs.lua.
 local function focus_later(func)
   C_Timer.After(0.1, func)
@@ -112,6 +127,7 @@ owner:RegisterEvent("ADDON_LOADED")
 owner:SetScript("OnEvent", function(_, event, addon)
   if event == "MERCHANT_SHOW" then
     repair()
+    sell_junk()
     focus_later(function() ns.cursor_select(MerchantItem1ItemButton) end)
   elseif addon == "Blizzard_TrainerUI" then
     ClassTrainerFrame:HookScript("OnShow", function()

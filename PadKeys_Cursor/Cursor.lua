@@ -638,19 +638,26 @@ owner:SetScript("OnUpdate", function(_, dt)
   end
 end)
 
--- The child of a window that autoFocus names ("CraftingPage.SearchBox"),
--- if it is shown.
+-- The child of a window that autoFocus names ("CraftingPage.SearchBox",
+-- or a list of paths: the first one shown), if it is shown.
 local function focus_child(name)
-  local path = (ns.config.cursor.autoFocus or {})[name]
-  local frame = path and _G[name]
-  for key in (path or ""):gmatch("[^.]+") do
-    frame = frame and frame[key]
+  local paths = (ns.config.cursor.autoFocus or {})[name]
+  if type(paths) ~= "table" then
+    paths = { paths }
   end
-  return frame and frame.IsVisible and frame:IsVisible() and frame or nil
+  for _, path in ipairs(paths) do
+    local frame = _G[name]
+    for key in path:gmatch("[^.]+") do
+      frame = frame and frame[key]
+    end
+    if frame and frame.IsVisible and frame:IsVisible() then
+      return frame
+    end
+  end
 end
 
--- Start the cursor when an autoFrames window opens, on its autoFocus child
--- if it has one. Some windows (professions) belong to Blizzard addons that
+-- Start the cursor when an autoFrames window opens, or move it there if
+-- it is on: to its autoFocus child, or its top-left button. Some windows (professions) belong to Blizzard addons that
 -- load later, so this runs again on every ADDON_LOADED.
 local hooked = {}
 local function hook_auto_frames()
@@ -664,7 +671,7 @@ local function hook_auto_frames()
           if child then
             ns.cursor_select(child)
           else
-            start(false)
+            ns.cursor_focus_in(frame)
           end
         end)
       end)

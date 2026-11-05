@@ -32,21 +32,31 @@ ns.config.cursor = {
   },
   -- Start the cursor by itself when these windows open (talk to an NPC
   -- with F, then pick an option with W/S and F or Space).
+  -- If the cursor is already on, it moves to the new window.
   autoFrames = {
     "GossipFrame", "QuestFrame", "MerchantFrame", "LootFrame",
-    "StaticPopup1", "ProfessionsFrame",
+    "StaticPopup1", "StaticPopup2", "StaticPopup3", "StaticPopup4",
+    "ProfessionsFrame",
   },
-  -- Where the cursor lands when one of those opens, as a path of child
-  -- keys; otherwise the top-left button. Space or F on a text field lets
-  -- you type in it; Escape or Enter goes back to moving.
+  -- Where the cursor lands when one of those opens: a path of child keys,
+  -- or a list of paths where the first one shown wins; otherwise the
+  -- top-left button. Space or F on a text field lets you type in it;
+  -- Escape or Enter goes back to moving. Popups land on their text field
+  -- (e.g. "type DELETE") or else on the accept button.
   autoFocus = {
     ProfessionsFrame = "CraftingPage.RecipeList.SearchBox",
+    StaticPopup1 = { "EditBox", "ButtonContainer.Button1" },
+    StaticPopup2 = { "EditBox", "ButtonContainer.Button1" },
+    StaticPopup3 = { "EditBox", "ButtonContainer.Button1" },
+    StaticPopup4 = { "EditBox", "ButtonContainer.Button1" },
   },
 }
 
 ns.config.vendor = {
   -- Repair all gear from your own money when a vendor window opens.
   autoRepair = true,
+  -- Sell junk (grey items) when a vendor window opens.
+  autoSellJunk = true,
 }
 
 ns.config.quest = {
