@@ -128,21 +128,24 @@ end
 
 -- An atlas name or a texture (file ID or path), sized and placed as
 -- Blizzard places each kind.
+-- Blizzard's sizes, times icon_scale.
 local function draw_icon(tex, index, icon)
+  local grow = ns.config.radial.icon_scale or 1
   local distance = TEXTURE_ICON_DISTANCE
   if type(icon) == "string" and C_Texture.GetAtlasInfo(icon) then
     local info = C_Texture.GetAtlasInfo(icon)
+    local size = ATLAS_ICON_SIZE * grow
     tex:SetAtlas(icon)
     if info.width > 0 and info.height > 0 then
-      local fit = math.min(ATLAS_ICON_SIZE / info.width, ATLAS_ICON_SIZE / info.height)
+      local fit = math.min(size / info.width, size / info.height)
       tex:SetSize(info.width * fit, info.height * fit)
     else
-      tex:SetSize(ATLAS_ICON_SIZE, ATLAS_ICON_SIZE)
+      tex:SetSize(size, size)
     end
     distance = ATLAS_ICON_DISTANCE
   else
     tex:SetTexture(icon or 134400)
-    tex:SetSize(TEXTURE_ICON_SIZE, TEXTURE_ICON_SIZE)
+    tex:SetSize(TEXTURE_ICON_SIZE * grow, TEXTURE_ICON_SIZE * grow)
   end
   tex:ClearAllPoints()
   tex:SetPoint("CENTER", polar(index, distance))
