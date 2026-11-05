@@ -7,7 +7,8 @@ addons. Only those folders go into the release zip (release.yaml).
 
 - Syntax, as CI runs it: `for f in PadKeys*/*.lua; do luac5.1 -p "$f"; done`
 - Lint: `luacheck .` (config in `.luacheckrc`)
-- If missing: `apt-get install -y lua5.1 luarocks && luarocks install luacheck`
+- Cloud sessions get both from `.claude/hooks/session-start.sh`. Elsewhere:
+  `apt-get install -y lua5.1 luarocks && luarocks install luacheck`
 
 There are no tests; changes can only be tried in the game client, so say
 what is untested.
