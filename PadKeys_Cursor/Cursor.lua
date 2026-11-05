@@ -42,27 +42,24 @@ local DIRECTIONS = {
 local owner = CreateFrame("Frame", "PadKeysCursorOwner", UIParent)
 local active, manual, current = false, false, nil
 
--- Highlight box drawn around the current button.
+-- Highlight drawn over the current button: the soft additive glow the quest
+-- log uses for its rows (which it tints the same way), instead of a hard
+-- outline, so it reads like the game's own mouseover.
 local box = CreateFrame("Frame", nil, UIParent)
 box:SetFrameStrata("TOOLTIP")
 box:Hide()
-local edges = {}
-local function edge(from, to, horizontal)
-  local tex = box:CreateTexture(nil, "OVERLAY")
-  tex:SetColorTexture(0.2, 0.8, 1, 0.9)
-  edges[#edges + 1] = tex
-  tex:SetPoint(from)
-  tex:SetPoint(to)
-  if horizontal then
-    tex:SetHeight(2)
+local glow = box:CreateTexture(nil, "OVERLAY")
+glow:SetTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight")
+glow:SetBlendMode("ADD")
+glow:SetAllPoints()
+local function tint(armed)
+  if armed then
+    glow:SetVertexColor(1, 0.7, 0.1, 1)
   else
-    tex:SetWidth(2)
+    glow:SetVertexColor(1, 0.9, 0.6, 0.8)
   end
 end
-edge("TOPLEFT", "TOPRIGHT", true)
-edge("BOTTOMLEFT", "BOTTOMRIGHT", true)
-edge("TOPLEFT", "BOTTOMLEFT", false)
-edge("TOPRIGHT", "BOTTOMRIGHT", false)
+tint(false)
 
 local proxy = CreateFrame("Button", "PadKeysCursorClick", UIParent,
                           "SecureActionButtonTemplate")
@@ -212,18 +209,12 @@ local function run_script(frame, script, ...)
   end
 end
 
--- The box turns gold while an entry waits for a second press to confirm
+-- The glow turns deep gold while an entry waits for a second press to confirm
 -- (Services.lua: buy, train). Moving the cursor away cancels it.
 local armed
 local function set_armed(frame)
   armed = frame
-  for _, tex in ipairs(edges) do
-    if frame then
-      tex:SetColorTexture(1, 0.8, 0.1, 0.9)
-    else
-      tex:SetColorTexture(0.2, 0.8, 1, 0.9)
-    end
-  end
+  tint(frame ~= nil)
 end
 
 -- Windows can take over the click on some of their buttons (Services.lua:
@@ -253,8 +244,7 @@ local function select_button(frame)
   end
   current = frame
   box:ClearAllPoints()
-  box:SetPoint("TOPLEFT", frame, "TOPLEFT", -2, 2)
-  box:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 2, -2)
+  box:SetAllPoints(frame)
   box:Show()
   if ns.config.cursor.tooltips ~= false then
     run_script(frame, "OnEnter", true)

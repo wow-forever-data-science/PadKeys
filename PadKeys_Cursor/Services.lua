@@ -1,6 +1,6 @@
 -- Vendors and trainers, done like the NPC dialogs (Dialogs.lua): the cursor
 -- lands on the first entry, and F (or Space) on an entry takes two presses,
--- a choice and a confirm, as on the quest reward page. The highlight box
+-- a choice and a confirm, as on the quest reward page. The highlight
 -- turns gold after the first press; moving away cancels it.
 --
 -- * Vendor: the first F on an item marks it, the second buys one (the
