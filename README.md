@@ -63,7 +63,7 @@ keyboard with each layer's keys. It's also published at
 | G (hold) | Action radial (Bar 6); with Cmd: pings, Shift: markers, Ctrl: main menu | C | Next debuff tooltip |
 | Z | Sheathe / draw weapon | Ctrl / Option / Cmd+C | Your buff / target debuff / target buff |
 | Shift+\` | UI cursor | X | Sit / stand |
-| F1 | Key map | | |
+| F1 | Key map | B | Bags, with the UI cursor inside |
 
 | Context | Keys |
 |---|---|
@@ -303,7 +303,10 @@ contextual ping, or drag for Blizzard's ping wheel.
 ## UI cursor (out of combat)
 
 Press **Shift+\`**. The cursor also starts by itself when a gossip, quest,
-merchant or loot window or a popup opens.
+merchant or loot window or a popup opens. **B** opens your bags with the
+cursor on the first slot (in combat it only opens them; press B again to
+close). It clicks Blizzard's backpack button through a secure button, so
+the bags aren't tainted.
 
 | Key | Does |
 |---|---|

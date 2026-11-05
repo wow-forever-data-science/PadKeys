@@ -11,6 +11,7 @@ local ns = PadKeys
 
 BINDING_HEADER_PADKEYS_CURSOR = "PadKeys: cursor"
 BINDING_NAME_PADKEYS_CURSOR = "Toggle keyboard UI cursor"
+_G["BINDING_NAME_CLICK PadKeysBags:LeftButton"] = "Open bags with the cursor inside"
 
 local EXTRA_ROOTS = {
   "LootFrame", "GossipFrame", "QuestFrame", "MerchantFrame",
@@ -568,6 +569,37 @@ function ns.toggle_cursor()
     start(true)
   end
 end
+
+-- The bags key: opens the bags by clicking Blizzard's backpack button
+-- through a secure button (opened from addon code they would be tainted),
+-- then puts the cursor on the first slot. In combat the cursor is off, so
+-- it only opens the bags; a second press closes them.
+local function open_bag()
+  if ContainerFrameCombinedBags and ContainerFrameCombinedBags:IsVisible() then
+    return ContainerFrameCombinedBags
+  end
+  for i = 1, 13 do
+    local frame = _G["ContainerFrame" .. i]
+    if frame and frame:IsVisible() then
+      return frame
+    end
+  end
+end
+
+local bags = CreateFrame("Button", "PadKeysBags", UIParent,
+                         "SecureActionButtonTemplate")
+bags:RegisterForClicks("AnyDown")
+bags:SetAttribute("useOnKeyDown", true)
+bags:SetAttribute("type", "macro")
+bags:SetAttribute("macrotext", "/click MainMenuBarBackpackButton")
+bags:HookScript("OnClick", function()
+  C_Timer.After(0.05, function()
+    local root = open_bag()
+    if root then
+      ns.cursor_focus_in(root)
+    end
+  end)
+end)
 
 -- A click often opens a new page or closes the window.
 proxy:HookScript("PostClick", function()
