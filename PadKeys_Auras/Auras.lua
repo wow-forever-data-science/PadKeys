@@ -1,18 +1,14 @@
 -- Inspect auras with keys, in combat too. One key per group (Config.lua):
 -- your debuffs, your buffs, your target's debuffs, your target's buffs.
--- Each press shows the next aura of that group, wrapping around, in
--- Blizzard's own aura tooltip (GameTooltip:SetUnitAura, what hovering an
--- aura shows), with a line saying which one it is ("Target debuff 2/5").
+-- Like hovering: the tooltip shows while the key is held and goes away on
+-- release. Each press shows the next aura of that group, wrapping around,
+-- in Blizzard's own aura tooltip (GameTooltip:SetUnitAura, what hovering
+-- an aura shows), with a line saying which one it is ("Target debuff 2/5").
 --
 -- It reads the auras from the unit, not from the aura icons, so it works
 -- the same for you and your target (Forever's target aura icons are
--- private frames).
---
--- Escape closes the tooltip view. Override bindings can't be changed by
--- addon code in combat, but a secure snippet reacting to a key press can:
--- the aura key binds Escape (owned by a secure header) to a close button,
--- and the close button clears it again. Outside the tooltip view, Escape
--- works as usual.
+-- private frames). The key clicks a plain button: showing a tooltip
+-- needs nothing secure.
 
 local ns = PadKeys
 
@@ -32,7 +28,8 @@ local GROUPS = {
 
 local MAX_AURAS = 40
 
--- What is showing: the group and the aura index in it.
+-- The last aura shown: its group and index. Kept after release, so the
+-- next press of the same key steps on.
 local shown_group, shown_index
 
 local function count_auras(unit, filter)
@@ -43,10 +40,14 @@ local function count_auras(unit, filter)
   return n
 end
 
-local function close()
-  if shown_group then
+local function hide()
+  if GameTooltip:GetOwner() == (shown_group and _G[GROUPS[shown_group].anchor]) then
     GameTooltip:Hide()
   end
+end
+
+local function close()
+  hide()
   shown_group, shown_index = nil, nil
 end
 
@@ -89,21 +90,13 @@ events:SetScript("OnEvent", function()
   end
 end)
 
-local header = CreateFrame("Frame", "PadKeysAuraHeader", UIParent,
-                           "SecureHandlerBaseTemplate")
-
-local function key_button(name, snippet, func)
-  local button = CreateFrame("Button", name, UIParent,
-                             "SecureActionButtonTemplate")
-  button:RegisterForClicks("AnyDown")
-  SecureHandlerWrapScript(button, "OnClick", header, snippet)
-  button:HookScript("OnClick", func)
-  return button
-end
-
--- Restricted snippets: owner is the header, which owns the Escape binding.
-local CLAIM_ESCAPE = [[ owner:SetBindingClick(true, "ESCAPE", "PadKeysAuraClose") ]]
-local RELEASE_ESCAPE = [[ owner:ClearBindings() ]]
-
-key_button("PadKeysAura", CLAIM_ESCAPE, function(_, group) show(group) end)
-key_button("PadKeysAuraClose", RELEASE_ESCAPE, close)
+-- The click's button name is the group; key down shows, key up hides.
+local button = CreateFrame("Button", "PadKeysAura", UIParent)
+button:RegisterForClicks("AnyDown", "AnyUp")
+button:SetScript("OnClick", function(_, group, down)
+  if down then
+    show(group)
+  else
+    hide()
+  end
+end)
