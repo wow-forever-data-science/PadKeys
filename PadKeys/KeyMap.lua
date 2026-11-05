@@ -117,6 +117,7 @@ local function sections()
           config_keys(k.previous_window) },
       { "Close window / leave", config_keys(k.back) },
       { "NPC dialog: choose / accept / complete", config_keys(c.quest.step) },
+      { "Vendor / trainer: choose, then buy / train", config_keys(c.quest.step) },
     } }
   end
 

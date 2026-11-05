@@ -46,9 +46,11 @@ local active, manual, current = false, false, nil
 local box = CreateFrame("Frame", nil, UIParent)
 box:SetFrameStrata("TOOLTIP")
 box:Hide()
+local edges = {}
 local function edge(from, to, horizontal)
   local tex = box:CreateTexture(nil, "OVERLAY")
   tex:SetColorTexture(0.2, 0.8, 1, 0.9)
+  edges[#edges + 1] = tex
   tex:SetPoint(from)
   tex:SetPoint(to)
   if horizontal then
@@ -210,9 +212,44 @@ local function run_script(frame, script, ...)
   end
 end
 
+-- The box turns gold while an entry waits for a second press to confirm
+-- (Services.lua: buy, train). Moving the cursor away cancels it.
+local armed
+local function set_armed(frame)
+  armed = frame
+  for _, tex in ipairs(edges) do
+    if frame then
+      tex:SetColorTexture(1, 0.8, 0.1, 0.9)
+    else
+      tex:SetColorTexture(0.2, 0.8, 1, 0.9)
+    end
+  end
+end
+
+-- Windows can take over the click on some of their buttons (Services.lua:
+-- vendor items, trainer skills). Each handler gets the button under the
+-- cursor and returns the button to click instead, or nil.
+local click_handlers = {}
+function ns.cursor_on_click(handler)
+  click_handlers[#click_handlers + 1] = handler
+end
+
+local function click_target(frame)
+  for _, handler in ipairs(click_handlers) do
+    local target = handler(frame)
+    if target then
+      return target
+    end
+  end
+  return frame
+end
+
 local function select_button(frame)
   if current and current ~= frame then
     run_script(current, "OnLeave", true)
+  end
+  if armed and armed ~= frame then
+    set_armed(nil)
   end
   current = frame
   box:ClearAllPoints()
@@ -222,7 +259,7 @@ local function select_button(frame)
   if ns.config.cursor.tooltips ~= false then
     run_script(frame, "OnEnter", true)
   end
-  proxy:SetAttribute("clickbutton", frame)
+  proxy:SetAttribute("clickbutton", click_target(frame))
 end
 
 local function stop()
@@ -235,6 +272,7 @@ local function stop()
   end
   run_script(current, "OnLeave", true)
   current = nil
+  set_armed(nil)
   box:Hide()
 end
 
@@ -356,9 +394,16 @@ end
 nav_button("PadKeysNavNextWindow", function() jump_window(1) end)
 nav_button("PadKeysNavPrevWindow", function() jump_window(-1) end)
 
+-- A key shared with the NPC dialog step (F) binds without priority, so
+-- Dialogs.lua's priority binding wins while a gossip or quest window is open.
+local function is_step_key(key)
+  return tContains(ns.config.quest.step, key)
+end
+
 local function bind(keys, name, mouse_button)
   for _, key in ipairs(keys or {}) do
-    SetOverrideBindingClick(owner, true, key, name, mouse_button)
+    SetOverrideBindingClick(owner, not is_step_key(key), key, name,
+      mouse_button)
   end
 end
 
@@ -411,6 +456,27 @@ end
 -- SmartNavigation:SelectButton / GetCurrentButton.
 function ns.cursor_current()
   return active and current or nil
+end
+
+-- Arm the button under the cursor for a confirming second press, or disarm.
+function ns.cursor_arm(on)
+  set_armed(on and current or nil)
+end
+
+function ns.cursor_armed()
+  return armed ~= nil and armed == current
+end
+
+-- Put the cursor on this button, starting the cursor if it is off.
+function ns.cursor_select(frame)
+  if InCombatLockdown() or not (frame and frame:IsVisible()) then
+    return
+  end
+  if active then
+    select_button(frame)
+  else
+    start(false, frame)
+  end
 end
 
 -- Put the cursor on the first (top-left) button inside root, starting the

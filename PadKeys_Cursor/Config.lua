@@ -17,7 +17,7 @@ ns.config.cursor = {
     down = { "S", "DOWN" },
     left = { "A", "LEFT" },
     right = { "D", "RIGHT" },
-    click = { "SPACE", "ENTER" },          -- gamepad A
+    click = { "SPACE", "F" },              -- gamepad A, same key as Interact
     rightclick = { "SHIFT-SPACE" },        -- use item, sell to vendor
     pickup = { "CTRL-SPACE" },             -- drag a spell or item
     -- gamepad B: close the window the cursor is in, or leave the cursor
@@ -34,6 +34,11 @@ ns.config.cursor = {
     "GossipFrame", "QuestFrame", "MerchantFrame", "LootFrame",
     "StaticPopup1",
   },
+}
+
+ns.config.vendor = {
+  -- Repair all gear from your own money when a vendor window opens.
+  autoRepair = true,
 }
 
 ns.config.quest = {
