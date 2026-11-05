@@ -307,8 +307,9 @@ contextual ping, or drag for Blizzard's ping wheel.
 ## UI cursor (out of combat)
 
 Press **Shift+\`**. The cursor also starts by itself when a gossip, quest,
-merchant, loot or professions window or a popup opens; in professions it
-lands on the search box. On a recipe, the first F selects it and the
+merchant, loot or professions window or a popup opens, and moves there if
+it is already on; in professions it lands on the search box, in a popup on
+its text field or accept button. On a recipe, the first F selects it and the
 second crafts it (the amount in Blizzard's box); F on Create / Create All
 runs them. **B** opens your bags with the
 cursor on the first slot (in combat it only opens them; press B again to
@@ -381,6 +382,9 @@ Face an NPC and press **F** to talk. Then:
 5. **Esc** closes the window.
 
 Vendor, trainer, bank and similar windows are driven with the UI cursor.
+When a vendor opens, gear is repaired from your own money and junk (grey
+items) is sold, as Blizzard's "Sell All Junk" does; `autoRepair` and
+`autoSellJunk` in `PadKeys_Cursor/Config.lua` turn them off.
 
 ## Key map (F1)
 
