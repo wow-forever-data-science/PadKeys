@@ -22,6 +22,7 @@ what is untested.
 ## Forever client rules (learned from in-game errors)
 
 - Secret values - cooldown, aura and health numbers are secret in combat; addon code may not compare them, do arithmetic on them, or pass them to most widget setters (`Cooldown:SetCooldown` refuses them)
+- Auras - `C_UnitAuras.GetAuraDataByIndex` errors in combat when tainted; `GameTooltip:SetUnitAura` can still show one by index
 - Use the duration objects instead - `C_ActionBar.GetActionCooldownDuration` / `GetActionChargeDuration` with `Cooldown:SetCooldownFromDurationObject`
 - Check an API in Gethe's `Blizzard_APIDocumentationGenerated` (branch `forever`) - `SecretArguments = "AllowedWhenUntainted"` means addon code can't pass secrets
 - Decide with the plain flags Blizzard returns (`isActive`, `isEnabled`), as Blizzard's own code does
