@@ -115,7 +115,9 @@ bar:SetSize(#FACE_KEYS * c.size + (#FACE_KEYS - 1) * c.spacing, c.size)
 bar:SetClampedToScreen(true)
 bar:SetMovable(true)
 
-local layer_text = bar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+local layer_text = bar:CreateFontString(nil, "OVERLAY")
+layer_text:SetFont(c.font, 14, "OUTLINE")
+layer_text:SetTextColor(1, 1, 1)
 layer_text:SetPoint("BOTTOM", bar, "TOP", 0, 6)
 
 local function place()
@@ -128,13 +130,27 @@ local function place()
   end
 end
 
-local function edge(parent, a, b, horizontal)
-  local t = parent:CreateTexture(nil, "OVERLAY")
-  t:SetColorTexture(1, 1, 1)
-  t:SetPoint(a)
-  t:SetPoint(b)
-  if horizontal then t:SetHeight(1) else t:SetWidth(1) end
-  return t
+-- Rounded corners: Blizzard's action button icon mask, if the client has
+-- it; square otherwise.
+local ROUND_MASK = "UI-HUD-ActionBar-IconFrame-Mask"
+local has_round_mask = C_Texture.GetAtlasInfo(ROUND_MASK) ~= nil
+
+local function round(frame, texture, inset)
+  if not has_round_mask then
+    return
+  end
+  local mask = frame:CreateMaskTexture()
+  mask:SetAtlas(ROUND_MASK)
+  mask:SetPoint("TOPLEFT", inset, -inset)
+  mask:SetPoint("BOTTOMRIGHT", -inset, inset)
+  texture:AddMaskTexture(mask)
+end
+
+local function text(parent, size)
+  local s = parent:CreateFontString(nil, "OVERLAY")
+  s:SetFont(c.font, size, "OUTLINE")
+  s:SetTextColor(1, 1, 1)
+  return s
 end
 
 local buttons = {}
@@ -143,18 +159,30 @@ for i, key in ipairs(FACE_KEYS) do
   b:SetSize(c.size, c.size)
   b:SetPoint("LEFT", bar, "LEFT", (i - 1) * (c.size + c.spacing), 0)
 
-  b.bg = b:CreateTexture(nil, "BACKGROUND")
-  b.bg:SetAllPoints()
-  b.bg:SetColorTexture(0, 0, 0, 0.5)
+  -- 1px border: a rounded shape behind the icon, dark normally, gold
+  -- while the action is active (casting, auto attack, a pet stance),
+  -- white while its key is down.
+  b.border = b:CreateTexture(nil, "BACKGROUND", nil, 0)
+  b.border:SetAllPoints()
+  b.border:SetColorTexture(1, 1, 1)
+  round(b, b.border, 0)
+
+  b.bg = b:CreateTexture(nil, "BACKGROUND", nil, 1)
+  b.bg:SetPoint("TOPLEFT", 1, -1)
+  b.bg:SetPoint("BOTTOMRIGHT", -1, 1)
+  b.bg:SetColorTexture(0, 0, 0, c.background_alpha)
+  round(b, b.bg, 1)
 
   b.icon = b:CreateTexture(nil, "ARTWORK")
   b.icon:SetPoint("TOPLEFT", 1, -1)
   b.icon:SetPoint("BOTTOMRIGHT", -1, 1)
   b.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+  round(b, b.icon, 1)
 
+  -- The swipe can't be masked; inset so it stays inside the round corners.
   b.cooldown = CreateFrame("Cooldown", nil, b, "CooldownFrameTemplate")
-  b.cooldown:SetPoint("TOPLEFT", 1, -1)
-  b.cooldown:SetPoint("BOTTOMRIGHT", -1, 1)
+  b.cooldown:SetPoint("TOPLEFT", 2, -2)
+  b.cooldown:SetPoint("BOTTOMRIGHT", -2, 2)
   b.cooldown:SetDrawEdge(false)
 
   -- Text above the cooldown swipe.
@@ -162,23 +190,14 @@ for i, key in ipairs(FACE_KEYS) do
   top:SetAllPoints()
   top:SetFrameLevel(b.cooldown:GetFrameLevel() + 1)
 
-  -- 1px border: dark normally, gold while the action is active (casting,
-  -- auto attack, a pet stance), white while its key is down.
-  b.edges = {
-    edge(top, "TOPLEFT", "TOPRIGHT", true),
-    edge(top, "BOTTOMLEFT", "BOTTOMRIGHT", true),
-    edge(top, "TOPLEFT", "BOTTOMLEFT", false),
-    edge(top, "TOPRIGHT", "BOTTOMRIGHT", false),
-  }
-
-  b.hotkey = top:CreateFontString(nil, "OVERLAY", "NumberFontNormalSmallGray")
+  b.hotkey = text(top, 12)
   b.hotkey:SetPoint("TOPRIGHT", -3, -3)
   b.hotkey:SetText(GetBindingText and GetBindingText(key) or key)
 
-  b.count = top:CreateFontString(nil, "OVERLAY", "NumberFontNormal")
+  b.count = text(top, 14)
   b.count:SetPoint("BOTTOMRIGHT", -2, 2)
 
-  b.name = top:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmallOutline")
+  b.name = text(top, 10)
   b.name:SetPoint("BOTTOMLEFT", 2, 2)
   b.name:SetPoint("BOTTOMRIGHT", -2, 2)
   b.name:SetHeight(10)
@@ -247,9 +266,7 @@ local function set_glow(b, on)
 end
 
 local function set_border(b, r, g, bl)
-  for _, t in ipairs(b.edges) do
-    t:SetVertexColor(r, g, bl)
-  end
+  b.border:SetVertexColor(r, g, bl)
 end
 
 -- Cooldown numbers are secret values in combat: addon code may neither
@@ -269,7 +286,7 @@ local function clear(b)
   b.icon:SetTexture(nil)
   b.count:SetText("")
   b.name:SetText("")
-  b.hotkey:SetTextColor(0.6, 0.6, 0.6)
+  b.hotkey:SetTextColor(1, 1, 1, 0.5)
   set_cooldown(b, nil)
   set_border(b, 0, 0, 0)
   set_glow(b, false)
@@ -358,7 +375,7 @@ local function update()
       if far then
         b.hotkey:SetTextColor(1, 0.1, 0.1)
       else
-        b.hotkey:SetTextColor(0.8, 0.8, 0.8)
+        b.hotkey:SetTextColor(1, 1, 1)
       end
       local pushed = src.button and src.button:GetButtonState() == "PUSHED"
       if pushed then
