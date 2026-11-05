@@ -181,8 +181,8 @@ footer p { margin: 0; max-width: 75ch; }
           <p>Works in combat.</p>
           <dl>
             <dt>C</dt><dd>Your next debuff</dd>
-            <dt>Shift+C</dt><dd>Your next buff</dd>
-            <dt>Ctrl+C</dt><dd>Target's next debuff</dd>
+            <dt>Ctrl+C</dt><dd>Your next buff</dd>
+            <dt>Option+C</dt><dd>Target's next debuff</dd>
             <dt>Cmd+C</dt><dd>Target's next buff</dd>
             <dt>Esc</dt><dd>Close the tooltip view</dd>
           </dl>
@@ -241,7 +241,6 @@ const MAP = {
     tab: { a: "Prev target", c: "target", long: "Previous enemy (friend in friendly mode)", combat: true },
     F: { a: "Assist", c: "target", long: "Assist: your target's target" },
     G: { a: "Markers", c: "menu", long: "Target marker radial", hold: true, combat: true },
-    C: { a: "Buffs", c: "act", long: "Your next buff tooltip", combat: true },
   },
   ctrl: {
     ...bar("Pet bar", "Pet", ["1","2","3","4"]),
@@ -249,10 +248,11 @@ const MAP = {
     tab: { a: "Next group", c: "target", long: "Next party or raid member (with Shift: previous)", combat: true },
     F: { a: "Last target", c: "target", long: "Back to your previous target" },
     G: { a: "Menu", c: "menu", long: "Main-menu radial", hold: true },
-    C: { a: "Tgt debuffs", c: "act", long: "Target's next debuff tooltip", combat: true },
+    C: { a: "Buffs", c: "act", long: "Your next buff tooltip", combat: true },
   },
   opt: {
     ...bar("Action Bar 5", "Bar5"),
+    C: { a: "Tgt debuffs", c: "act", long: "Target's next debuff tooltip", combat: true },
   },
   cmd: {
     ...bar("Action Bar 2", "Bar2"),
