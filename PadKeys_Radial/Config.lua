@@ -14,6 +14,8 @@ b["CTRL-G"] = "CLICK PadKeysRing:menu"      -- Blizzard's main menu entries
 ns.config.radial = {
   -- Size against Blizzard's gamepad radial (1 = the same size).
   scale = 0.35,
+  -- Icon size against Blizzard's (1 = the same), on top of scale.
+  icon_scale = 1.5,
   -- Open centred on the mouse, so pointing at an icon picks it. false
   -- opens at x, y from the screen centre.
   at_cursor = true,
