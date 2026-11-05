@@ -115,7 +115,16 @@ bar:SetSize(#FACE_KEYS * c.size + (#FACE_KEYS - 1) * c.spacing, c.size)
 bar:SetClampedToScreen(true)
 bar:SetMovable(true)
 
-local layer_text = bar:CreateFontString(nil, "OVERLAY", "GameFontHighlightOutline")
+-- Text in c.font (Roboto Condensed Bold, shipped in Fonts/), outlined;
+-- Blizzard's font object stays if the file can't be loaded.
+local function text(parent, size, fallback)
+  local s = parent:CreateFontString(nil, "OVERLAY", fallback)
+  s:SetFont(c.font, size, "OUTLINE")
+  s:SetTextColor(1, 1, 1)
+  return s
+end
+
+local layer_text = text(bar, 15, "GameFontHighlightOutline")
 layer_text:SetPoint("BOTTOM", bar, "TOP", 0, 6)
 
 local function place()
@@ -162,14 +171,14 @@ for i, key in ipairs(FACE_KEYS) do
   top:SetAllPoints()
   top:SetFrameLevel(b.cooldown:GetFrameLevel() + 1)
 
-  b.hotkey = top:CreateFontString(nil, "OVERLAY", "NumberFontNormalSmall")
+  b.hotkey = text(top, 13, "NumberFontNormalSmall")
   b.hotkey:SetPoint("TOPRIGHT", -3, -3)
   b.hotkey:SetText(GetBindingText and GetBindingText(key) or key)
 
-  b.count = top:CreateFontString(nil, "OVERLAY", "NumberFontNormal")
+  b.count = text(top, 15, "NumberFontNormal")
   b.count:SetPoint("BOTTOMRIGHT", -2, 2)
 
-  b.name = top:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmallOutline")
+  b.name = text(top, 11, "GameFontHighlightSmallOutline")
   b.name:SetPoint("BOTTOMLEFT", 2, 2)
   b.name:SetPoint("BOTTOMRIGHT", -2, 2)
   b.name:SetHeight(10)
