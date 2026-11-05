@@ -10,3 +10,4 @@ Config.lua
 Cursor.lua
 Dialogs.lua
 Services.lua
+Professions.lua
