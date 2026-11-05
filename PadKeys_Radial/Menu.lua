@@ -1,28 +1,53 @@
--- The main-menu radial (Ctrl+G). The entries are Blizzard's: their labels,
--- icons, enabled state and actions come from GamepadRadial's own table of
--- segment handlers (Forever's Blizzard_Gamepad addon), so they do what the
--- gamepad's do. The wheel is ours (Wheel.lua):
---
--- * hold the menu key: show it, on the start page;
--- * move the mouse: the direction picks a segment;
--- * page keys while open (out of combat): previous / next page;
--- * release: close, and run the picked segment.
---
--- In combat it opens on the start page only: the page keys are override
--- bindings, which combat blocks. Entries Blizzard blocks in combat show
--- greyed out.
+-- The main-menu page of the ring (Ctrl+G): what each entry looks like and
+-- how it opens. The looks (label, icon, enabled state) come from Blizzard's
+-- gamepad radial (GamepadRadial's segment handlers in Forever's
+-- Blizzard_Gamepad addon). The opening does not call those handlers: from
+-- addon code their windows open tainted, and tainted Blizzard code errors
+-- on the client's secret values (health and the like). Instead each entry
+-- is a /click of Blizzard's own button, run by the ring's secure button.
 
 local ns = PadKeys
 
-BINDING_HEADER_PADKEYS_RADIAL = "PadKeys: radials"
-BINDING_NAME_PADKEYS_RADIAL = "Main menu radial (hold)"
+-- Entry -> the Blizzard button it clicks. Entries of Blizzard's radial
+-- without a button (social, chat, tracking) are left out.
+local BUTTONS = {
+  bags = "MainMenuBarBackpackButton",
+  buffs = "PadKeysRadialBuffs",
+  calendar = "GameTimeFrame",
+  character = "CharacterMicroButton",
+  collections = "CollectionsMicroButton",
+  guild = "GuildMicroButton",
+  legacy = "LegacyMicroButton",
+  lfd = "LFDMicroButton",
+  map = "QuestLogMicroButton",
+  menu = "MainMenuMicroButton",
+  professions = "ProfessionMicroButton",
+  spellbook = "SpellbookMicroButton",
+  store = "StoreMicroButton",
+  talents = "TalentMicroButton",
+  time = "TimeManagerClockButton",
+}
+-- Entries that are a slash command instead.
+local COMMANDS = {
+  pvp = "/pvp",
+}
 
-local wheel = ns.create_wheel("PadKeysMenuRadial")
-local owner = CreateFrame("Frame", "PadKeysRadialOwner", UIParent)
-local page
+-- Buffs: Blizzard's entry calls BuffFrame:SetGamepadFocus(), which
+-- PadKeys_Cursor turns into the UI cursor on your auras. Our own button,
+-- so it can be clicked like the others.
+local buffs = CreateFrame("Button", "PadKeysRadialBuffs", UIParent)
+buffs:SetScript("OnClick", function()
+  if not BuffFrame:SetGamepadFocus() then
+    DebuffFrame:SetGamepadFocus()
+  end
+end)
 
-local function handlers()
-  return GamepadRadial and GamepadRadial.segmentOptions
+-- The macro that opens an entry, or nil for an unknown entry.
+function ns.menu_macro(name)
+  if BUTTONS[name] then
+    return "/click " .. BUTTONS[name]
+  end
+  return COMMANDS[name]
 end
 
 -- The icon Blizzard's segment would show (BasicSegmentHandler:UpdateIcon).
@@ -39,102 +64,22 @@ local function icon_of(handler)
   return icons.up, false
 end
 
-local function key_text(keys)
-  return keys[1] and GetBindingText(keys[1]) or ""
-end
-
-local function show_page(index)
-  local config = ns.config.radial.menu
-  local pages = config.pages
-  page = (index - 1) % #pages + 1
-  local options = handlers()
+-- Wheel entries for one menu page.
+function ns.menu_entries(page)
+  local handlers = GamepadRadial and GamepadRadial.segmentOptions or {}
   local entries = {}
   for i = 1, ns.wheel_segments do
-    local name = pages[page][i]
-    local handler = name and options[name]
-    if handler then
+    local name = ns.config.radial.menu.pages[page][i]
+    local handler = name and handlers[name]
+    if handler and ns.menu_macro(name) then
       local icon, desaturate = icon_of(handler)
       entries[i] = {
         icon = icon,
         desaturate = desaturate,
         label = handler:GetLabel(),
         enabled = handler:IsEnabled(),
-        handler = handler,
       }
     end
   end
-  wheel:set_entries(entries)
-  local count = InCombatLockdown() and 1 or #pages
-  wheel:set_page(page, count, key_text(config.page_keys.previous),
-                 key_text(config.page_keys.next))
-end
-
-local function page_button(name, step)
-  local button = CreateFrame("Button", name, UIParent)
-  button:RegisterForClicks("AnyDown")
-  button:SetScript("OnClick", function()
-    show_page(page + step)
-    PlaySound(SOUNDKIT.GAMEPAD_RADIAL_MENU_TAB_OVER)
-  end)
-end
-page_button("PadKeysRadialPrev", -1)
-page_button("PadKeysRadialNext", 1)
-
-local function open()
-  if wheel:is_open() then
-    return
-  end
-  if not handlers() then
-    ns.say("the menu radial needs Blizzard's gamepad UI (Blizzard_Gamepad), which isn't loaded.")
-    return
-  end
-  local config = ns.config.radial.menu
-  wheel:open(FRAME_LABEL_MAIN_MENU or MAINMENU_BUTTON)
-  show_page(config.start_page)
-  if not InCombatLockdown() then
-    for _, key in ipairs(config.page_keys.previous) do
-      SetOverrideBindingClick(owner, true, key, "PadKeysRadialPrev")
-    end
-    for _, key in ipairs(config.page_keys.next) do
-      SetOverrideBindingClick(owner, true, key, "PadKeysRadialNext")
-    end
-  end
-end
-
-local function release()
-  if not wheel:is_open() then
-    return
-  end
-  local index = wheel:picked()
-  local handler = index and wheel.entries[index].handler
-  wheel:close()
-  if handler then
-    handler:Trigger()
-  end
-end
-
-wheel.frame:HookScript("OnHide", function()
-  if not InCombatLockdown() then
-    ClearOverrideBindings(owner)
-  end
-end)
-
--- Combat starting with the radial open must not leave Q/E paging it:
--- PLAYER_REGEN_DISABLED comes just before the lockdown, so the page keys
--- can still be cleared then.
-owner:RegisterEvent("PLAYER_REGEN_DISABLED")
-owner:SetScript("OnEvent", function()
-  ClearOverrideBindings(owner)
-  if wheel:is_open() then
-    show_page(page)
-  end
-end)
-
--- Called by the PADKEYS_RADIAL binding on key down and key up.
-function ns.radial_key(keystate)
-  if keystate == "down" then
-    open()
-  else
-    release()
-  end
+  return entries
 end

@@ -1,27 +1,33 @@
--- The combat ring: one secure button with three pages, picked by the key
--- that opens it (G, Cmd+G, Shift+G in Config.lua):
+-- The ring: one secure button with four pages, picked by the key that
+-- opens it (Config.lua):
 --
--- * actions: Action Bar 6, slots 1-8 (drag spells, items, macros there);
--- * pings: Blizzard's ping types, sent as /ping macros;
--- * markers: target markers, sent as /tm macros.
+-- * actions (G): Action Bar 6, slots 1-8 (drag spells, items, macros there);
+-- * pings (Cmd+G): Blizzard's ping types, sent as /ping macros;
+-- * markers (Shift+G): target markers, sent as /tm macros;
+-- * menu (Ctrl+G): Blizzard's main-menu entries (Menu.lua), several pages
+--   turned with Q/E or the mouse wheel while it is open.
 --
--- Spells and macros in combat must go through a secure button, so the pick
--- happens in a restricted snippet: on key down it notes the mouse position,
--- on key up it turns the direction into a segment (ns.pick_index's rule)
--- and passes the click on as that segment's button ("actions3"), whose
--- attributes say what to do. The wheel (Wheel.lua) only shows the same
--- pick; it never casts anything.
+-- Everything runs through the secure button, so it works in combat and
+-- nothing it opens is tainted. The pick happens in a restricted snippet: on
+-- key down it notes the mouse position, on key up it turns the direction
+-- into a segment (ns.pick_index's rule) and passes the click on as that
+-- segment's button ("actions3", "menu2x5"), whose attributes say what to
+-- do. The wheel (Wheel.lua) only shows the same pick; it never runs
+-- anything.
 
 local ns = PadKeys
 
+BINDING_HEADER_PADKEYS_RADIAL = "PadKeys: radials"
 _G["BINDING_NAME_CLICK PadKeysRing:actions"] = "Action radial, Action Bar 6 (hold)"
 _G["BINDING_NAME_CLICK PadKeysRing:pings"] = "Ping radial (hold)"
 _G["BINDING_NAME_CLICK PadKeysRing:markers"] = "Target marker radial (hold)"
+_G["BINDING_NAME_CLICK PadKeysRing:menu"] = "Main menu radial (hold)"
 
 local TITLES = {
   actions = "Actions",
   pings = "Pings",
   markers = "Target markers",
+  menu = FRAME_LABEL_MAIN_MENU or MAINMENU_BUTTON,
 }
 
 -- Ping names in Config.lua -> Enum.PingSubjectType key and label global.
@@ -34,11 +40,35 @@ local PINGS = {
 
 -- Runs in the restricted environment: self = the ring button, owner = the
 -- header (as large as the screen, so GetMousePosition always answers),
--- button = the page, down = key down or up. Same rule as ns.pick_index.
+-- button = the page (or a menu page key), down = key down or up. The
+-- direction rule is ns.pick_index's.
 local ON_CLICK = [[
+  if button == "menuprev" or button == "menunext" then
+    if down and menu_open then
+      local count = self:GetAttribute("menu-pages")
+      local step = (button == "menunext") and 1 or -1
+      local page = self:GetAttribute("menu-page") + step
+      self:SetAttribute("menu-page", (page - 1) % count + 1)
+    end
+    return false
+  end
   if down then
     origin_x, origin_y = owner:GetMousePosition()
+    if button == "menu" then
+      menu_open = true
+      self:SetAttribute("menu-page", self:GetAttribute("menu-start"))
+      for key in gmatch(self:GetAttribute("menu-prev-keys"), "[^,]+") do
+        owner:SetBindingClick(true, key, "PadKeysRing", "menuprev")
+      end
+      for key in gmatch(self:GetAttribute("menu-next-keys"), "[^,]+") do
+        owner:SetBindingClick(true, key, "PadKeysRing", "menunext")
+      end
+    end
     return false
+  end
+  if menu_open then
+    menu_open = false
+    owner:ClearBindings()
   end
   local x, y = owner:GetMousePosition()
   local ox, oy = origin_x, origin_y
@@ -53,7 +83,11 @@ local ON_CLICK = [[
     return false
   end
   local degrees = math.deg(math.atan2(dy, dx)) % 360
-  local segment = button .. (math.floor(degrees / 45 + 0.5) % 8 + 1)
+  local index = math.floor(degrees / 45 + 0.5) % 8 + 1
+  local segment = button .. index
+  if button == "menu" then
+    segment = "menu" .. self:GetAttribute("menu-page") .. "x" .. index
+  end
   if not self:GetAttribute("*type-" .. segment) then
     return false
   end
@@ -75,34 +109,33 @@ end
 
 -- What each segment does, as attributes of its button name ("pings1").
 -- The "*" matches any modifier, so Cmd or Shift still held on release
--- doesn't matter.
-local function set_segment(segment, kind, key, value)
-  button:SetAttribute("*type-" .. segment, kind)
-  if key then
-    button:SetAttribute("*" .. key .. "-" .. segment, value)
-  end
+-- doesn't matter. A nil kind empties the segment.
+local function set_macro(segment, macro)
+  button:SetAttribute("*type-" .. segment, macro and "macro")
+  button:SetAttribute("*macrotext-" .. segment, macro)
 end
 
 local function setup()
   local config = ring_config()
+  local menu = ns.config.radial.menu
   header:SetAllPoints(UIParent)
   button:SetAttribute("useOnKeyDown", false)
   button:SetAttribute("dead-zone", ns.config.radial.dead_zone)
   for i = 1, ns.wheel_segments do
-    set_segment("actions" .. i, "action", "action", config.first_slot + i - 1)
+    button:SetAttribute("*type-actions" .. i, "action")
+    button:SetAttribute("*action-actions" .. i, config.first_slot + i - 1)
     local ping = config.pings[i]
-    if ping then
-      set_segment("pings" .. i, "macro", "macrotext", format(config.ping_macro, ping))
-    else
-      set_segment("pings" .. i, nil)
-    end
+    set_macro("pings" .. i, ping and format(config.ping_macro, ping))
     local marker = config.markers[i]
-    if marker then
-      set_segment("markers" .. i, "macro", "macrotext", format(config.marker_macro, marker))
-    else
-      set_segment("markers" .. i, nil)
+    set_macro("markers" .. i, marker and format(config.marker_macro, marker))
+    for page, names in ipairs(menu.pages) do
+      set_macro("menu" .. page .. "x" .. i, names[i] and ns.menu_macro(names[i]))
     end
   end
+  button:SetAttribute("menu-start", menu.start_page)
+  button:SetAttribute("menu-pages", #menu.pages)
+  button:SetAttribute("menu-prev-keys", table.concat(menu.page_keys.previous, ","))
+  button:SetAttribute("menu-next-keys", table.concat(menu.page_keys.next, ","))
 end
 
 -- Wheel entries per page.
@@ -173,16 +206,43 @@ local function marker_entries()
   return entries
 end
 
+local function key_text(keys)
+  return keys[1] and GetBindingText(keys[1]) or ""
+end
+
+-- The menu page the secure snippet is on.
+local function show_menu_page()
+  local menu = ns.config.radial.menu
+  local page = button:GetAttribute("menu-page") or menu.start_page
+  wheel:set_entries(ns.menu_entries(page))
+  wheel:set_page(page, #menu.pages, key_text(menu.page_keys.previous),
+                 key_text(menu.page_keys.next))
+end
+
 local ENTRIES = {
   actions = action_entries,
   pings = ping_entries,
   markers = marker_entries,
 }
 
--- Runs after the secure snippet, with the original page name.
+-- Runs after the secure snippet, with the original button name.
 button:HookScript("OnClick", function(_, page, down)
+  if page == "menuprev" or page == "menunext" then
+    if down and wheel:is_open() then
+      show_menu_page()
+      if SOUNDKIT.GAMEPAD_RADIAL_MENU_TAB_OVER then
+        PlaySound(SOUNDKIT.GAMEPAD_RADIAL_MENU_TAB_OVER)
+      end
+    end
+    return
+  end
   if not down then
     wheel:close()
+    return
+  end
+  if page == "menu" then
+    wheel:open(TITLES.menu)
+    show_menu_page()
     return
   end
   local entries = ENTRIES[page]
