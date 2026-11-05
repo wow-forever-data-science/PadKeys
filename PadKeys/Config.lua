@@ -84,6 +84,6 @@ ns.modules = {
   { addon = "PadKeys_Cursor", does = "UI cursor and NPC dialogs" },
   { addon = "PadKeys_Auras", does = "Debuff and buff tooltips (C)" },
   { addon = "PadKeys_Targeting", does = "Friendly/enemy toggle, group cycling" },
-  { addon = "PadKeys_Radial", does = "Blizzard's main-menu radial (Z)" },
+  { addon = "PadKeys_Radial", does = "Main-menu radial (Z)" },
   { addon = "PadKeys_Bar", does = "One bar that shows the layer you hold" },
 }

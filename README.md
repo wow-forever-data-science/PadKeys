@@ -8,7 +8,8 @@ without a gamepad, and adds its own code only where Blizzard's doesn't:
   gamepad's buttons and shoulders;
 - **targeting** like the gamepad: a friendly/enemy mode toggle, enemy and
   group cycling, assist and last target, all usable in combat;
-- Blizzard's **main-menu radial** (three pages) and **ping system**;
+- a **main-menu radial** in the style of Blizzard's gamepad radial, with
+  Blizzard's entries, and Blizzard's **ping system**;
 - a **keyboard UI cursor** that moves through open windows, unit frames and
   your buffs;
 - **aura inspection**: step through your debuff and buff tooltips in combat;
@@ -27,7 +28,7 @@ error points at one part:
 | **PadKeys_Cursor** | UI cursor (windows, unit frames, buffs) and NPC dialogs (F = A, Esc = B) | PadKeys |
 | **PadKeys_Auras** | Debuff (C) and buff (Option+C) tooltips | PadKeys |
 | **PadKeys_Targeting** | Friendly/enemy toggle (\`) and party/raid cycling (Ctrl+Tab) | PadKeys |
-| **PadKeys_Radial** | Blizzard's main-menu radial (hold Z) | PadKeys |
+| **PadKeys_Radial** | Main-menu radial with Blizzard's entries (hold Z) | PadKeys |
 | **PadKeys_Bar** | One bar that shows the layer you hold (Cmd, Shift, Option, Ctrl) | PadKeys (SpellActivationOverlay optional, for its proc glows) |
 
 It started in the wowforevR R package repository and moved here as a
@@ -246,10 +247,10 @@ The mode toggle and group cycling are secure buttons, so they work in
 combat: the toggle rebinds Tab and Shift+Tab, and group cycling picks the
 next group member that exists.
 
-## Main-menu radial (Blizzard's)
+## Main-menu radial
 
-Hold **Z**. Blizzard's gamepad radial opens with its three pages, centre page
-first:
+Hold **Z**. A radial in the style of Blizzard's gamepad radial, at half its
+size, opens with three pages, centre page first:
 
 - **Left:** Group Finder, Legacy, Shop, Guild, Social, Buffs, Tracking,
   Collections.
@@ -257,12 +258,15 @@ first:
   Spellbook.
 - **Right:** Clock, Calendar, PvP.
 
-Move the mouse towards a segment (the mouse acts as the right stick).
-Switch pages with **Q / E** or the **mouse wheel** (the gamepad's
-shoulders). Release Z to open the highlighted segment, or release with
-nothing highlighted to close. It opens windows, so it's for out of combat,
-as on a gamepad. The page hints show gamepad button icons, because it's
-Blizzard's gamepad art.
+Move the mouse towards a segment: the direction picks it as soon as the
+mouse leaves a small dead zone, and its name shows in the centre. Switch
+pages with **Q / E** or the **mouse wheel**. Release Z to open the
+highlighted segment, or release with nothing highlighted to close. It opens
+windows, so it's for out of combat, as on a gamepad.
+
+The frame and input are ours; the entries are Blizzard's (labels, icons,
+enabled state and actions come from `GamepadRadial`'s handlers). Size,
+position, dead zone and the pages are in `PadKeys_Radial/Config.lua`.
 
 The **Buffs** segment only works in gamepad mode in Blizzard's code. On
 keyboard, PadKeys hooks it to open the UI cursor on your buffs (or debuffs,
@@ -347,7 +351,7 @@ action names, so it always shows your real setup. Esc closes it.
 
 | Feature | Blizzard code used | Our code |
 |---|---|---|
-| Menu radial | `GamepadRadial` (`Blizzard_Gamepad/UI/Radials`): art, pages, segments and actions | feeding it the mouse as the "stick", page keys and release |
+| Menu radial | `GamepadRadial` (`Blizzard_Gamepad/UI/Radials`): art (atlases), entries and their actions | the frame, pages, mouse direction, page keys and release |
 | Pings | the ping system (`TOGGLEPINGLISTENER`, `Blizzard_PingUI`) and its wheel | none, only the key |
 | NPC dialogs | `QuestFrame_GeneralProgressAction` (accept/continue/complete) and the gamepad's rules: cursor on the first entry, A clicks it, B closes | our cursor in place of SmartNavigation |
 | Key layout | Blizzard's binding actions | apply/restore of the bindings |
@@ -435,9 +439,9 @@ Known risks:
 - PadKeys_Bar checks range from Blizzard's range events. If the key label
   never turns red out of range, the hidden bars may have stopped range
   checks; send what you see.
-- The radial is Blizzard's gamepad frame running in keyboard mode. If it
-  errors, its open/close steps call gamepad managers that may not be
-  running; send the error and it can be fixed or worked around.
+- The radial reads its entries from Blizzard's `GamepadRadial` frame. If
+  Blizzard changes that table, or an entry's action only works in gamepad
+  mode (like Buffs, which PadKeys hooks), send what you see.
 - Tooltips while the cursor moves come from calling Blizzard's own OnEnter
   handlers. If that causes "action blocked" errors, set `tooltips = false`
   under `cursor` in `PadKeys_Cursor/Config.lua`.
