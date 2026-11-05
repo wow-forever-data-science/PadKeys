@@ -9,9 +9,11 @@ ns.config.bar = {
   point = "BOTTOM",
   x = 0,
   y = 60,
-  size = 45,          -- button size (45 is Blizzard's)
+  size = 44,          -- button size
   spacing = 3,        -- gap between buttons
   scale = 1,
+  -- Behind each button; 0 is see-through, 1 is solid black.
+  background_alpha = 0.75,
   -- Name of the layer you hold ("Cmd", "Shift+Ctrl") above the bar.
   -- Nothing shows without a modifier.
   show_layer = true,

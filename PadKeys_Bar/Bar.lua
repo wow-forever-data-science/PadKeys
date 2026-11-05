@@ -129,26 +129,50 @@ local function place()
 end
 
 
--- Blizzard's action button art is made for this size.
-local BLIZZARD_SIZE = 45
-
 local buttons = {}
 for i, key in ipairs(FACE_KEYS) do
-  -- Blizzard's own action button look (ActionButtonTemplate: the rounded
-  -- icon mask, slot background, frame and fonts of the other bars). For
-  -- looks only: the mouse is off, and the keys press Blizzard's real
-  -- buttons. Scaled to c.size.
-  local b = CreateFrame("CheckButton", "PadKeysBarButton" .. i, bar,
-                        "ActionButtonTemplate")
-  b:EnableMouse(false)
-  local scale = c.size / BLIZZARD_SIZE
-  b:SetScale(scale)
-  b:SetPoint("LEFT", bar, "LEFT", (i - 1) * (c.size + c.spacing) / scale, 0)
-  b.cooldown:SetDrawEdge(false)
-  local top = b.TextOverlayContainer
+  local b = CreateFrame("Frame", nil, bar)
+  b:SetSize(c.size, c.size)
+  b:SetPoint("LEFT", bar, "LEFT", (i - 1) * (c.size + c.spacing), 0)
 
-  b.hotkey, b.count, b.name = b.HotKey, b.Count, b.Name
+  -- 1px border: a square behind the icon, dark normally, gold while the
+  -- action is active (casting, auto attack, a pet stance), white while its
+  -- key is down.
+  b.border = b:CreateTexture(nil, "BACKGROUND", nil, 0)
+  b.border:SetAllPoints()
+  b.border:SetColorTexture(1, 1, 1)
+
+  b.bg = b:CreateTexture(nil, "BACKGROUND", nil, 1)
+  b.bg:SetPoint("TOPLEFT", 1, -1)
+  b.bg:SetPoint("BOTTOMRIGHT", -1, 1)
+  b.bg:SetColorTexture(0, 0, 0, c.background_alpha)
+
+  b.icon = b:CreateTexture(nil, "ARTWORK")
+  b.icon:SetPoint("TOPLEFT", 1, -1)
+  b.icon:SetPoint("BOTTOMRIGHT", -1, 1)
+  b.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+
+  b.cooldown = CreateFrame("Cooldown", nil, b, "CooldownFrameTemplate")
+  b.cooldown:SetPoint("TOPLEFT", 1, -1)
+  b.cooldown:SetPoint("BOTTOMRIGHT", -1, 1)
+  b.cooldown:SetDrawEdge(false)
+
+  -- Text above the cooldown swipe.
+  local top = CreateFrame("Frame", nil, b)
+  top:SetAllPoints()
+  top:SetFrameLevel(b.cooldown:GetFrameLevel() + 1)
+
+  b.hotkey = top:CreateFontString(nil, "OVERLAY", "NumberFontNormalSmall")
+  b.hotkey:SetPoint("TOPRIGHT", -3, -3)
   b.hotkey:SetText(GetBindingText and GetBindingText(key) or key)
+
+  b.count = top:CreateFontString(nil, "OVERLAY", "NumberFontNormal")
+  b.count:SetPoint("BOTTOMRIGHT", -2, 2)
+
+  b.name = top:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmallOutline")
+  b.name:SetPoint("BOTTOMLEFT", 2, 2)
+  b.name:SetPoint("BOTTOMRIGHT", -2, 2)
+  b.name:SetHeight(10)
 
   -- Fallback proc glow, for when no addon has loaded LibButtonGlow: a
   -- pulsing gold ring.
@@ -157,7 +181,7 @@ for i, key in ipairs(FACE_KEYS) do
   b.glow:SetBlendMode("ADD")
   b.glow:SetVertexColor(1, 0.85, 0.2)
   b.glow:SetPoint("CENTER")
-  b.glow:SetSize(BLIZZARD_SIZE * 1.8, BLIZZARD_SIZE * 1.8)
+  b.glow:SetSize(c.size * 1.8, c.size * 1.8)
   b.glow:Hide()
   b.pulse = b.glow:CreateAnimationGroup()
   b.pulse:SetLooping("BOUNCE")
@@ -213,11 +237,8 @@ local function set_glow(b, on)
   end
 end
 
--- Blizzard's frame states: pushed while the key is down, checked while
--- the action is active (casting, auto attack, a pet stance).
-local function set_state(b, pushed, active)
-  b:SetButtonState(pushed and "PUSHED" or "NORMAL")
-  b:SetChecked(active and true or false)
+local function set_border(b, r, g, bl)
+  b.border:SetVertexColor(r, g, bl)
 end
 
 -- Cooldown numbers are secret values in combat: addon code may neither
@@ -239,7 +260,7 @@ local function clear(b)
   b.name:SetText("")
   b.hotkey:SetTextColor(1, 1, 1, 0.5)
   set_cooldown(b, nil)
-  set_state(b, false, false)
+  set_border(b, 0, 0, 0)
   set_glow(b, false)
 end
 
@@ -329,7 +350,13 @@ local function update()
         b.hotkey:SetTextColor(1, 1, 1)
       end
       local pushed = src.button and src.button:GetButtonState() == "PUSHED"
-      set_state(b, pushed, active)
+      if pushed then
+        set_border(b, 1, 1, 1)
+      elseif active then
+        set_border(b, 1, 0.82, 0)
+      else
+        set_border(b, 0, 0, 0)
+      end
       set_glow(b, c.glow and not src.pet and source_glows(src.button))
     end
   end
