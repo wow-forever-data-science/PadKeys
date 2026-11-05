@@ -4,14 +4,12 @@ local ns = PadKeys
 
 -- Inspect auras, in combat too: a press shows the tooltip of the next aura
 -- in that group (wrapping around) at the aura, and it fades. C
--- replaces the character window (it's on the menu radial, Ctrl+G). ALT is
--- Option on a Mac; on Windows, where Cmd's layer is Alt, pick another key
--- for target debuffs.
+-- replaces the character window (it's on the menu radial, Ctrl+G).
 local b = ns.config.bindings
-b.C = "CLICK PadKeysAura:mydebuffs"
-b["CTRL-C"] = "CLICK PadKeysAura:mybuffs"
-b["ALT-C"] = "CLICK PadKeysAura:targetdebuffs"
+b.C = "CLICK PadKeysAura:targetdebuffs"
 b[ns.config.mod .. "C"] = "CLICK PadKeysAura:targetbuffs"
+b["SHIFT-C"] = "CLICK PadKeysAura:mydebuffs"
+b["CTRL-C"] = "CLICK PadKeysAura:mybuffs"
 
 ns.config.auras = {
   -- Shortest time left first, auras without a duration last. false keeps
