@@ -177,9 +177,10 @@ Cmd is `META` and Option is `ALT` in WoW's key names.
 
 ## One bar for every layer (PadKeys_Bar)
 
-A single row of eight buttons on a dark background, with white key labels
-in Roboto Condensed (shipped in `PadKeys_Bar/Fonts/` with its SIL Open Font
-License), that shows what 1 2 3 4 Q E R T
+A single row of eight slightly rounded buttons on a dark background, with
+white key labels in Roboto Condensed ExtraBold (shipped in
+`PadKeys_Bar/Fonts/` with its SIL Open Font License), that shows what
+1 2 3 4 Q E R T
 do **with the modifiers you hold right now**: Bar 1 with none, Bar 2 while
 you hold Cmd, Bar 3 with Shift, Bar 5 with Option, and the pet bar plus
 Bar 4 with Ctrl. Like a gamepad's skill panel, the bar changes the moment
