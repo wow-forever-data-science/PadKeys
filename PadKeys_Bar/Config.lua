@@ -14,10 +14,12 @@ ns.config.bar = {
   scale = 1,
   -- Behind each button; 0 is see-through, 1 is solid black.
   background_alpha = 0.75,
-  -- Labels, counts and macro names. Roboto Condensed Bold comes with
+  -- Slightly rounded corners (Media/RoundedSquare.tga); false for square.
+  rounded = true,
+  -- Labels, counts and macro names. Roboto Condensed ExtraBold comes with
   -- PadKeys_Bar (Fonts/, SIL Open Font License); WoW's own fonts work too,
   -- e.g. "Fonts\\FRIZQT__.TTF" or "Fonts\\ARIALN.TTF".
-  font = "Interface\\AddOns\\PadKeys_Bar\\Fonts\\RobotoCondensed-Bold.ttf",
+  font = "Interface\\AddOns\\PadKeys_Bar\\Fonts\\RobotoCondensed-ExtraBold.ttf",
   -- Name of the layer you hold ("Cmd", "Shift+Ctrl") above the bar.
   -- Nothing shows without a modifier.
   show_layer = true,

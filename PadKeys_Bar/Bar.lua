@@ -115,7 +115,7 @@ bar:SetSize(#FACE_KEYS * c.size + (#FACE_KEYS - 1) * c.spacing, c.size)
 bar:SetClampedToScreen(true)
 bar:SetMovable(true)
 
--- White text in c.font (Roboto Condensed Bold, shipped in Fonts/) with a
+-- White text in c.font (Roboto Condensed ExtraBold, shipped in Fonts/) with a
 -- drop shadow, which keeps it brighter than an outline; Blizzard's font
 -- object stays if the file can't be loaded.
 local function text(parent, size, fallback)
@@ -140,6 +140,22 @@ local function place()
   end
 end
 
+-- Slightly rounded corners: a mask of our own (Media/RoundedSquare.tga,
+-- made by tools/make_rounded_mask.py) that fills the whole button, so the
+-- icon keeps its size. The cooldown swipe can't be masked; it is drawn in
+-- the same shape instead.
+local ROUNDED = "Interface\\AddOns\\PadKeys_Bar\\Media\\RoundedSquare"
+
+local function round(frame, texture, inset)
+  if not c.rounded then
+    return
+  end
+  local mask = frame:CreateMaskTexture()
+  mask:SetTexture(ROUNDED, "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
+  mask:SetPoint("TOPLEFT", inset, -inset)
+  mask:SetPoint("BOTTOMRIGHT", -inset, inset)
+  texture:AddMaskTexture(mask)
+end
 
 local buttons = {}
 for i, key in ipairs(FACE_KEYS) do
@@ -147,27 +163,34 @@ for i, key in ipairs(FACE_KEYS) do
   b:SetSize(c.size, c.size)
   b:SetPoint("LEFT", bar, "LEFT", (i - 1) * (c.size + c.spacing), 0)
 
-  -- 1px border: a square behind the icon, dark normally, gold while the
+  -- 1px border: a shape behind the icon, dark normally, gold while the
   -- action is active (casting, auto attack, a pet stance), white while its
   -- key is down.
   b.border = b:CreateTexture(nil, "BACKGROUND", nil, 0)
   b.border:SetAllPoints()
   b.border:SetColorTexture(1, 1, 1)
+  round(b, b.border, 0)
 
   b.bg = b:CreateTexture(nil, "BACKGROUND", nil, 1)
   b.bg:SetPoint("TOPLEFT", 1, -1)
   b.bg:SetPoint("BOTTOMRIGHT", -1, 1)
   b.bg:SetColorTexture(0, 0, 0, c.background_alpha)
+  round(b, b.bg, 1)
 
   b.icon = b:CreateTexture(nil, "ARTWORK")
   b.icon:SetPoint("TOPLEFT", 1, -1)
   b.icon:SetPoint("BOTTOMRIGHT", -1, 1)
   b.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+  round(b, b.icon, 1)
 
   b.cooldown = CreateFrame("Cooldown", nil, b, "CooldownFrameTemplate")
   b.cooldown:SetPoint("TOPLEFT", 1, -1)
   b.cooldown:SetPoint("BOTTOMRIGHT", -1, 1)
   b.cooldown:SetDrawEdge(false)
+  if c.rounded then
+    b.cooldown:SetSwipeTexture(ROUNDED)
+    b.cooldown:SetSwipeColor(0, 0, 0, 0.8)
+  end
 
   -- Text above the cooldown swipe.
   local top = CreateFrame("Frame", nil, b)
