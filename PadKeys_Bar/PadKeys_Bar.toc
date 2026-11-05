@@ -4,7 +4,7 @@
 ## Author: wow-forever-data-science
 ## Version: 0.2.0
 ## Dependencies: PadKeys
-## OptionalDeps: SpellActivationOverlay
+## OptionalDeps: SpellActivationOverlay, PadKeys_Debug
 
 Config.lua
 Bar.lua
