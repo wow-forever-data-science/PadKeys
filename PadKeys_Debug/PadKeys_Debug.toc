@@ -1,0 +1,8 @@
+## Interface: 11507, 16001
+## Title: PadKeys - Debug
+## Notes: Saves Lua errors and blocked actions to SavedVariables, to read outside the game. Type /pkdebug.
+## Author: wow-forever-data-science
+## Version: 0.1.0
+## SavedVariables: PadKeysDebugDB
+
+Debug.lua

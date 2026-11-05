@@ -4,6 +4,7 @@
 ## Author: wow-forever-data-science
 ## Version: 0.2.0
 ## Dependencies: PadKeys
+## OptionalDeps: PadKeys_Debug
 
 Config.lua
 Targeting.lua

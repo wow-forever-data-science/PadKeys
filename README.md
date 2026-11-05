@@ -30,6 +30,7 @@ error points at one part:
 | **PadKeys_Targeting** | Friendly/enemy toggle (\`) and party/raid cycling (Ctrl+Tab) | PadKeys |
 | **PadKeys_Radial** | Main-menu radial with Blizzard's entries (hold Z) | PadKeys |
 | **PadKeys_Bar** | One bar that shows the layer you hold (Cmd, Shift, Option, Ctrl) | PadKeys (SpellActivationOverlay optional, for its proc glows) |
+| **PadKeys_Debug** | Saves Lua errors and blocked actions to a file, to send or read outside the game (`/pkdebug`) | — |
 
 It started in the wowforevR R package repository and moved here as a
 standalone addon; the history came along.
@@ -346,6 +347,19 @@ Vendor, trainer, bank and similar windows are driven with the UI cursor.
 **F1** (or `/padkeys map`) opens the key map in a Blizzard-style window. It
 reads your live keybindings each time it opens, with Blizzard's own key and
 action names, so it always shows your real setup. Esc closes it.
+
+## Errors (PadKeys_Debug)
+
+Enable **PadKeys_Debug** to keep every Lua error and "action blocked"
+message, with its stack, in
+`WTF/Account/<account>/SavedVariables/PadKeys_Debug.lua`.
+
+- The game writes the file on `/reload` and logout, so `/reload` after an
+  error and the file has it.
+- Each login or `/reload` starts a new session; the file holds only the last one.
+- Repeats count up instead of adding entries; at most 100 entries.
+- `/pkdebug` shows the count, `/pkdebug clear` empties it.
+- Blizzard's own error popup still works.
 
 ## What is Blizzard's and what is ours
 

@@ -13,6 +13,12 @@ addons. Only those folders go into the release zip (release.yaml).
 There are no tests; changes can only be tried in the game client, so say
 what is untested.
 
+## Errors from the game
+
+- PadKeys_Debug saves them on `/reload` or logout
+- Read `/Applications/World of Warcraft/_forever_/WTF/Account/*/SavedVariables/PadKeys_Debug.lua`
+- The installed addons are symlinks to this repo, so the game runs the checked-out branch
+
 ## Workflow
 
 - Work on a branch, open a PR, and merge it yourself once the checks pass
