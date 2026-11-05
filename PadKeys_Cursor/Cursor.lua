@@ -163,9 +163,15 @@ local function unclipped(frame, x, y)
   return true
 end
 
+-- Buttons, and text fields (a search box): the cursor can type in those.
 local function clickable(frame)
-  if not (frame:IsObjectType("Button") and frame:IsVisible() and
-            frame:IsEnabled() and frame:IsMouseClickEnabled()) then
+  if frame:IsObjectType("EditBox") then
+    if not (frame:IsVisible() and frame:IsMouseEnabled() and
+              (not frame.IsEnabled or frame:IsEnabled())) then
+      return false
+    end
+  elseif not (frame:IsObjectType("Button") and frame:IsVisible() and
+                frame:IsEnabled() and frame:IsMouseClickEnabled()) then
     return false
   end
   local width, height = frame:GetSize()
@@ -298,6 +304,23 @@ local function click_target(frame)
   end
   return frame
 end
+
+-- A text field under the cursor: the click key puts the text caret in it,
+-- so you can type. While it has the caret it takes the keys; Escape or
+-- Enter (the field's own handlers) give them back to the cursor.
+local field
+local focus = CreateFrame("Button", "PadKeysCursorFocus", UIParent)
+focus:SetScript("OnClick", function()
+  if field and field:IsVisible() then
+    field:SetFocus()
+  end
+end)
+ns.cursor_on_click(function(frame)
+  if frame:IsObjectType("EditBox") then
+    field = frame
+    return focus
+  end
+end)
 
 local function select_button(frame)
   if current and current ~= frame then
@@ -615,21 +638,51 @@ owner:SetScript("OnUpdate", function(_, dt)
   end
 end)
 
+-- The child of a window that autoFocus names ("CraftingPage.SearchBox"),
+-- if it is shown.
+local function focus_child(name)
+  local path = (ns.config.cursor.autoFocus or {})[name]
+  local frame = path and _G[name]
+  for key in (path or ""):gmatch("[^.]+") do
+    frame = frame and frame[key]
+  end
+  return frame and frame.IsVisible and frame:IsVisible() and frame or nil
+end
+
+-- Start the cursor when an autoFrames window opens, on its autoFocus child
+-- if it has one. Some windows (professions) belong to Blizzard addons that
+-- load later, so this runs again on every ADDON_LOADED.
+local hooked = {}
+local function hook_auto_frames()
+  for _, name in ipairs(ns.config.cursor.autoFrames or {}) do
+    local frame = _G[name]
+    if frame and frame.HookScript and not hooked[frame] then
+      hooked[frame] = true
+      frame:HookScript("OnShow", function()
+        C_Timer.After(0.05, function()
+          local child = focus_child(name)
+          if child then
+            ns.cursor_select(child)
+          else
+            start(false)
+          end
+        end)
+      end)
+    end
+  end
+end
+
 owner:RegisterEvent("PLAYER_LOGIN")
+owner:RegisterEvent("ADDON_LOADED")
 owner:RegisterEvent("PLAYER_REGEN_DISABLED")
 owner:SetScript("OnEvent", function(_, event)
   if event == "PLAYER_REGEN_DISABLED" then
     -- Fires just before combat lockdown, so bindings can still be cleared.
     stop()
+  elseif event == "ADDON_LOADED" then
+    hook_auto_frames()
   elseif event == "PLAYER_LOGIN" then
-    for _, name in ipairs(ns.config.cursor.autoFrames or {}) do
-      local frame = _G[name]
-      if frame and frame.HookScript then
-        frame:HookScript("OnShow", function()
-          C_Timer.After(0.05, function() start(false) end)
-        end)
-      end
-    end
+    hook_auto_frames()
     -- Blizzard's radial "Buffs" item calls BuffFrame:SetGamepadFocus(), which
     -- only works in gamepad mode. On keyboard, open our cursor on the auras.
     if BuffFrame and BuffFrame.SetGamepadFocus then

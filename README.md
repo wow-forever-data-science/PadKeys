@@ -306,7 +306,8 @@ contextual ping, or drag for Blizzard's ping wheel.
 ## UI cursor (out of combat)
 
 Press **Shift+\`**. The cursor also starts by itself when a gossip, quest,
-merchant or loot window or a popup opens. **B** opens your bags with the
+merchant, loot or professions window or a popup opens; in professions it
+lands on the search box. **B** opens your bags with the
 cursor on the first slot (in combat it only opens them; press B again to
 close). It clicks Blizzard's backpack button through a secure button, so
 the bags aren't tainted.
@@ -314,7 +315,7 @@ the bags aren't tainted.
 | Key | Does |
 |---|---|
 | W A S D / arrows | Move between buttons |
-| Space / Enter | Click: cast from the spellbook, pick a gossip line |
+| Space / Enter | Click: cast from the spellbook, pick a gossip line; on a text field (search box), type in it, and Escape or Enter goes back to moving |
 | Shift+Space | Right-click: use or sell an item, cancel a buff |
 | Ctrl+Space | Pick up a spell or item; move to an action bar slot and click to place it |
 | Tab / Shift+Tab | Jump to the next / previous open window (the gamepad's "Next Frame") |

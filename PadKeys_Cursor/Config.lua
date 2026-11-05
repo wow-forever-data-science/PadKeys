@@ -34,7 +34,13 @@ ns.config.cursor = {
   -- with F, then pick an option with W/S and F or Space).
   autoFrames = {
     "GossipFrame", "QuestFrame", "MerchantFrame", "LootFrame",
-    "StaticPopup1",
+    "StaticPopup1", "ProfessionsFrame",
+  },
+  -- Where the cursor lands when one of those opens, as a path of child
+  -- keys; otherwise the top-left button. Space or F on a text field lets
+  -- you type in it; Escape or Enter goes back to moving.
+  autoFocus = {
+    ProfessionsFrame = "CraftingPage.RecipeList.SearchBox",
   },
 }
 
