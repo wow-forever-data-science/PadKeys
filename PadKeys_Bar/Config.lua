@@ -14,10 +14,6 @@ ns.config.bar = {
   scale = 1,
   -- Behind each button; 0 is see-through, 1 is solid black.
   background_alpha = 0.75,
-  -- Key labels, counts and macro names. Fonts that come with the game:
-  -- Fonts\ARIALN.TTF (Arial Narrow), Fonts\FRIZQT__.TTF (WoW's default),
-  -- Fonts\skurri.ttf, Fonts\MORPHEUS.TTF.
-  font = "Fonts\\ARIALN.TTF",
   -- Name of the layer you hold ("Cmd", "Shift+Ctrl") above the bar.
   -- Nothing shows without a modifier.
   show_layer = true,

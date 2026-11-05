@@ -115,9 +115,7 @@ bar:SetSize(#FACE_KEYS * c.size + (#FACE_KEYS - 1) * c.spacing, c.size)
 bar:SetClampedToScreen(true)
 bar:SetMovable(true)
 
-local layer_text = bar:CreateFontString(nil, "OVERLAY")
-layer_text:SetFont(c.font, 14, "OUTLINE")
-layer_text:SetTextColor(1, 1, 1)
+local layer_text = bar:CreateFontString(nil, "OVERLAY", "GameFontHighlightOutline")
 layer_text:SetPoint("BOTTOM", bar, "TOP", 0, 6)
 
 local function place()
@@ -130,28 +128,6 @@ local function place()
   end
 end
 
--- Rounded corners: Blizzard's action button icon mask, if the client has
--- it; square otherwise.
-local ROUND_MASK = "UI-HUD-ActionBar-IconFrame-Mask"
-local has_round_mask = C_Texture.GetAtlasInfo(ROUND_MASK) ~= nil
-
-local function round(frame, texture, inset)
-  if not has_round_mask then
-    return
-  end
-  local mask = frame:CreateMaskTexture()
-  mask:SetAtlas(ROUND_MASK)
-  mask:SetPoint("TOPLEFT", inset, -inset)
-  mask:SetPoint("BOTTOMRIGHT", -inset, inset)
-  texture:AddMaskTexture(mask)
-end
-
-local function text(parent, size)
-  local s = parent:CreateFontString(nil, "OVERLAY")
-  s:SetFont(c.font, size, "OUTLINE")
-  s:SetTextColor(1, 1, 1)
-  return s
-end
 
 local buttons = {}
 for i, key in ipairs(FACE_KEYS) do
@@ -159,30 +135,26 @@ for i, key in ipairs(FACE_KEYS) do
   b:SetSize(c.size, c.size)
   b:SetPoint("LEFT", bar, "LEFT", (i - 1) * (c.size + c.spacing), 0)
 
-  -- 1px border: a rounded shape behind the icon, dark normally, gold
-  -- while the action is active (casting, auto attack, a pet stance),
-  -- white while its key is down.
+  -- 1px border: a square behind the icon, dark normally, gold while the
+  -- action is active (casting, auto attack, a pet stance), white while its
+  -- key is down.
   b.border = b:CreateTexture(nil, "BACKGROUND", nil, 0)
   b.border:SetAllPoints()
   b.border:SetColorTexture(1, 1, 1)
-  round(b, b.border, 0)
 
   b.bg = b:CreateTexture(nil, "BACKGROUND", nil, 1)
   b.bg:SetPoint("TOPLEFT", 1, -1)
   b.bg:SetPoint("BOTTOMRIGHT", -1, 1)
   b.bg:SetColorTexture(0, 0, 0, c.background_alpha)
-  round(b, b.bg, 1)
 
   b.icon = b:CreateTexture(nil, "ARTWORK")
   b.icon:SetPoint("TOPLEFT", 1, -1)
   b.icon:SetPoint("BOTTOMRIGHT", -1, 1)
   b.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
-  round(b, b.icon, 1)
 
-  -- The swipe can't be masked; inset so it stays inside the round corners.
   b.cooldown = CreateFrame("Cooldown", nil, b, "CooldownFrameTemplate")
-  b.cooldown:SetPoint("TOPLEFT", 2, -2)
-  b.cooldown:SetPoint("BOTTOMRIGHT", -2, 2)
+  b.cooldown:SetPoint("TOPLEFT", 1, -1)
+  b.cooldown:SetPoint("BOTTOMRIGHT", -1, 1)
   b.cooldown:SetDrawEdge(false)
 
   -- Text above the cooldown swipe.
@@ -190,14 +162,14 @@ for i, key in ipairs(FACE_KEYS) do
   top:SetAllPoints()
   top:SetFrameLevel(b.cooldown:GetFrameLevel() + 1)
 
-  b.hotkey = text(top, 12)
+  b.hotkey = top:CreateFontString(nil, "OVERLAY", "NumberFontNormalSmall")
   b.hotkey:SetPoint("TOPRIGHT", -3, -3)
   b.hotkey:SetText(GetBindingText and GetBindingText(key) or key)
 
-  b.count = text(top, 14)
+  b.count = top:CreateFontString(nil, "OVERLAY", "NumberFontNormal")
   b.count:SetPoint("BOTTOMRIGHT", -2, 2)
 
-  b.name = text(top, 10)
+  b.name = top:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmallOutline")
   b.name:SetPoint("BOTTOMLEFT", 2, 2)
   b.name:SetPoint("BOTTOMRIGHT", -2, 2)
   b.name:SetHeight(10)
