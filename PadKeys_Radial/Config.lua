@@ -13,14 +13,14 @@ b["CTRL-G"] = "CLICK PadKeysRing:menu"      -- Blizzard's main menu entries
 
 ns.config.radial = {
   -- Size against Blizzard's gamepad radial (1 = the same size).
-  scale = 0.5,
+  scale = 0.35,
   -- Open centred on the mouse, so pointing at an icon picks it. false
   -- opens at x, y from the screen centre.
   at_cursor = true,
   x = 0,
   y = 0,
   -- Mouse distance before a direction picks a segment.
-  dead_zone = 12,
+  dead_zone = 8,
 
   -- Segments go counter-clockwise from east (right), eight per page;
   -- false leaves one empty.

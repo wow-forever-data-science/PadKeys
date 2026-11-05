@@ -1,6 +1,6 @@
 -- The wheel both radials draw: Blizzard's gamepad radial art (the atlases
 -- of GamepadRadial, in Forever's Blizzard_Gamepad addon) at our scale, eight
--- segments, a title, page dots and the picked segment's name in the centre.
+-- segments, a title, page dots and the picked segment's name below.
 -- It only draws and picks; Menu.lua and Ring.lua decide what the segments
 -- are and what they do.
 --
@@ -98,8 +98,9 @@ function ns.create_wheel(name)
   end
 
   w.label = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-  w.label:SetPoint("CENTER", art)
-  w.label:SetWidth(110)
+  -- Under the wheel: the centre is too small for text at small scales.
+  w.label:SetPoint("TOP", art, "BOTTOM", 0, -6)
+  w.label:SetWidth(160)
 
   w.title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
   w.title:SetTextColor(1, 1, 1)

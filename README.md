@@ -253,8 +253,9 @@ next group member that exists.
 
 Hold **G** (with or without a modifier), point with the mouse, release G.
 The wheel opens centred on the mouse, the direction picks a segment as soon
-as the mouse leaves a small dead zone, and its name shows in the centre. The
-wheel is Blizzard's gamepad radial art at half size. The modifier you press with G picks the radial:
+as the mouse leaves a small dead zone (8 px, so a flick is enough), and its
+name shows below the wheel. The wheel is Blizzard's gamepad radial art at
+about a third of its size. The modifier you press with G picks the radial:
 
 | Key | Radial | In combat |
 |---|---|---|
