@@ -1,4 +1,5 @@
--- Saves every Lua error and blocked action to PadKeysDebugDB, so they can
+-- Saves every Lua error and blocked action (and notes from the PadKeys
+-- addons, PadKeysDebug_Note) to PadKeysDebugDB, so they can
 -- be read outside the game in
 -- WTF/Account/<account>/SavedVariables/PadKeys_Debug.lua. The game writes
 -- that file on /reload and logout. Blizzard's own error display keeps
@@ -79,6 +80,12 @@ events:SetScript("OnEvent", function(_, event, who, action)
   record(event, format("%s tried %s", tostring(who), tostring(action)),
          debugstack(2), nil)
 end)
+
+-- For the PadKeys addons: note a diagnostic line (kind "note"), e.g.
+-- frame sizes, to read from the file like an error.
+function PadKeysDebug_Note(message)
+  record("note", tostring(message), nil, nil)
+end
 
 SLASH_PADKEYSDEBUG1 = "/pkdebug"
 SlashCmdList.PADKEYSDEBUG = function(msg)

@@ -95,7 +95,7 @@ local function sections()
     menu_rows[#menu_rows + 1] = action_row("CLICK PadKeysRing:actions")
     menu_rows[#menu_rows + 1] = action_row("CLICK PadKeysRing:pings")
     menu_rows[#menu_rows + 1] = action_row("CLICK PadKeysRing:markers")
-    menu_rows[#menu_rows + 1] = action_row("PADKEYS_RADIAL")
+    menu_rows[#menu_rows + 1] = action_row("CLICK PadKeysRing:menu")
   else
     menu_rows[#menu_rows + 1] = action_row("TOGGLEPINGLISTENER")
   end
@@ -130,7 +130,7 @@ local function sections()
 
   local other = {}
   if c.radial then
-    other[#other + 1] = { "Menu radial pages (out of combat)",
+    other[#other + 1] = { "Menu radial pages",
       config_keys(c.radial.menu.page_keys.previous) .. " / " ..
         config_keys(c.radial.menu.page_keys.next) }
   end

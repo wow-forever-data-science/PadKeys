@@ -18,6 +18,8 @@ local ATLAS_ICON_DISTANCE = 100
 local TEXTURE_ICON_DISTANCE = 130
 local ATLAS_ICON_SIZE = 57
 local TEXTURE_ICON_SIZE = 38
+-- The wheel art's size, if its atlas gives none.
+local WHEEL_SIZE = 400
 
 ns.wheel_segments = SEGMENT_COUNT
 
@@ -62,7 +64,7 @@ function ns.create_wheel(name)
 
   local frame = CreateFrame("Frame", name, UIParent)
   frame:SetFrameStrata("DIALOG")
-  frame:SetSize(1, 1)
+  frame:SetSize(WHEEL_SIZE, WHEEL_SIZE)
   frame:Hide()
   w.frame = frame
 
@@ -72,8 +74,14 @@ function ns.create_wheel(name)
   local background = art:CreateTexture(nil, "ARTWORK", nil, 0)
   background:SetAtlas("gamepad-radial-menu-wheelbg", true)
   background:SetPoint("CENTER")
-  art:SetSize(background:GetSize())
+  local width, height = background:GetSize()
+  if not (width and width > 0) then
+    width, height = WHEEL_SIZE, WHEEL_SIZE
+    background:SetSize(width, height)
+  end
+  art:SetSize(width, height)
   w.art = art
+  w.background = background
 
   w.highlight = art:CreateTexture(nil, "ARTWORK", nil, 2)
   w.highlight:SetAtlas("gamepad-radial-menu-selected", true)
@@ -221,6 +229,33 @@ function Wheel:open(title)
   self.label:SetText("")
   frame:Show()
   play("GAMEPAD_RADIAL_MENU_OPEN")
+  self:note_layout()
+end
+
+-- Once per session, what the wheel looks like on screen, for
+-- PadKeys_Debug: sizes, visibility and whether the atlases exist.
+function Wheel:note_layout()
+  if self.noted or not PadKeysDebug_Note then
+    return
+  end
+  self.noted = true
+  local frame, art = self.frame, self.art
+  local function size(region)
+    local width, height = region:GetSize()
+    return format("%.0fx%.0f", width or -1, height or -1)
+  end
+  PadKeysDebug_Note(format(
+    "%s: frame %s visible=%s alpha=%.2f scale=%.2f strata=%s rect=%s | art %s visible=%s"
+      .. " | background %s shown=%s atlas=%s | title %q visible=%s | wheelbg=%s selected=%s",
+    frame:GetName() or "?", size(frame), tostring(frame:IsVisible()),
+    frame:GetEffectiveAlpha(), frame:GetEffectiveScale(), frame:GetFrameStrata(),
+    strjoin(",", tostringall(frame:GetRect())),
+    size(art), tostring(art:IsVisible()),
+    size(self.background), tostring(self.background:IsShown()),
+    tostring(self.background:GetAtlas()),
+    self.title:GetText() or "", tostring(self.title:IsVisible()),
+    tostring(C_Texture.GetAtlasInfo("gamepad-radial-menu-wheelbg") ~= nil),
+    tostring(C_Texture.GetAtlasInfo("gamepad-radial-menu-selected") ~= nil)))
 end
 
 function Wheel:close()

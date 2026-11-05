@@ -68,7 +68,7 @@ keyboard with each layer's keys. It's also published at
 | Context | Keys |
 |---|---|
 | UI cursor | WASD / arrows move · Space click · Shift+Space right-click · Ctrl+Space pick up · Tab / Shift+Tab next / previous window · Esc leave |
-| Radials | point with the mouse · release G: run · Ctrl+G only: Q / E or mouse wheel page, out of combat |
+| Radials | point with the mouse · release G: run · Ctrl+G only: Q / E or mouse wheel page |
 | NPC dialog | W / S move to an option or reward · F choose, accept, continue, complete · Esc close |
 | Aura tooltips | hold C, Ctrl+C, Option+C, Cmd+C: next aura in that group, gone on release |
 
@@ -261,13 +261,14 @@ radial art at half size. The modifier you press with G picks the radial:
 | G | Action Bar 6, slots 1-8: drag spells, items and macros there | yes |
 | Cmd+G | Pings: attack (top), assist (right), warning (left), on my way (bottom) | yes |
 | Shift+G | Target markers on your target, skull at the top | yes |
-| Ctrl+G | Blizzard's main-menu entries | centre page only |
+| Ctrl+G | Blizzard's main-menu entries, three pages | yes |
 
 - **Action Bar 6** is Blizzard's bar 6; it can stay hidden in Edit Mode.
   The radial shows icons and names only, not cooldowns or usability yet.
-- The G radials are a **secure button**: on release, a secure snippet
+- All four are one **secure button**: on release, a secure snippet
   turns the mouse direction into a segment and fires its action, so
-  spells and macros work in combat. The modifier only matters on press.
+  spells, macros and windows work in combat and nothing is tainted. The
+  modifier only matters on press.
 - Hold-G for Blizzard's ping system is gone; without PadKeys_Radial, G
   is Blizzard's ping system again. **Z** is sheathe / draw again.
 
@@ -275,25 +276,24 @@ radial art at half size. The modifier you press with G picks the radial:
 
 Three pages, centre page first:
 
-- **Left:** Group Finder, Legacy, Shop, Guild, Social, Buffs, Tracking,
-  Collections.
-- **Centre:** Bags, Professions, Character, Talents, Map, Chat, Menu,
-  Spellbook.
+- **Left:** Group Finder, Legacy, Shop, Guild, Buffs, Collections.
+- **Centre:** Bags, Professions, Character, Talents, Map, Menu, Spellbook.
 - **Right:** Clock, Calendar, PvP.
 
-Switch pages with **Q / E** or the **mouse wheel**, out of combat. In
-combat it opens on the centre page only, since combat blocks the page keys;
-entries Blizzard blocks in combat show greyed out. Release Ctrl+G with
-nothing highlighted to close.
+Switch pages with **Q / E** or the **mouse wheel** while it is open, in
+combat too (the secure snippet binds them until release). Release Ctrl+G
+with nothing highlighted to close.
 
-The frame and input are ours; the entries are Blizzard's (labels, icons,
-enabled state and actions come from `GamepadRadial`'s handlers). Size,
-position, dead zone, the pages, the pings and the marker order are in
-`PadKeys_Radial/Config.lua`.
+The labels, icons and enabled state come from Blizzard's gamepad radial
+(`GamepadRadial`'s handlers). Each entry opens by `/click`ing Blizzard's
+own button (`CharacterMicroButton` and so on), not by calling those
+handlers: from addon code their windows open tainted, and tainted Blizzard
+code errors on the client's secret values. Social, Chat and Tracking have
+no button to click, so they are left out. Size, position, dead zone, the
+pages, the pings and the marker order are in `PadKeys_Radial/Config.lua`.
 
-The **Buffs** segment only works in gamepad mode in Blizzard's code. On
-keyboard, PadKeys hooks it to open the UI cursor on your buffs (or debuffs,
-if you have no buffs).
+**Buffs** opens the UI cursor on your buffs (or debuffs, if you have no
+buffs) when PadKeys_Cursor is on.
 
 ## Pings (Blizzard's)
 
@@ -390,7 +390,7 @@ message, with its stack, in
 
 | Feature | Blizzard code used | Our code |
 |---|---|---|
-| Radials | `GamepadRadial` (`Blizzard_Gamepad/UI/Radials`): art (atlases), menu entries and their actions; the secure action button; `/ping`, `/tm` | the wheel, pages, mouse direction (secure snippet for the G radials), page keys and release |
+| Radials | `GamepadRadial` (`Blizzard_Gamepad/UI/Radials`): art (atlases), menu labels and icons; the micro buttons (clicked); the secure action button; `/ping`, `/tm` | the wheel, pages, mouse direction and paging (secure snippet), release |
 | Pings | the ping system (`TOGGLEPINGLISTENER`, `Blizzard_PingUI`) and its wheel | none, only the key |
 | NPC dialogs | `QuestFrame_GeneralProgressAction` (accept/continue/complete) and the gamepad's rules: cursor on the first entry, A clicks it, B closes | our cursor in place of SmartNavigation |
 | Key layout | Blizzard's binding actions | apply/restore of the bindings |
@@ -455,7 +455,8 @@ is loaded.
 **Stage 5: + PadKeys_Radial**
 
 10. **Menu radial**: hold Ctrl+G, move the mouse, switch pages with Q/E and
-    the wheel, release on a segment. Watch for Lua errors when it opens.
+    the wheel, release on a segment, also in combat. Watch for Lua errors
+    when the window opens.
 11. **Buffs** (with PadKeys_Cursor on): hold Ctrl+G, left page, pick Buffs.
     The cursor should land on your buffs; cancel one with Shift+Space.
 12. **Combat ring**: put a spell on Action Bar 6 slot 3, hold G, point up,

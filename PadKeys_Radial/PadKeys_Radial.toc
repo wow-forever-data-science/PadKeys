@@ -1,8 +1,8 @@
 ## Interface: 11507, 16001
 ## Title: PadKeys - Radial
-## Notes: Radials in the style of Blizzard's gamepad radial: actions, pings and markers in combat (G, Cmd+G, Shift+G), main menu (Ctrl+G). Needs PadKeys.
+## Notes: Radials in the style of Blizzard's gamepad radial, in combat too: actions (G), pings (Cmd+G), markers (Shift+G), main menu (Ctrl+G). Needs PadKeys.
 ## Author: wow-forever-data-science
-## Version: 0.4.0
+## Version: 0.5.0
 ## Dependencies: PadKeys
 ## OptionalDeps: PadKeys_Debug
 
