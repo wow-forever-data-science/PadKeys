@@ -42,9 +42,10 @@ local DIRECTIONS = {
 local owner = CreateFrame("Frame", "PadKeysCursorOwner", UIParent)
 local active, manual, current = false, false, nil
 
--- Highlight drawn over the current button: the soft additive glow the quest
--- log uses for its rows (which it tints the same way), instead of a hard
--- outline, so it reads like the game's own mouseover.
+-- What marks the current button, after the gamepad UI: a gold arrow that
+-- bobs at the button's left, the soft additive glow the quest log uses for
+-- its rows (tinted the way the quest log tints it), and a pulsing gold glow
+-- around the window the button is in.
 local box = CreateFrame("Frame", nil, UIParent)
 box:SetFrameStrata("TOOLTIP")
 box:Hide()
@@ -52,11 +53,73 @@ local glow = box:CreateTexture(nil, "OVERLAY")
 glow:SetTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight")
 glow:SetBlendMode("ADD")
 glow:SetAllPoints()
+
+local arrow = box:CreateTexture(nil, "OVERLAY")
+arrow:SetTexture("Interface\\ChatFrame\\ChatFrameExpandArrow")
+arrow:SetSize(16, 16)
+arrow:SetPoint("RIGHT", box, "LEFT", 2, 0)
+local bob = box:CreateAnimationGroup()
+bob:SetLooping("BOUNCE")
+local nudge = bob:CreateAnimation("Translation")
+nudge:SetOffset(-3, 0)
+nudge:SetDuration(0.5)
+nudge:SetSmoothing("IN_OUT")
+nudge:SetTarget(arrow)
+box:SetScript("OnShow", function() bob:Play() end)
+box:SetScript("OnHide", function() bob:Stop() end)
+
+local frame_glow = CreateFrame("Frame", nil, UIParent)
+frame_glow:SetFrameStrata("TOOLTIP")
+frame_glow:Hide()
+local GLOW = 10
+local glow_edges = {}
+-- A strip just outside each side of the window: its inner edge on the
+-- window's edge. The top and bottom strips also run over the corners.
+local function glow_edge(outward, p1, r1, x1, y1, p2, r2, x2, y2)
+  local tex = frame_glow:CreateTexture(nil, "OVERLAY")
+  tex:SetColorTexture(1, 1, 1)
+  tex:SetBlendMode("ADD")
+  tex:SetPoint(p1, frame_glow, r1, x1, y1)
+  tex:SetPoint(p2, frame_glow, r2, x2, y2)
+  glow_edges[#glow_edges + 1] = { tex = tex, outward = outward }
+end
+glow_edge("up", "BOTTOMLEFT", "TOPLEFT", -GLOW, 0,
+          "TOPRIGHT", "TOPRIGHT", GLOW, GLOW)
+glow_edge("down", "TOPLEFT", "BOTTOMLEFT", -GLOW, 0,
+          "BOTTOMRIGHT", "BOTTOMRIGHT", GLOW, -GLOW)
+glow_edge("left", "TOPRIGHT", "TOPLEFT", 0, 0,
+          "BOTTOMLEFT", "BOTTOMLEFT", -GLOW, 0)
+glow_edge("right", "TOPLEFT", "TOPRIGHT", 0, 0,
+          "BOTTOMRIGHT", "BOTTOMRIGHT", GLOW, 0)
+local pulse = frame_glow:CreateAnimationGroup()
+pulse:SetLooping("BOUNCE")
+local fade = pulse:CreateAnimation("Alpha")
+fade:SetFromAlpha(1)
+fade:SetToAlpha(0.45)
+fade:SetDuration(1.2)
+fade:SetSmoothing("IN_OUT")
+frame_glow:SetScript("OnShow", function() pulse:Play() end)
+frame_glow:SetScript("OnHide", function() pulse:Stop() end)
+
 local function tint(armed)
+  local r, g, b = 1, 0.82, 0.2
   if armed then
-    glow:SetVertexColor(1, 0.7, 0.1, 1)
-  else
-    glow:SetVertexColor(1, 0.9, 0.6, 0.8)
+    r, g, b = 1, 0.6, 0.05
+  end
+  glow:SetVertexColor(r, g, b, armed and 1 or 0.85)
+  arrow:SetVertexColor(r, g, b)
+  local edge, clear = CreateColor(r, g, b, 0.6), CreateColor(r, g, b, 0)
+  for _, e in ipairs(glow_edges) do
+    -- Brightest at the window's edge, fading outward.
+    if e.outward == "up" then
+      e.tex:SetGradient("VERTICAL", edge, clear)
+    elseif e.outward == "down" then
+      e.tex:SetGradient("VERTICAL", clear, edge)
+    elseif e.outward == "left" then
+      e.tex:SetGradient("HORIZONTAL", clear, edge)
+    else
+      e.tex:SetGradient("HORIZONTAL", edge, clear)
+    end
   end
 end
 tint(false)
@@ -246,6 +309,13 @@ local function select_button(frame)
   box:ClearAllPoints()
   box:SetAllPoints(frame)
   box:Show()
+  local root = root_of[frame]
+  if root then
+    frame_glow:SetAllPoints(root)
+    frame_glow:Show()
+  else
+    frame_glow:Hide()
+  end
   if ns.config.cursor.tooltips ~= false then
     run_script(frame, "OnEnter", true)
   end
@@ -264,6 +334,7 @@ local function stop()
   current = nil
   set_armed(nil)
   box:Hide()
+  frame_glow:Hide()
 end
 
 -- Re-check after windows change: keep the current button if it is still
