@@ -2,8 +2,8 @@
 
 local ns = PadKeys
 
--- Inspect auras, in combat too: each press shows the next aura's tooltip
--- in that group (wrapping around); Escape closes the tooltip view. C
+-- Inspect auras, in combat too: hold a key for the tooltip of the next aura
+-- in that group (wrapping around), like hovering it. C
 -- replaces the character window (it's on the menu radial, Ctrl+G). ALT is
 -- Option on a Mac; on Windows, where Cmd's layer is Alt, pick another key
 -- for target debuffs.

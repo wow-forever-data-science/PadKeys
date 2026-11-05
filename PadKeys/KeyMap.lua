@@ -134,11 +134,8 @@ local function sections()
       config_keys(c.radial.menu.page_keys.previous) .. " / " ..
         config_keys(c.radial.menu.page_keys.next) }
   end
-  if loaded("PadKeys_Auras") then
-    other[#other + 1] = { "Close aura view", key_text("ESCAPE") }
-  end
   if #other > 0 then
-    list[#list + 1] = { "In the radial and aura view", other }
+    list[#list + 1] = { "In the radial", other }
   end
   return list
 end
