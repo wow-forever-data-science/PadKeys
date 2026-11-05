@@ -115,12 +115,15 @@ bar:SetSize(#FACE_KEYS * c.size + (#FACE_KEYS - 1) * c.spacing, c.size)
 bar:SetClampedToScreen(true)
 bar:SetMovable(true)
 
--- Text in c.font (Roboto Condensed Bold, shipped in Fonts/), outlined;
--- Blizzard's font object stays if the file can't be loaded.
+-- White text in c.font (Roboto Condensed Bold, shipped in Fonts/) with a
+-- drop shadow, which keeps it brighter than an outline; Blizzard's font
+-- object stays if the file can't be loaded.
 local function text(parent, size, fallback)
   local s = parent:CreateFontString(nil, "OVERLAY", fallback)
-  s:SetFont(c.font, size, "OUTLINE")
+  s:SetFont(c.font, size, "")
   s:SetTextColor(1, 1, 1)
+  s:SetShadowColor(0, 0, 0, 1)
+  s:SetShadowOffset(1, -1)
   return s
 end
 
@@ -172,7 +175,8 @@ for i, key in ipairs(FACE_KEYS) do
   top:SetFrameLevel(b.cooldown:GetFrameLevel() + 1)
 
   b.hotkey = text(top, 13, "NumberFontNormalSmall")
-  b.hotkey:SetPoint("TOPRIGHT", -3, -3)
+  b.hotkey:SetPoint("TOPLEFT", 3, -3)
+  b.hotkey:SetJustifyH("LEFT")
   b.hotkey:SetText(GetBindingText and GetBindingText(key) or key)
 
   b.count = text(top, 15, "NumberFontNormal")
@@ -267,7 +271,7 @@ local function clear(b)
   b.icon:SetTexture(nil)
   b.count:SetText("")
   b.name:SetText("")
-  b.hotkey:SetTextColor(1, 1, 1, 0.5)
+  b.hotkey:SetTextColor(1, 1, 1)
   set_cooldown(b, nil)
   set_border(b, 0, 0, 0)
   set_glow(b, false)
