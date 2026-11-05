@@ -252,13 +252,14 @@ local function set_border(b, r, g, bl)
   end
 end
 
--- Cooldown numbers are secret values in combat: our code may hand them to
--- the cooldown widget but not compare them (that errors). So, as in
--- Blizzard's ActionButton_ApplyCooldown, a plain flag decides whether to
--- show one, and the numbers go straight to SetCooldown.
-local function set_cooldown(b, show, start, duration, mod_rate)
-  if show then
-    b.cooldown:SetCooldown(start, duration, mod_rate or 1)
+-- Cooldown numbers are secret values in combat: addon code may neither
+-- compare them nor pass them to SetCooldown. A duration object wraps them
+-- (C_ActionBar.GetActionCooldownDuration), and the widget takes it with
+-- SetCooldownFromDurationObject. A plain flag (isActive) decides whether
+-- to show one, as in Blizzard's ActionButton_ApplyCooldown.
+local function set_cooldown(b, duration)
+  if duration then
+    b.cooldown:SetCooldownFromDurationObject(duration)
   else
     b.cooldown:Clear()
   end
@@ -269,7 +270,7 @@ local function clear(b)
   b.count:SetText("")
   b.name:SetText("")
   b.hotkey:SetTextColor(0.6, 0.6, 0.6)
-  set_cooldown(b, false)
+  set_cooldown(b, nil)
   set_border(b, 0, 0, 0)
   set_glow(b, false)
 end
@@ -295,16 +296,15 @@ local function show_action(b, action)
   local cd = ab.GetActionCooldown(action)
   local charges = ab.GetActionCharges and ab.GetActionCharges(action)
   if cd and cd.isActive then
-    set_cooldown(b, true, cd.startTime, cd.duration, cd.modRate)
+    set_cooldown(b, ab.GetActionCooldownDuration(action))
   elseif charges and charges.isActive then
-    set_cooldown(b, true, charges.cooldownStartTime, charges.cooldownDuration,
-                 charges.chargeModRate)
+    set_cooldown(b, ab.GetActionChargeDuration(action))
   else
-    set_cooldown(b, false)
+    set_cooldown(b, nil)
   end
 
-  b.count:SetText(ab.GetActionDisplayCount and
-                  ab.GetActionDisplayCount(action) or "")
+  -- The count may be secret too: SetText takes it, testing it would not.
+  b.count:SetText(ab.GetActionDisplayCount(action))
   local is_macro = GetActionInfo(action) == "macro"
   b.name:SetText(c.show_macro_names and is_macro and
                  ab.GetActionText(action) or "")
@@ -325,10 +325,12 @@ local function show_pet(b, slot)
   else
     b.icon:SetVertexColor(0.4, 0.4, 0.4)
   end
-  -- The pet API has no plain flag; a duration of 0 shows no swipe, so the
-  -- numbers go to the widget unchecked.
+  -- The pet API has no duration object. If its numbers are secret,
+  -- SetCooldown refuses them and the button shows no swipe.
   local start, duration = GetPetActionCooldown(slot)
-  set_cooldown(b, type(start) == "number", start, duration)
+  if not pcall(b.cooldown.SetCooldown, b.cooldown, start, duration) then
+    b.cooldown:Clear()
+  end
   b.count:SetText("")
   b.name:SetText("")
   return is_active, checks_range and not in_range
