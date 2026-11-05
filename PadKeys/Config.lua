@@ -52,8 +52,10 @@ local bindings = {
   TAB = "TARGETNEARESTENEMY",
   ["SHIFT-TAB"] = "TARGETPREVIOUSENEMY",
   -- Hold for Blizzard's ping system: click a spot or unit to ping it, or
-  -- drag for Blizzard's ping wheel.
+  -- drag for Blizzard's ping wheel. PadKeys_Radial puts its ring here.
   G = "TOGGLEPINGLISTENER",
+  -- Sheathe / draw your weapon, as in WoW's defaults.
+  Z = "TOGGLESHEATH",
   -- Sit / stand, as in WoW's defaults.
   X = "SITORSTAND",
   -- This key map (like Blizzard's Controller Map).
@@ -76,6 +78,7 @@ end
 ns.config = {
   bindings = bindings,
   face_keys = FACE_KEYS,
+  mod = MOD,
 }
 
 -- Addons that add to the layout. Each loaded one adds its own keys to
@@ -84,7 +87,7 @@ ns.modules = {
   { addon = "PadKeys_Cursor", does = "UI cursor and NPC dialogs" },
   { addon = "PadKeys_Auras", does = "Debuff and buff tooltips (C)" },
   { addon = "PadKeys_Targeting", does = "Friendly/enemy toggle, group cycling" },
-  { addon = "PadKeys_Radial", does = "Main-menu radial (Z)" },
+  { addon = "PadKeys_Radial", does = "Combat ring (G) and main-menu radial (Ctrl+G)" },
   { addon = "PadKeys_Bar", does = "One bar that shows the layer you hold" },
   { addon = "PadKeys_Debug", does = "Saves errors to SavedVariables (/pkdebug)" },
 }

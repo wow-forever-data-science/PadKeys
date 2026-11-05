@@ -158,13 +158,13 @@ footer p { margin: 0; max-width: 75ch; }
           </dl>
         </div>
         <div class="card">
-          <h3>Main-menu radial</h3>
-          <p>Hold Z. Blizzard's menu entries on a smaller radial, three pages.</p>
+          <h3>Radials</h3>
+          <p>Hold G, point with the mouse, release G. The modifier picks the radial.</p>
           <dl>
-            <dt>Mouse</dt><dd>Point at a segment</dd>
-            <dt>Q / E</dt><dd>Previous / next page</dd>
-            <dt>Wheel</dt><dd>Previous / next page</dd>
-            <dt>Release Z</dt><dd>Open the highlighted segment</dd>
+            <dt>G</dt><dd>Action Bar 6, slots 1-8 (in combat too)</dd>
+            <dt>Cmd+G</dt><dd>Pings (in combat too)</dd>
+            <dt>Shift+G</dt><dd>Target markers (in combat too)</dd>
+            <dt>Ctrl+G</dt><dd>Main menu; Q / E or wheel page it out of combat</dd>
           </dl>
         </div>
         <div class="card">
@@ -228,8 +228,8 @@ const MAP = {
     F: { a: "Interact", c: "act", long: "Interact; in an NPC dialog, choose / accept / complete" },
     X: { a: "Sit", c: "move", long: "Sit / stand" },
     C: { a: "Debuffs", c: "act", long: "Next debuff tooltip", combat: true },
-    Z: { a: "Radial", c: "menu", long: "Main-menu radial", hold: true },
-    G: { a: "Ping", c: "menu", long: "Blizzard's ping system", hold: true },
+    Z: { a: "Sheathe", c: "move", long: "Sheathe / draw your weapon" },
+    G: { a: "Actions", c: "menu", long: "Action radial: Action Bar 6, slots 1-8", hold: true, combat: true },
     F1: { a: "Key map", c: "menu", long: "This key map, in game" },
     esc: { a: "Back", c: "menu", long: "Game menu; closes the cursor or aura view first" },
   },
@@ -238,12 +238,14 @@ const MAP = {
     "`": { a: "Cursor", c: "menu", long: "Keyboard UI cursor" },
     tab: { a: "Prev target", c: "target", long: "Previous enemy (friend in friendly mode)", combat: true },
     F: { a: "Assist", c: "target", long: "Assist: your target's target" },
+    G: { a: "Markers", c: "menu", long: "Target marker radial", hold: true, combat: true },
   },
   ctrl: {
     ...bar("Pet bar", "Pet", ["1","2","3","4"]),
     ...bar("Action Bar 4", "Bar4", ["Q","E","R","T"]),
     tab: { a: "Next group", c: "target", long: "Next party or raid member (with Shift: previous)", combat: true },
     F: { a: "Last target", c: "target", long: "Back to your previous target" },
+    G: { a: "Menu", c: "menu", long: "Main-menu radial", hold: true },
   },
   opt: {
     ...bar("Action Bar 5", "Bar5"),
@@ -252,6 +254,7 @@ const MAP = {
   cmd: {
     ...bar("Action Bar 2", "Bar2"),
     F: { a: "Last hostile", c: "target", long: "Last hostile target" },
+    G: { a: "Pings", c: "menu", long: "Ping radial", hold: true, combat: true },
   },
 };
 const LAYER_NAMES = { plain: "No modifier", shift: "Shift", ctrl: "Control", opt: "Option", cmd: "Command" };

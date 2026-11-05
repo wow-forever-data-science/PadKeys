@@ -8,8 +8,8 @@ without a gamepad, and adds its own code only where Blizzard's doesn't:
   gamepad's buttons and shoulders;
 - **targeting** like the gamepad: a friendly/enemy mode toggle, enemy and
   group cycling, assist and last target, all usable in combat;
-- a **main-menu radial** in the style of Blizzard's gamepad radial, with
-  Blizzard's entries, and Blizzard's **ping system**;
+- **radials** in the style of Blizzard's gamepad radial: actions, pings and
+  target markers in combat, and Blizzard's main-menu entries;
 - a **keyboard UI cursor** that moves through open windows, unit frames and
   your buffs;
 - **aura inspection**: step through your debuff and buff tooltips in combat;
@@ -28,7 +28,7 @@ error points at one part:
 | **PadKeys_Cursor** | UI cursor (windows, unit frames, buffs) and NPC dialogs (F = A, Esc = B) | PadKeys |
 | **PadKeys_Auras** | Debuff (C) and buff (Option+C) tooltips | PadKeys |
 | **PadKeys_Targeting** | Friendly/enemy toggle (\`) and party/raid cycling (Ctrl+Tab) | PadKeys |
-| **PadKeys_Radial** | Main-menu radial with Blizzard's entries (hold Z) | PadKeys |
+| **PadKeys_Radial** | Radials: actions (G), pings (Cmd+G), markers (Shift+G), main menu (Ctrl+G) | PadKeys |
 | **PadKeys_Bar** | One bar that shows the layer you hold (Cmd, Shift, Option, Ctrl) | PadKeys (SpellActivationOverlay optional, for its proc glows) |
 | **PadKeys_Debug** | Saves Lua errors and blocked actions to a file, to send or read outside the game (`/pkdebug`) | — |
 
@@ -60,15 +60,15 @@ keyboard with each layer's keys. It's also published at
 | \` | Friendly ↔ enemy targeting | | |
 | Tab / Shift+Tab | Next / previous target (in mode) | Ctrl+F | Last target |
 | Ctrl+Tab / Ctrl+Shift+Tab | Next / previous group member | Cmd+F | Last hostile target |
-| Z (hold) | Main-menu radial | C | Next debuff tooltip |
-| G (hold) | Pings | Option+C | Next buff tooltip |
+| G (hold) | Action radial (Bar 6); with Cmd: pings, Shift: markers, Ctrl: main menu | C | Next debuff tooltip |
+| Z | Sheathe / draw weapon | Option+C | Next buff tooltip |
 | Shift+\` | UI cursor | X | Sit / stand |
 | F1 | Key map | | |
 
 | Context | Keys |
 |---|---|
 | UI cursor | WASD / arrows move · Space click · Shift+Space right-click · Ctrl+Space pick up · Tab / Shift+Tab next / previous window · Esc leave |
-| Radial | Q / E or mouse wheel: pages · release Z: open |
+| Radials | point with the mouse · release G: run · Ctrl+G only: Q / E or mouse wheel page, out of combat |
 | NPC dialog | W / S move to an option or reward · F choose, accept, continue, complete · Esc close |
 | Aura tooltips | C / Option+C next · Esc close |
 
@@ -248,10 +248,31 @@ The mode toggle and group cycling are secure buttons, so they work in
 combat: the toggle rebinds Tab and Shift+Tab, and group cycling picks the
 next group member that exists.
 
-## Main-menu radial
+## Radials (PadKeys_Radial)
 
-Hold **Z**. A radial in the style of Blizzard's gamepad radial, at half its
-size, opens with three pages, centre page first:
+Hold **G** (with or without a modifier), point with the mouse, release G.
+The direction picks a segment as soon as the mouse leaves a small dead
+zone, and its name shows in the centre. The wheel is Blizzard's gamepad
+radial art at half size. The modifier you press with G picks the radial:
+
+| Key | Radial | In combat |
+|---|---|---|
+| G | Action Bar 6, slots 1-8: drag spells, items and macros there | yes |
+| Cmd+G | Pings: attack (top), assist (right), warning (left), on my way (bottom) | yes |
+| Shift+G | Target markers on your target, skull at the top | yes |
+| Ctrl+G | Blizzard's main-menu entries | centre page only |
+
+- **Action Bar 6** is Blizzard's bar 6; it can stay hidden in Edit Mode.
+  The radial shows icons and names only, not cooldowns or usability yet.
+- The G radials are a **secure button**: on release, a secure snippet
+  turns the mouse direction into a segment and fires its action, so
+  spells and macros work in combat. The modifier only matters on press.
+- Hold-G for Blizzard's ping system is gone; without PadKeys_Radial, G
+  is Blizzard's ping system again. **Z** is sheathe / draw again.
+
+### Main menu (Ctrl+G)
+
+Three pages, centre page first:
 
 - **Left:** Group Finder, Legacy, Shop, Guild, Social, Buffs, Tracking,
   Collections.
@@ -259,15 +280,15 @@ size, opens with three pages, centre page first:
   Spellbook.
 - **Right:** Clock, Calendar, PvP.
 
-Move the mouse towards a segment: the direction picks it as soon as the
-mouse leaves a small dead zone, and its name shows in the centre. Switch
-pages with **Q / E** or the **mouse wheel**. Release Z to open the
-highlighted segment, or release with nothing highlighted to close. It opens
-windows, so it's for out of combat, as on a gamepad.
+Switch pages with **Q / E** or the **mouse wheel**, out of combat. In
+combat it opens on the centre page only, since combat blocks the page keys;
+entries Blizzard blocks in combat show greyed out. Release Ctrl+G with
+nothing highlighted to close.
 
 The frame and input are ours; the entries are Blizzard's (labels, icons,
 enabled state and actions come from `GamepadRadial`'s handlers). Size,
-position, dead zone and the pages are in `PadKeys_Radial/Config.lua`.
+position, dead zone, the pages, the pings and the marker order are in
+`PadKeys_Radial/Config.lua`.
 
 The **Buffs** segment only works in gamepad mode in Blizzard's code. On
 keyboard, PadKeys hooks it to open the UI cursor on your buffs (or debuffs,
@@ -365,7 +386,7 @@ message, with its stack, in
 
 | Feature | Blizzard code used | Our code |
 |---|---|---|
-| Menu radial | `GamepadRadial` (`Blizzard_Gamepad/UI/Radials`): art (atlases), entries and their actions | the frame, pages, mouse direction, page keys and release |
+| Radials | `GamepadRadial` (`Blizzard_Gamepad/UI/Radials`): art (atlases), menu entries and their actions; the secure action button; `/ping`, `/tm` | the wheel, pages, mouse direction (secure snippet for the G radials), page keys and release |
 | Pings | the ping system (`TOGGLEPINGLISTENER`, `Blizzard_PingUI`) and its wheel | none, only the key |
 | NPC dialogs | `QuestFrame_GeneralProgressAction` (accept/continue/complete) and the gamepad's rules: cursor on the first entry, A clicks it, B closes | our cursor in place of SmartNavigation |
 | Key layout | Blizzard's binding actions | apply/restore of the bindings |
@@ -428,20 +449,24 @@ is loaded.
 
 **Stage 5: + PadKeys_Radial**
 
-10. **Radial**: hold Z, move the mouse, switch pages with Q/E and the wheel,
-    release on a segment. Watch for Lua errors when it opens.
-11. **Buffs** (with PadKeys_Cursor on): hold Z, left page, pick Buffs. The
-    cursor should land on your buffs; cancel one with Shift+Space.
+10. **Menu radial**: hold Ctrl+G, move the mouse, switch pages with Q/E and
+    the wheel, release on a segment. Watch for Lua errors when it opens.
+11. **Buffs** (with PadKeys_Cursor on): hold Ctrl+G, left page, pick Buffs.
+    The cursor should land on your buffs; cancel one with Shift+Space.
+12. **Combat ring**: put a spell on Action Bar 6 slot 3, hold G, point up,
+    release: it should cast, also in combat. Then Cmd+G up (attack ping)
+    and Shift+G up (skull on your target). The highlight must match what
+    fires; if not, send the debug file.
 
 **Stage 6: + PadKeys_Bar**
 
-12. **Bar**: hold Cmd, Shift, Option and Ctrl in turn; the bar should show
+13. **Bar**: hold Cmd, Shift, Option and Ctrl in turn; the bar should show
     Bars 2, 3 and 5, then the pet bar and Bar 4. Cast something with a
     cooldown on each layer and watch the swipe. `/padkeys bar` and drag it.
-13. **Hidden bars**: hide all of Blizzard's bars in Edit Mode, then press
+14. **Hidden bars**: hide all of Blizzard's bars in Edit Mode, then press
     keys on every layer: they should still cast. Drag a spell from the
     spellbook: the hidden bars should appear until you drop it.
-14. **Proc glow** (optional, only if you installed SpellActivationOverlay;
+15. **Proc glow** (optional, only if you installed SpellActivationOverlay;
     skip it otherwise): trigger a proc it tracks
     for a spell on Bar 2, hold Cmd: that button should glow on the bar.
 

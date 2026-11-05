@@ -1,10 +1,12 @@
 ## Interface: 11507, 16001
 ## Title: PadKeys - Radial
-## Notes: Main-menu radial in the style of Blizzard's gamepad radial (hold Z). Needs PadKeys.
+## Notes: Radials in the style of Blizzard's gamepad radial: actions, pings and markers in combat (G, Cmd+G, Shift+G), main menu (Ctrl+G). Needs PadKeys.
 ## Author: wow-forever-data-science
-## Version: 0.3.0
+## Version: 0.4.0
 ## Dependencies: PadKeys
 ## OptionalDeps: PadKeys_Debug
 
 Config.lua
-Radial.lua
+Wheel.lua
+Menu.lua
+Ring.lua
