@@ -15,8 +15,6 @@ local ns = PadKeys
 local c = ns.config.fade
 
 local HOVER_INTERVAL = 0.05
-local ACCENT = "33ccff"
-local FONT = "Interface\\AddOns\\PadKeys_Bar\\Fonts\\RobotoCondensed-ExtraBold.ttf"
 
 -- Older names for the same frames.
 local ALIASES = { MainActionBar = "MainMenuBar" }
@@ -133,10 +131,8 @@ local function make_label(frame, name)
   holder:SetFrameStrata("MEDIUM")
   holder:SetSize(1, 1)
   holder:SetPoint("RIGHT", frame, "LEFT", -8, 0)
-  local text = holder:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-  text:SetFont(FONT, c.label_size or 12, "")
-  text:SetShadowColor(0, 0, 0, 1)
-  text:SetShadowOffset(1, -1)
+  local text = ns.text(holder, c.label_size or 12, "white", "OVERLAY",
+                       "GameFontHighlightSmall")
   text:SetPoint("RIGHT")
   text:SetJustifyH("RIGHT")
   holder.text = text
@@ -149,8 +145,9 @@ end
 local function update_labels()
   for _, label in ipairs(labels) do
     local keys = keys_for(label.bar, label.name)
-    label.text:SetText(format("|cffd9d9d9%s|r%s", BAR_NAMES[label.name],
-      keys and format("  |cff%s%s|r", ACCENT, keys) or ""))
+    -- The bar's name in grey, its key in white.
+    label.text:SetText(ns.paint(BAR_NAMES[label.name], "light") ..
+      (keys and "  " .. ns.paint(keys, "white") or ""))
   end
 end
 

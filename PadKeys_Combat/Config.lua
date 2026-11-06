@@ -4,8 +4,7 @@ local ns = PadKeys
 
 ns.config.combat = {
   -- A short text in the middle of the screen when you enter and leave
-  -- combat. It uses PadKeys_Bar's font (its Config.lua `font`), or Roboto
-  -- Condensed ExtraBold from PadKeys_Bar's folder if that isn't loaded.
+  -- combat, in white and the PadKeys font (PadKeys/Config.lua, theme).
   banner = true,
   enter_text = "Combat",
   leave_text = "Out of Combat",

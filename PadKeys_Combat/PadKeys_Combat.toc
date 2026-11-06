@@ -4,7 +4,7 @@
 ## Author: wow-forever-data-science
 ## Version: 0.1.0
 ## Dependencies: PadKeys
-## OptionalDeps: PadKeys_Bar, PadKeys_Debug
+## OptionalDeps: PadKeys_Debug
 
 Config.lua
 Combat.lua

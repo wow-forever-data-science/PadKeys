@@ -16,10 +16,6 @@ ns.config.bar = {
   background_alpha = 0.75,
   -- Slightly rounded corners (Media/RoundedSquare.tga); false for square.
   rounded = true,
-  -- Labels, counts and macro names. Roboto Condensed ExtraBold comes with
-  -- PadKeys_Bar (Fonts/, SIL Open Font License); WoW's own fonts work too,
-  -- e.g. "Fonts\\FRIZQT__.TTF" or "Fonts\\ARIALN.TTF".
-  font = "Interface\\AddOns\\PadKeys_Bar\\Fonts\\RobotoCondensed-ExtraBold.ttf",
   -- A see-through black box behind each key label, so it reads on bright
   -- icons. Alpha: 0 is see-through, 1 is solid black. The outline is a
   -- darker 1px edge on the box's open sides; false for none.

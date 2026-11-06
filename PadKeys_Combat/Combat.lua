@@ -10,8 +10,6 @@
 local ns = PadKeys
 local c = ns.config.combat
 
-local DEFAULT_FONT = "Interface\\AddOns\\PadKeys_Bar\\Fonts\\RobotoCondensed-ExtraBold.ttf"
-
 -- --- Banner ---------------------------------------------------------------
 
 local banner = CreateFrame("Frame", "PadKeysCombatBanner", UIParent)
@@ -20,13 +18,10 @@ banner:SetPoint("CENTER", UIParent, "CENTER", c.x or 0, c.y or 0)
 banner:SetFrameStrata("HIGH")
 banner:SetAlpha(0)
 
--- The action bar's font and look (white with a drop shadow); Blizzard's
--- font object stays if the file can't be loaded.
-local label = banner:CreateFontString(nil, "OVERLAY", "GameFontHighlightHuge")
-local font = ns.config.bar and ns.config.bar.font or DEFAULT_FONT
-label:SetFont(font, c.size or 28, "")
-label:SetTextColor(1, 1, 1)
-label:SetShadowColor(0, 0, 0, 1)
+-- The PadKeys font, white with a drop shadow; Blizzard's font object stays
+-- if the file can't be loaded.
+local label = ns.text(banner, c.size or 28, "white", "OVERLAY",
+                      "GameFontHighlightHuge")
 label:SetShadowOffset(2, -2)
 label:SetPoint("CENTER")
 
