@@ -89,5 +89,6 @@ ns.modules = {
   { addon = "PadKeys_Targeting", does = "Friendly/enemy toggle, group cycling" },
   { addon = "PadKeys_Radial", does = "Combat ring (G) and main-menu radial (Ctrl+G)" },
   { addon = "PadKeys_Bar", does = "One bar that shows the layer you hold" },
+  { addon = "PadKeys_Fade", does = "Blizzard's bars fade in on mouseover or drag" },
   { addon = "PadKeys_Debug", does = "Saves errors to SavedVariables (/pkdebug)" },
 }

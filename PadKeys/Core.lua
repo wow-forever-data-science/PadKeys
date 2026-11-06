@@ -18,6 +18,7 @@ local HELP = {
   "/padkeys cursor - toggle the keyboard UI cursor (PadKeys_Cursor)",
   "/padkeys map - show the key map",
   "/padkeys bar - unlock / lock the bar to drag it; bar reset (PadKeys_Bar)",
+  "/padkeys fade - stop / start fading Blizzard's bars (PadKeys_Fade)",
   "/padkeys status - which PadKeys addons are loaded",
 }
 
@@ -54,6 +55,12 @@ SlashCmdList.PADKEYS = function(msg)
       ns.toggle_bar_move(arg)
     else
       ns.say("the bar is in PadKeys_Bar, which isn't loaded.")
+    end
+  elseif cmd == "fade" then
+    if ns.toggle_fade then
+      ns.toggle_fade()
+    else
+      ns.say("fading is in PadKeys_Fade, which isn't loaded.")
     end
   elseif cmd == "status" then
     status()
