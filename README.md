@@ -71,7 +71,7 @@ keyboard with each layer's keys. It's also published at
 | Context | Keys |
 |---|---|
 | UI cursor | WASD / arrows move · Space click · Shift+Space right-click · Ctrl+Space pick up · Tab / Shift+Tab next / previous window · Esc leave |
-| Radials | point with the mouse · release G: run · Ctrl+G only: Q / E or mouse wheel page |
+| Radials | point with the mouse · release G: run · Ctrl+G only: mouse wheel pages |
 | NPC dialog | W / S move to an option or reward · F choose, accept, continue, complete · Esc close |
 | Aura tooltips | C, Cmd+C, Shift+C, Ctrl+C: next aura in that group, fades after 3 s |
 
@@ -320,8 +320,8 @@ Three pages, centre page first:
 - **Centre:** Bags, Professions, Character, Talents, Map, Menu, Spellbook.
 - **Right:** Clock, Calendar, PvP.
 
-Switch pages with **Q / E** or the **mouse wheel** while it is open, in
-combat too (the secure snippet binds them until release). Release Ctrl+G
+Switch pages with the **mouse wheel** (up: left, down: right) while it is open, in
+combat too (the secure snippet binds the wheel until release). Release Ctrl+G
 with nothing highlighted to close.
 
 The labels, icons and enabled state come from Blizzard's gamepad radial

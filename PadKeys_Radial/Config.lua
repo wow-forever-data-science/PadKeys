@@ -43,10 +43,10 @@ ns.config.radial = {
   -- The main-menu page (Menu.lua).
   menu = {
     -- Page keys while it is open, also with a modifier held (Ctrl from
-    -- Ctrl+G).
+    -- Ctrl+G): scroll the mouse wheel. Add keys ("Q") to page with them too.
     page_keys = {
-      previous = { "Q", "MOUSEWHEELUP" },
-      next = { "E", "MOUSEWHEELDOWN" },
+      previous = { "MOUSEWHEELUP" },
+      next = { "MOUSEWHEELDOWN" },
     },
     -- The page it opens on.
     start_page = 2,
