@@ -19,9 +19,11 @@ without a gamepad, and adds its own code only where Blizzard's doesn't:
 - **one action bar** that shows the layer you hold, like a gamepad's
   skill panel, so Blizzard's bars can be hidden;
 - **fading bars**: Blizzard's bars, micro menu and bags stay out of sight
-  until you mouse over them or drag a spell, each labelled with its key.
+  until you mouse over them or drag a spell, each labelled with its key;
+- a **combat banner**: "Combat" / "Out of Combat" fades in and out in the
+  middle of the screen as you enter and leave combat.
 
-It comes as seven addons, so you can switch them on one at a time and an
+It comes as several addons, so you can switch them on one at a time and an
 error points at one part:
 
 | Addon | What it adds | Needs |
@@ -33,6 +35,7 @@ error points at one part:
 | **PadKeys_Radial** | Radials: actions (G), pings (Cmd+G), markers (Shift+G), main menu (Ctrl+G) | PadKeys |
 | **PadKeys_Bar** | One bar that shows the layer you hold (Cmd, Shift, Option, Ctrl) | PadKeys (SpellActivationOverlay optional, for its proc glows) |
 | **PadKeys_Fade** | Blizzard's action bars, micro menu and bags fade out until you mouse over them or drag a spell; each bar is labelled with its PadKeys key (Cmd, Shift, G wheel) | PadKeys |
+| **PadKeys_Combat** | "Combat" / "Out of Combat" fades in the middle of the screen as you enter and leave combat, in the action bar's font | PadKeys |
 | **PadKeys_Debug** | Saves Lua errors and blocked actions to a file, to send or read outside the game (`/pkdebug`) | — |
 
 It started in the wowforevR R package repository and moved here as a
@@ -269,6 +272,19 @@ press the buttons as before. Invisible buttons still take clicks where
 they sit, which is why the bottom of the screen is the place for them.
 Groups, timings, the faded alpha (0 is invisible) and the labels are in
 `PadKeys_Fade/Config.lua`.
+
+## Combat banner (PadKeys_Combat)
+
+As you enter combat, **Combat** fades in above the middle of the screen in
+red and fades out a second later; as you leave it, **Out of Combat** does
+the same in green. It uses PadKeys_Bar's font (Roboto Condensed
+ExtraBold, or whatever `font` is set to in `PadKeys_Bar/Config.lua`).
+Texts, colours, size, position and timings are in
+`PadKeys_Combat/Config.lua`; `banner = false` turns it off.
+
+It only sets a text's alpha, so it works in combat. Later this addon is
+meant to change how buffs and debuffs show in and out of combat, and to
+show boss timers or, in PvP, enemy cooldowns.
 
 ## Targeting (works in combat)
 
