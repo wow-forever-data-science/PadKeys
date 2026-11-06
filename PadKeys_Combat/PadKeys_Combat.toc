@@ -1,0 +1,10 @@
+## Interface: 11507, 16001
+## Title: PadKeys - Combat
+## Notes: Changes the UI when you enter and leave combat. For now: a short "Combat" / "Out of Combat" text in the middle of the screen. Needs PadKeys.
+## Author: wow-forever-data-science
+## Version: 0.1.0
+## Dependencies: PadKeys
+## OptionalDeps: PadKeys_Bar, PadKeys_Debug
+
+Config.lua
+Combat.lua
