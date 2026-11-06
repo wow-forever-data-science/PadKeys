@@ -20,6 +20,13 @@ ns.config.bar = {
   -- PadKeys_Bar (Fonts/, SIL Open Font License); WoW's own fonts work too,
   -- e.g. "Fonts\\FRIZQT__.TTF" or "Fonts\\ARIALN.TTF".
   font = "Interface\\AddOns\\PadKeys_Bar\\Fonts\\RobotoCondensed-ExtraBold.ttf",
+  -- A see-through black box behind each key label, so it reads on bright
+  -- icons. Alpha: 0 is see-through, 1 is solid black. The outline is a
+  -- darker 1px edge on the box's open sides; false for none.
+  hotkey_background = true,
+  hotkey_background_alpha = 0.55,
+  hotkey_outline = true,
+  hotkey_outline_alpha = 0.9,
   -- Name of the layer you hold ("Cmd", "Shift+Ctrl") above the bar.
   -- Nothing shows without a modifier.
   show_layer = true,
