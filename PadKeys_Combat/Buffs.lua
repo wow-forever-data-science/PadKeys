@@ -429,7 +429,20 @@ end
 
 local panel = CreateFrame("Frame", "PadKeysBuffReminder", UIParent)
 panel:SetSize(1, 1)
-panel:SetPoint(cfg.point, UIParent, cfg.point, cfg.x, cfg.y)
+-- In the middle of the screen (its top centre at the screen's centre, a
+-- block of left-aligned rows), or under a frame (its top left at the
+-- frame's bottom left), offset by x, y. A named frame is looked up when
+-- the list shows, so one moved in Edit Mode is followed.
+local function place()
+  local frame = cfg.anchor ~= "center" and _G[cfg.anchor]
+  panel:ClearAllPoints()
+  if frame then
+    panel:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", cfg.x, cfg.y)
+  else
+    panel:SetPoint("TOP", UIParent, "CENTER", cfg.x, cfg.y)
+  end
+end
+place()
 panel:SetFrameStrata("MEDIUM")
 panel:EnableMouse(false)
 panel:SetAlpha(0)
@@ -493,6 +506,9 @@ end
 
 local function fade(target, duration)
   if target > 0 then
+    if not panel:IsShown() then
+      place()
+    end
     panel:Show()
   elseif not panel:IsShown() then
     return

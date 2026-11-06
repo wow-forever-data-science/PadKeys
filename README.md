@@ -310,7 +310,8 @@ meant to show boss timers or, in PvP, enemy cooldowns.
 ### Buff reminder
 
 Long buffs matter before a pull, not during it. Out of combat, a short list
-near the top of the screen shows the long buffs that are **missing** or
+just below the middle of the screen (under your character; the combat
+banner is above) shows the long buffs that are **missing** or
 have **under 5 minutes** left; when nothing is, it isn't there. As you enter
 combat it fades out as fast as the banner does (`fade_out`), and it fades
 back in as you leave combat (`fade_in`).
@@ -337,7 +338,8 @@ frame's and nameplates' auras are Blizzard's protected frames, so they keep
 Blizzard's own filters; inspect them with PadKeys_Auras (C).
 
 Settings are under `ns.config.combat.buffs` in `PadKeys_Combat/Config.lua`:
-the 5-minute limit (`warn_at`), position, size, `ignore` to drop a buff,
+the 5-minute limit (`warn_at`), position (`anchor = "PlayerFrame"` puts it
+under the player frame instead), size, `ignore` to drop a buff,
 `hide_resting`, `consolidate_in_combat = false` to leave the buff frame
 alone, and `enabled = false` to turn the reminder off.
 
