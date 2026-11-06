@@ -77,8 +77,8 @@ local function sections()
   end
   target_rows[#target_rows + 1] = {
     not targeting and "Next / previous enemy" or
-      (friendly and "Next / previous target (friend in combat)" or
-       "Next / previous target (enemy in combat)"),
+      (friendly and "Next / previous enemy, else friend (friend in combat)" or
+       "Next / previous enemy, else friend"),
     keys_for("TARGETNEARESTENEMY") .. " / " .. keys_for("TARGETPREVIOUSENEMY") }
   if targeting then
     target_rows[#target_rows + 1] = action_row(

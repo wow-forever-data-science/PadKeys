@@ -1,8 +1,9 @@
 -- Targeting, the keyboard version of the gamepad's targeting buttons.
 --
 -- Tab and Shift+Tab (next / previous target):
--- * Out of combat they cycle everything in front of you, friend or enemy
---   (TARGETNEAREST).
+-- * Out of combat they cycle the enemies in front of you, and the friends
+--   when there is no enemy (a secure macro). Blizzard's TARGETNEAREST,
+--   meant for any unit, only found friends.
 -- * In combat they follow friendly/enemy mode (gamepad LB "Target
 --   Friendly" / RB "Target Hostile"): one key toggles the mode.
 -- A secure header rebinds the keys as combat starts and ends (a state
@@ -68,18 +69,28 @@ ns.group_cycle = button
 -- mode. In combat in enemy mode it clears them, so the layout's normal
 -- enemy bindings apply again.
 local APPLY = [[
-  local next, prev
-  if not self:GetAttribute("combat") then
-    next, prev = "TARGETNEAREST", "TARGETPREVIOUS"
-  elseif self:GetAttribute("friendly") then
-    next, prev = "TARGETNEARESTFRIEND", "TARGETPREVIOUSFRIEND"
-  end
   self:ClearBindings()
-  if next then
-    self:SetBinding(true, self:GetAttribute("nextkey"), next)
-    self:SetBinding(true, self:GetAttribute("prevkey"), prev)
+  local nextkey, prevkey = self:GetAttribute("nextkey"), self:GetAttribute("prevkey")
+  if not self:GetAttribute("combat") then
+    self:SetBindingClick(true, nextkey, "PadKeysTargetAny", "LeftButton")
+    self:SetBindingClick(true, prevkey, "PadKeysTargetAny", "RightButton")
+  elseif self:GetAttribute("friendly") then
+    self:SetBinding(true, nextkey, "TARGETNEARESTFRIEND")
+    self:SetBinding(true, prevkey, "TARGETPREVIOUSFRIEND")
   end
 ]]
+
+-- Out of combat: the next (left button) or previous (right button) enemy;
+-- if that leaves no living enemy targeted, the next or previous friend.
+local any = CreateFrame("Button", "PadKeysTargetAny", UIParent,
+                        "SecureActionButtonTemplate")
+any:RegisterForClicks("AnyDown")
+any:SetAttribute("useOnKeyDown", true)
+any:SetAttribute("type", "macro")
+any:SetAttribute("macrotext1",
+  "/targetenemy\n/stopmacro [harm,nodead]\n/targetfriend")
+any:SetAttribute("macrotext2",
+  "/targetenemy 1\n/stopmacro [harm,nodead]\n/targetfriend 1")
 
 local TOGGLE_MODE = [[
   owner:SetAttribute("friendly", not owner:GetAttribute("friendly"))
