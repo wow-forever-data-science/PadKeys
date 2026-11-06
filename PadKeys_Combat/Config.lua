@@ -26,11 +26,14 @@ ns.config.combat.buffs = {
   enabled = true,
   -- Seconds left under which a buff shows (5 minutes).
   warn_at = 300,
-  -- Where the list sits: its top left corner, from this point of the
-  -- screen, in pixels (positive y is up).
-  point = "TOP",
-  x = -120,
-  y = -140,
+  -- Where the list sits. "center": just below the middle of the screen,
+  -- under your character (the combat banner is above it). Or a frame's
+  -- name to sit under it, e.g. "PlayerFrame" or "TargetFrame" (party and
+  -- pet frames sit under the player frame, so it can cover them).
+  -- x, y move it, in pixels (positive y is up).
+  anchor = "center",
+  x = 0,
+  y = -120,
   size = 14,
   max_rows = 8,
   -- Names listed per buff before "+N".
