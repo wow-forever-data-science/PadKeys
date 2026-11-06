@@ -209,11 +209,19 @@ Bar 4 with Ctrl. Like a gamepad's skill panel, the bar changes the moment
 you press or let go of a modifier, in combat too. The layer name ("Cmd")
 shows above it while a modifier is held.
 
-Each button shows the icon, cooldown, charges or item count, macro name,
-a dim icon when the spell can't be used now (a little less dim: not
-enough mana), a dark grey key label when the target is out of range, a
+Each button shows the icon, charges or item count, macro name, a dim icon
+when the spell can't be used now (a little less dim: not enough mana), a
 grey border while the action is active (casting, auto attack, a pet
-stance) and a white border while its key is down. Stance and form paging of Bar 1 carries over.
+stance) and a white border while its key is down. Cooldown and range
+show on the icon itself, and the key label stays white:
+
+- **On cooldown** the icon turns see-through with the seconds left in
+  the middle. There's no swipe, and the global cooldown alone shows
+  nothing. A spell recharging with charges left shows its recharge time
+  but stays solid; pet cooldowns show the time but don't fade.
+- **Out of range** the icon turns grey and a little see-through.
+
+How see-through, and the countdown's size, are in `PadKeys_Bar/Config.lua`. Stance and form paging of Bar 1 carries over.
 
 **Proc glow:** when a Blizzard button lights up, the bar's button for that
 key lights up too, on whichever layer you hold. That covers
@@ -614,7 +622,7 @@ Known risks:
   procs never glow with the bars hidden, set the bars to "Always" to
   check, and send what you see.
 - PadKeys_Bar checks range from Blizzard's range events. If the key label
-  never turns dark grey out of range, the hidden bars may have stopped range
+  never turns grey out of range, the hidden bars may have stopped range
   checks; send what you see.
 - The radial reads its entries from Blizzard's `GamepadRadial` frame. If
   Blizzard changes that table, or an entry's action only works in gamepad

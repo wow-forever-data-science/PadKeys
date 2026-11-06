@@ -8,7 +8,8 @@
 -- visibility). Each slot shows the action of the Blizzard button the key
 -- presses (button.action, so stance and override paging carry over), with
 -- Blizzard's own action API for the icon, cooldown, count, usable tint and
--- range. Nothing here is secure, so it updates freely in combat.
+-- range. Out of range greys the icon; a cooldown makes it see-through
+-- with the seconds left on top (no swipe). Nothing here is secure, so it updates freely in combat.
 
 local ns = PadKeys
 local c = ns.config.bar
@@ -107,6 +108,19 @@ local function watch_range(action)
   end
 end
 
+-- Which action slots are only on the global cooldown, so a cast doesn't
+-- dim the whole bar. Blizzard's isOnGCD flag is only right while handling
+-- SPELL_UPDATE_COOLDOWN, so it is read then for every slot and kept.
+local MAX_ACTION_SLOT = 180
+local on_gcd = {}
+local function read_gcd()
+  local ab = C_ActionBar
+  for action = 1, MAX_ACTION_SLOT do
+    local cd = ab.HasAction(action) and ab.GetActionCooldown(action)
+    on_gcd[action] = cd and cd.isOnGCD or nil
+  end
+end
+
 -- --- The bar ------------------------------------------------------------
 
 local bar = CreateFrame("Frame", "PadKeysBar", UIParent)
@@ -137,8 +151,7 @@ end
 
 -- Slightly rounded corners: a mask of our own (Media/RoundedSquare.tga,
 -- made by tools/make_rounded_mask.py) that fills the whole button, so the
--- icon keeps its size. The cooldown swipe can't be masked; it is drawn in
--- the same shape instead.
+-- icon keeps its size.
 local ROUNDED = "Interface\\AddOns\\PadKeys_Bar\\Media\\RoundedSquare"
 
 local function round(frame, texture, inset)
@@ -182,18 +195,19 @@ for i, key in ipairs(FACE_KEYS) do
   b.cooldown = CreateFrame("Cooldown", nil, b, "CooldownFrameTemplate")
   b.cooldown:SetPoint("TOPLEFT", 1, -1)
   b.cooldown:SetPoint("BOTTOMRIGHT", -1, 1)
+  -- Only the countdown: no swipe, edge or flash. Blizzard shows the
+  -- numbers by the countdownForCooldowns setting; ours always shows them.
+  b.cooldown:SetDrawSwipe(false)
   b.cooldown:SetDrawEdge(false)
-  if c.rounded then
-    b.cooldown:SetSwipeTexture(ROUNDED)
-    b.cooldown:SetSwipeColor(0, 0, 0, 0.8)
-  end
+  b.cooldown:SetDrawBling(false)
+  b.cooldown:SetHideCountdownNumbers(false)
   local countdown = b.cooldown.GetCountdownFontString and
     b.cooldown:GetCountdownFontString()
   if countdown then
-    ns.style(countdown, 16)
+    ns.style(countdown, c.countdown_size or 20)
   end
 
-  -- Text above the cooldown swipe.
+  -- Text above the countdown.
   local top = CreateFrame("Frame", nil, b)
   top:SetAllPoints()
   top:SetFrameLevel(b.cooldown:GetFrameLevel() + 1)
@@ -307,12 +321,26 @@ local function set_cooldown(b, duration)
   end
 end
 
+-- Out of range: the icon in grey. On cooldown: see-through, the countdown
+-- on top. Both only change the icon; the key label stays white.
+local function set_state(b, far, cooling)
+  b.icon:SetDesaturated(far or ns.config.theme.grey_icons or false)
+  local alpha = 1
+  if cooling then
+    alpha = c.cooldown_alpha or 0.35
+  end
+  if far then
+    alpha = math.min(alpha, c.range_alpha or 0.6)
+  end
+  b.icon:SetAlpha(alpha)
+end
+
 local function clear(b)
   b.icon:SetTexture(nil)
   b.count:SetText("")
   b.name:SetText("")
-  b.hotkey:SetTextColor(1, 1, 1)
   set_cooldown(b, nil)
+  set_state(b, false, false)
   set_border(b, 0, 0, 0)
   set_glow(b, false)
 end
@@ -335,10 +363,14 @@ local function show_action(b, action)
     b.icon:SetVertexColor(0.35, 0.35, 0.35)
   end
 
+  -- The global cooldown alone shows nothing. A spell out of charges is on
+  -- cooldown; one recharging with charges left shows the recharge time but
+  -- stays solid, as it can still be cast.
   local cd = ab.GetActionCooldown(action)
   local charges = ab.GetActionCharges and ab.GetActionCharges(action)
-  if cd and cd.isActive then
-    set_cooldown(b, ab.GetActionCooldownDuration(action))
+  local cooling = cd and cd.isActive and not on_gcd[action] or false
+  if cooling then
+    set_cooldown(b, ab.GetActionCooldownDuration(action, true))
   elseif charges and charges.isActive then
     set_cooldown(b, ab.GetActionChargeDuration(action))
   else
@@ -351,7 +383,7 @@ local function show_action(b, action)
   b.name:SetText(c.show_macro_names and is_macro and
                  ab.GetActionText(action) or "")
   return ab.IsCurrentAction(action) or ab.IsAutoRepeatAction(action),
-         out_of_range[action]
+         out_of_range[action], cooling
 end
 
 local function show_pet(b, slot)
@@ -367,8 +399,9 @@ local function show_pet(b, slot)
   else
     b.icon:SetVertexColor(0.35, 0.35, 0.35)
   end
-  -- The pet API has no duration object. If its numbers are secret,
-  -- SetCooldown refuses them and the button shows no swipe.
+  -- The pet API has no duration object and no plain "active" flag, so a
+  -- pet cooldown shows the countdown but doesn't fade the icon. If its
+  -- numbers are secret, SetCooldown refuses them and nothing shows.
   local start, duration = GetPetActionCooldown(slot)
   if not pcall(b.cooldown.SetCooldown, b.cooldown, start, duration) then
     b.cooldown:Clear()
@@ -388,20 +421,16 @@ local function update()
 
   for _, b in ipairs(buttons) do
     local src = source_for(mods, b.key)
-    local active, far
+    local active, far, cooling
     if not src then
       clear(b)
     elseif src.pet then
       active, far = show_pet(b, src.pet)
     else
-      active, far = show_action(b, src.action)
+      active, far, cooling = show_action(b, src.action)
     end
     if src and b.icon:GetTexture() then
-      if far then
-        b.hotkey:SetTextColor(ns.grey.dark, ns.grey.dark, ns.grey.dark)
-      else
-        b.hotkey:SetTextColor(1, 1, 1)
-      end
+      set_state(b, far, cooling)
       local pushed = src.button and src.button:GetButtonState() == "PUSHED"
       if pushed then
         set_border(b, 1, 1, 1)
@@ -429,8 +458,11 @@ end)
 bar:RegisterEvent("PLAYER_LOGIN")
 bar:RegisterEvent("MODIFIER_STATE_CHANGED")
 bar:RegisterEvent("ACTION_RANGE_CHECK_UPDATE")
+bar:RegisterEvent("SPELL_UPDATE_COOLDOWN")
 bar:SetScript("OnEvent", function(_, event, ...)
-  if event == "ACTION_RANGE_CHECK_UPDATE" then
+  if event == "SPELL_UPDATE_COOLDOWN" then
+    read_gcd()
+  elseif event == "ACTION_RANGE_CHECK_UPDATE" then
     local action, in_range, checks_range = ...
     out_of_range[action] = checks_range and not in_range or nil
     return
