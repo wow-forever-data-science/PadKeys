@@ -30,8 +30,8 @@ ns.config.bar = {
   range_alpha = 0.6,
   countdown_size = 20,
   -- Name of the layer you hold ("Cmd", "Shift+Ctrl") above the bar.
-  -- Nothing shows without a modifier.
-  show_layer = true,
+  -- Nothing shows without a modifier. Off: the key labels are enough.
+  show_layer = false,
   -- Name of the macro on each button, as on Blizzard's bars.
   show_macro_names = true,
   -- Light up a button when the Blizzard button behind it glows: procs from
