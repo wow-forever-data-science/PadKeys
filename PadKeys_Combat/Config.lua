@@ -9,9 +9,6 @@ ns.config.combat = {
   banner = true,
   enter_text = "Combat",
   leave_text = "Out of Combat",
-  -- Colours, red/green/blue from 0 to 1.
-  enter_color = { 1, 0.25, 0.2 },
-  leave_color = { 0.4, 1, 0.4 },
   size = 28,
   -- Offset from the centre of the screen, in pixels (positive is up).
   x = 0,
