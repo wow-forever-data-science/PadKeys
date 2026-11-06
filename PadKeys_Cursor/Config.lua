@@ -25,8 +25,10 @@ ns.config.cursor = {
     scroll_up = { "MOUSEWHEELUP" },
     scroll_down = { "MOUSEWHEELDOWN" },
     click = { "SPACE", "F" },              -- gamepad A, same key as Interact
-    rightclick = { "SHIFT-SPACE" },        -- use item, sell to vendor
-    pickup = { "CTRL-SPACE" },             -- drag a spell or item
+    -- While the cursor is on, these take over Shift+F (assist) and Ctrl+F
+    -- (previous target) from PadKeys/Config.lua.
+    rightclick = { "SHIFT-F" },            -- use item, sell to vendor
+    pickup = { "CTRL-F" },                 -- drag a spell or item
     -- gamepad B: close the window the cursor is in, or leave the cursor
     -- where there is nothing to close. Only taken over while the cursor is
     -- on; otherwise Escape opens the game menu as usual.

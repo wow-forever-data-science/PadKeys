@@ -75,7 +75,7 @@ keyboard with each layer's keys. It's also published at
 
 | Context | Keys |
 |---|---|
-| UI cursor | WASD / arrows move · Space click · Shift+Space right-click · Ctrl+Space pick up · Tab / Shift+Tab next / previous window · Esc leave |
+| UI cursor | WASD / arrows move · F / Space click (uses a bag item) · Shift+F right-click · Ctrl+F pick up · Tab / Shift+Tab next / previous window · Esc leave |
 | Radials | point with the mouse · release G: run · Ctrl+G only: mouse wheel pages |
 | NPC dialog | W / S move to an option or reward · F choose, accept, continue, complete · Esc close |
 | Aura tooltips | C, Cmd+C, Shift+C, Ctrl+C: next aura in that group, fades after 3 s |
@@ -428,9 +428,9 @@ the bags aren't tainted.
 | Key | Does |
 |---|---|
 | W A S D / arrows | Move between buttons |
-| Space / Enter | Click: cast from the spellbook, pick a gossip line; on a text field (search box), type in it, and Escape or Enter goes back to moving |
-| Shift+Space | Right-click: use or sell an item, cancel a buff |
-| Ctrl+Space | Pick up a spell or item; move to an action bar slot and click to place it |
+| F / Space | Click: cast from the spellbook, pick a gossip line, use a bag item (eat, drink, equip, sell to an open vendor); on a text field (search box), type in it, and Escape or Enter goes back to moving |
+| Shift+F | Right-click: use or sell an item, cancel a buff (takes over Assist while the cursor is on) |
+| Ctrl+F | Pick up a spell or item; move to an action bar slot or bag slot and click to place it (takes over Last target while the cursor is on) |
 | Tab / Shift+Tab | Jump to the next / previous open window (the gamepad's "Next Frame") |
 | Esc / Backspace | Close the window the cursor is in (the gamepad's B). Where there's nothing to close (unit frames, auras, popups), leave the cursor. |
 
@@ -439,7 +439,7 @@ gamepad's UI focus mode. They're only taken over while it's on.
 
 - **Started with Shift+\`:** it also reaches the player, target, focus,
   party and raid frames (Space targets that unit) and your **buffs and
-  debuffs** (the highlighted one shows its tooltip; Shift+Space cancels a
+  debuffs** (the highlighted one shows its tooltip; Shift+F cancels a
   buff, the same right-click Blizzard's gamepad uses).
 - **Started by a window opening:** it only covers windows, and switches off
   when they close.
@@ -562,7 +562,7 @@ is loaded.
 **Stage 2: + PadKeys_Cursor**
 
 6. **Cursor**: open the spellbook and bags, press Shift+\`, move with WASD,
-   Tab between the windows, Space on a spell, Shift+Space on a bag item,
+   Tab between the windows, Space on a spell, Shift+F on a bag item,
    Esc to close the window.
 7. **NPC dialogs**: talk to a quest giver with F and keep pressing F; pick a
    reward with S and F. Talk to an innkeeper or banker, move to an option
@@ -586,7 +586,7 @@ is loaded.
     the wheel, release on a segment, also in combat. Watch for Lua errors
     when the window opens.
 11. **Buffs** (with PadKeys_Cursor on): hold Ctrl+G, left page, pick Buffs.
-    The cursor should land on your buffs; cancel one with Shift+Space.
+    The cursor should land on your buffs; cancel one with Shift+F.
 12. **Combat ring**: put a spell on Action Bar 6 slot 3, hold G, point up,
     release: it should cast, also in combat. Then Cmd+G up (attack ping)
     and Shift+G up (skull on your target). The highlight must match what
