@@ -1,6 +1,8 @@
 -- Keyboard UI cursor, modelled on Forever's gamepad "SmartNavigation": while
 -- it is active the movement keys move a highlight between the buttons of the
 -- open windows, Space clicks the highlighted one and Esc closes its window.
+-- The mouse wheel steps through entries one at a time. A window that opens
+-- takes the cursor (followWindows, autoFrames in Config.lua).
 --
 -- Clicks go through a secure proxy button bound with an override binding,
 -- so they count as real key presses: spells in the spellbook can be cast and
@@ -217,6 +219,10 @@ local function root_names()
   return names
 end
 
+-- Windows Blizzard opened with ShowUIPanel, in case one isn't listed in
+-- UIPanelWindows (see the ShowUIPanel hook below).
+local panels = {}
+
 -- Which window (root) each candidate button belongs to, for next/previous
 -- window. Rebuilt by candidates().
 local root_of = {}
@@ -224,8 +230,14 @@ local root_of = {}
 local function candidates()
   local out, seen = {}, {}
   root_of = {}
+  local roots = {}
   for _, name in ipairs(root_names()) do
-    local frame = _G[name]
+    roots[#roots + 1] = _G[name]
+  end
+  for _, frame in ipairs(panels) do
+    roots[#roots + 1] = frame
+  end
+  for _, frame in ipairs(roots) do
     if type(frame) == "table" and frame.IsVisible and not seen[frame] and
       frame:IsVisible() then
       seen[frame] = true
@@ -407,7 +419,132 @@ local function nav_button(name, func)
   button:RegisterForClicks("AnyDown")
   button:SetScript("OnClick", func)
 end
+-- Scrolling the mouse wheel steps through entries one at a time, in reading
+-- order (left to right, then down), as the gamepad's shoulder buttons page:
+--
+-- * Windows can take a step over (Services.lua: vendor items turn the page
+--   at the end of one). Each handler gets the button and the step (1 next,
+--   -1 previous) and returns true if it handled it.
+-- * In a scrolling list (trainer skills, recipes, gossip) the next row,
+--   scrolling the list to bring it into view.
+-- * Elsewhere the next button of the same size in the same window (bag
+--   slots, spells), else the nearest button down or up.
+local scroll_handlers = {}
+function ns.cursor_on_scroll(handler)
+  scroll_handlers[#scroll_handlers + 1] = handler
+end
+
+-- The ScrollBox list a button is a row of (or is inside a row of): the
+-- list and the row.
+local function list_row(frame)
+  local child, parent = frame, frame:GetParent()
+  while parent and parent ~= UIParent do
+    local list = parent:GetParent()
+    if list and list.FindFrameElementDataIndex and list.GetScrollTarget and
+      list:GetScrollTarget() == parent then
+      return list, child
+    end
+    child, parent = parent, list
+  end
+end
+
+-- A row's own button, else its top-left button.
+local function button_in(frame)
+  if clickable(frame) then
+    return frame
+  end
+  local out = {}
+  collect(frame, out, 0)
+  return first(out)
+end
+
+local function select_found(frame)
+  candidates() -- so the window glow follows
+  select_button(frame)
+end
+
+local function scroll_list(list, row, delta)
+  local index = list:FindFrameElementDataIndex(row)
+  local size = list.GetDataProviderSize and list:GetDataProviderSize()
+  if not (index and size) then
+    return false
+  end
+  local align = ScrollBoxConstants and ScrollBoxConstants.AlignNearest
+  -- Skip rows with nothing to click (dividers), but not forever.
+  local i = index + delta
+  for _ = 1, 20 do
+    if i < 1 or i > size then
+      break
+    end
+    list:ScrollToElementDataIndex(i, align, 0, true)
+    local data = list:FindElementData(i)
+    local frame = data and list:FindFrame(data)
+    local target = frame and button_in(frame)
+    if target then
+      select_found(target)
+      break
+    end
+    i = i + delta
+  end
+  return true
+end
+
+local function same_size(a, b)
+  local aw, ah = a:GetSize()
+  local bw, bh = b:GetSize()
+  return math.abs(aw - bw) <= 2 and math.abs(ah - bh) <= 2
+end
+
+local function reads_before(a, b)
+  local ax, ay = center(a)
+  local bx, by = center(b)
+  if math.abs(ay - by) > 4 then
+    return ay > by
+  end
+  return ax < bx
+end
+
+local function scroll(delta)
+  if not active or InCombatLockdown() then
+    return
+  end
+  local cands = candidates()
+  if not current or not current:IsVisible() then
+    refresh()
+    return
+  end
+  for _, handler in ipairs(scroll_handlers) do
+    if handler(current, delta) then
+      return
+    end
+  end
+  local list, row = list_row(current)
+  if list and scroll_list(list, row, delta) then
+    return
+  end
+  local root, peers = root_of[current], {}
+  for _, frame in ipairs(cands) do
+    if root_of[frame] == root and same_size(frame, current) then
+      peers[#peers + 1] = frame
+    end
+  end
+  if #peers > 1 then
+    table.sort(peers, reads_before)
+    for i, frame in ipairs(peers) do
+      if frame == current then
+        if peers[i + delta] then
+          select_button(peers[i + delta])
+        end
+        return
+      end
+    end
+  end
+  move(delta > 0 and "down" or "up")
+end
+
 nav_button("PadKeysNavUp", function() move("up") end)
+nav_button("PadKeysNavScrollUp", function() scroll(-1) end)
+nav_button("PadKeysNavScrollDown", function() scroll(1) end)
 nav_button("PadKeysNavDown", function() move("down") end)
 nav_button("PadKeysNavLeft", function() move("left") end)
 nav_button("PadKeysNavRight", function() move("right") end)
@@ -522,6 +659,8 @@ local function start(by_hand, root)
   bind(keys.down, "PadKeysNavDown")
   bind(keys.left, "PadKeysNavLeft")
   bind(keys.right, "PadKeysNavRight")
+  bind(keys.scroll_up, "PadKeysNavScrollUp")
+  bind(keys.scroll_down, "PadKeysNavScrollDown")
   bind(keys.click, "PadKeysCursorClick", "LeftButton")
   bind(keys.rightclick, "PadKeysCursorClick", "RightButton")
   bind(keys.pickup, "PadKeysNavPickup")
@@ -656,28 +795,63 @@ local function focus_child(name)
   end
 end
 
--- Start the cursor when an autoFrames window opens, or move it there if
--- it is on: to its autoFocus child, or its top-left button. Some windows (professions) belong to Blizzard addons that
--- load later, so this runs again on every ADDON_LOADED.
+-- Take the cursor into a window that just opened: start it, or move it
+-- there if it is on; to its autoFocus child, or its top-left button.
+-- Waits a moment for the window to lay itself out. One window opening can
+-- call this twice (its OnShow and ShowUIPanel); that only moves once.
+local pending = {}
+local function take_cursor(frame)
+  local name = frame:GetName()
+  if pending[frame] or (name and
+      tContains(ns.config.cursor.ignoreWindows or {}, name)) then
+    return
+  end
+  pending[frame] = true
+  C_Timer.After(0.05, function()
+    pending[frame] = nil
+    if not frame:IsVisible() then
+      return
+    end
+    local child = name and focus_child(name)
+    if child then
+      ns.cursor_select(child)
+    else
+      ns.cursor_focus_in(frame)
+    end
+  end)
+end
+
+-- Start the cursor when an autoFrames window opens. Some windows
+-- (professions) belong to Blizzard addons that load later, so this runs
+-- again on every ADDON_LOADED; such a window can already be open by then
+-- (the first visit loads it while it opens), so take the cursor now.
 local hooked = {}
 local function hook_auto_frames()
   for _, name in ipairs(ns.config.cursor.autoFrames or {}) do
     local frame = _G[name]
     if frame and frame.HookScript and not hooked[frame] then
       hooked[frame] = true
-      frame:HookScript("OnShow", function()
-        C_Timer.After(0.05, function()
-          local child = focus_child(name)
-          if child then
-            ns.cursor_select(child)
-          else
-            ns.cursor_focus_in(frame)
-          end
-        end)
-      end)
+      frame:HookScript("OnShow", take_cursor)
+      if frame:IsVisible() then
+        take_cursor(frame)
+      end
     end
   end
 end
+
+-- followWindows: every window Blizzard opens through its panel manager
+-- (character, spellbook, talents, quest log, professions, trainers, ...)
+-- takes the cursor, so the cursor is always in the window you just opened.
+hooksecurefunc("ShowUIPanel", function(frame)
+  if not (ns.config.cursor.followWindows and type(frame) == "table" and
+          frame.IsVisible) then
+    return
+  end
+  if not tContains(panels, frame) then
+    panels[#panels + 1] = frame
+  end
+  take_cursor(frame)
+end)
 
 owner:RegisterEvent("PLAYER_LOGIN")
 owner:RegisterEvent("ADDON_LOADED")

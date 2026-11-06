@@ -6,6 +6,8 @@
 -- * Vendor: the first F on an item marks it, the second buys one (the
 --   gamepad's A, MerchantFrame_SetupGamepad). On the Buyback tab the second
 --   F buys it back. Shift-Space still buys at once.
+-- * Vendor: the mouse wheel steps through the items, turning the page at
+--   the end of one.
 -- * Vendor: gear is repaired from your own money, and junk (grey items)
 --   is sold, as the window opens.
 -- * Trainer: the first F selects a skill and shows its cost, the second
@@ -84,6 +86,46 @@ ns.cursor_on_click(function(button)
   if is_merchant_item(button) or is_trainer_skill(button) then
     return stepper
   end
+end)
+
+-- The mouse wheel on a vendor item: the next or previous item, turning the
+-- page past the first or last one on a page (MerchantFrame_OnMouseWheel).
+local function merchant_slot(button)
+  for i = 1, BUYBACK_ITEMS_PER_PAGE or 12 do
+    if _G["MerchantItem" .. i .. "ItemButton"] == button then
+      return i
+    end
+  end
+end
+
+local function last_merchant_item()
+  for i = BUYBACK_ITEMS_PER_PAGE or 12, 1, -1 do
+    local button = _G["MerchantItem" .. i .. "ItemButton"]
+    if button and button:IsVisible() then
+      return button
+    end
+  end
+end
+
+ns.cursor_on_scroll(function(button, delta)
+  local slot = is_merchant_item(button) and merchant_slot(button)
+  if not slot then
+    return false
+  end
+  local nearby = _G["MerchantItem" .. (slot + delta) .. "ItemButton"]
+  if nearby and nearby:IsVisible() then
+    ns.cursor_select(nearby)
+    return true
+  end
+  local page = delta > 0 and MerchantNextPageButton or MerchantPrevPageButton
+  if page and page:IsVisible() and page:IsEnabled() then
+    page:Click()
+    C_Timer.After(0.05, function()
+      ns.cursor_select(delta > 0 and MerchantItem1ItemButton or
+                         last_merchant_item())
+    end)
+  end
+  return true
 end)
 
 local function repair()

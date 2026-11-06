@@ -19,6 +19,11 @@ ns.config.cursor = {
     down = { "S", "DOWN" },
     left = { "A", "LEFT" },
     right = { "D", "RIGHT" },
+    -- Step through entries one at a time (vendor items, trainer skills,
+    -- recipes, gossip options, bag slots); a vendor turns the page at the
+    -- end of one, lists scroll along.
+    scroll_up = { "MOUSEWHEELUP" },
+    scroll_down = { "MOUSEWHEELDOWN" },
     click = { "SPACE", "F" },              -- gamepad A, same key as Interact
     rightclick = { "SHIFT-SPACE" },        -- use item, sell to vendor
     pickup = { "CTRL-SPACE" },             -- drag a spell or item
@@ -30,6 +35,15 @@ ns.config.cursor = {
     next_window = { "TAB" },
     previous_window = { "SHIFT-TAB" },
   },
+  -- Every window Blizzard opens as a panel (character, spellbook, talents,
+  -- quest log, professions, trainers, ...) takes the cursor when it opens,
+  -- starting it if it is off. While it is on, W/A/S/D move the cursor, not
+  -- you; Esc closes the window and gives them back. Set to false to have
+  -- only the autoFrames below do this.
+  followWindows = true,
+  -- Windows that never take the cursor by themselves (you can still Tab to
+  -- them with the cursor on). The map stays out so you can walk with it open.
+  ignoreWindows = { "WorldMapFrame" },
   -- Start the cursor by itself when these windows open (talk to an NPC
   -- with F, then pick an option with W/S and F or Space).
   -- If the cursor is already on, it moves to the new window.
