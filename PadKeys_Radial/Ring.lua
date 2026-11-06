@@ -1,7 +1,8 @@
--- The ring: one secure button with four pages, picked by the key that
+-- The ring: one secure button with five pages, picked by the key that
 -- opens it (Config.lua):
 --
 -- * actions (G): Action Bar 6, slots 1-8 (drag spells, items, macros there);
+-- * extra (Alt+G): Action Bar 7, slots 1-8, the same way;
 -- * pings (Cmd+G): Blizzard's ping types, sent as /ping macros;
 -- * markers (Shift+G): target markers, sent as /tm macros;
 -- * menu (Ctrl+G): Blizzard's main-menu entries (Menu.lua), several pages
@@ -19,12 +20,14 @@ local ns = PadKeys
 
 BINDING_HEADER_PADKEYS_RADIAL = "PadKeys: radials"
 _G["BINDING_NAME_CLICK PadKeysRing:actions"] = "Action radial, Action Bar 6 (hold)"
+_G["BINDING_NAME_CLICK PadKeysRing:extra"] = "Second action radial, Action Bar 7 (hold)"
 _G["BINDING_NAME_CLICK PadKeysRing:pings"] = "Ping radial (hold)"
 _G["BINDING_NAME_CLICK PadKeysRing:markers"] = "Target marker radial (hold)"
 _G["BINDING_NAME_CLICK PadKeysRing:menu"] = "Main menu radial (hold)"
 
 local TITLES = {
   actions = "Actions",
+  extra = "More actions",
   pings = "Pings",
   markers = "Target markers",
   menu = FRAME_LABEL_MAIN_MENU or MAINMENU_BUTTON,
@@ -149,6 +152,8 @@ local function setup()
   for i = 1, ns.wheel_segments do
     button:SetAttribute("*type-actions" .. i, "action")
     button:SetAttribute("*action-actions" .. i, config.first_slot + i - 1)
+    button:SetAttribute("*type-extra" .. i, "action")
+    button:SetAttribute("*action-extra" .. i, config.extra_first_slot + i - 1)
     local ping = config.pings[i]
     set_macro("pings" .. i, ping and format(config.ping_macro, ping))
     local marker = config.markers[i]
@@ -178,9 +183,8 @@ local function action_name(slot)
 end
 
 -- No usable or cooldown state yet: icon and name only.
-local function action_entries()
+local function slot_entries(first)
   local entries = {}
-  local first = ring_config().first_slot
   for i = 1, ns.wheel_segments do
     local slot = first + i - 1
     if ab.HasAction(slot) then
@@ -192,6 +196,14 @@ local function action_entries()
     end
   end
   return entries
+end
+
+local function action_entries()
+  return slot_entries(ring_config().first_slot)
+end
+
+local function extra_entries()
+  return slot_entries(ring_config().extra_first_slot)
 end
 
 local function ping_icon(enum_key)
@@ -253,6 +265,7 @@ end
 
 local ENTRIES = {
   actions = action_entries,
+  extra = extra_entries,
   pings = ping_entries,
   markers = marker_entries,
 }
@@ -285,8 +298,12 @@ button:HookScript("OnClick", function(_, page, down)
   wheel:open(TITLES[page])
   wheel:set_entries(entries())
   wheel:set_page(1, 1)
-  if page == "actions" and not next(wheel.entries) then
-    wheel.label:SetText("Put spells, items or macros on Action Bar 6")
+  if not next(wheel.entries) then
+    if page == "actions" then
+      wheel.label:SetText("Put spells, items or macros on Action Bar 6")
+    elseif page == "extra" then
+      wheel.label:SetText("Put spells, items or macros on Action Bar 7")
+    end
   end
 end)
 
