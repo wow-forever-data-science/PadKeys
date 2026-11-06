@@ -25,6 +25,7 @@ banner:SetAlpha(0)
 local label = banner:CreateFontString(nil, "OVERLAY", "GameFontHighlightHuge")
 local font = ns.config.bar and ns.config.bar.font or DEFAULT_FONT
 label:SetFont(font, c.size or 28, "")
+label:SetTextColor(1, 1, 1)
 label:SetShadowColor(0, 0, 0, 1)
 label:SetShadowOffset(2, -2)
 label:SetPoint("CENTER")
@@ -47,10 +48,9 @@ anim:SetScript("OnFinished", function()
   banner:SetAlpha(0)
 end)
 
-local function show(text, color)
+local function show(text)
   anim:Stop()
   label:SetText(text)
-  label:SetTextColor(color[1], color[2], color[3])
   banner:SetAlpha(0)
   anim:Play()
 end
@@ -64,9 +64,9 @@ events:SetScript("OnEvent", function(_, event)
   local entering = event == "PLAYER_REGEN_DISABLED"
   if c.banner then
     if entering then
-      show(c.enter_text, c.enter_color)
+      show(c.enter_text)
     else
-      show(c.leave_text, c.leave_color)
+      show(c.leave_text)
     end
   end
 end)

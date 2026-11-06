@@ -276,10 +276,10 @@ Groups, timings, the faded alpha (0 is invisible) and the labels are in
 ## Combat banner (PadKeys_Combat)
 
 As you enter combat, **Combat** fades in above the middle of the screen in
-red and fades out a second later; as you leave it, **Out of Combat** does
-the same in green. It uses PadKeys_Bar's font (Roboto Condensed
+white and fades out a second later; as you leave it, **Out of Combat** does
+the same. It uses PadKeys_Bar's font (Roboto Condensed
 ExtraBold, or whatever `font` is set to in `PadKeys_Bar/Config.lua`).
-Texts, colours, size, position and timings are in
+Texts, size, position and timings are in
 `PadKeys_Combat/Config.lua`; `banner = false` turns it off.
 
 It only sets a text's alpha, so it works in combat. Later this addon is
