@@ -189,7 +189,7 @@ local function show(group_name)
   end
   if group.unit == "target" and not UnitExists("target") then
     close()
-    UIErrorsFrame:AddMessage("No target.", 1, 0.82, 0)
+    ns.flash("No target.")
     return
   end
   -- The same key steps on, unless it has rested; another key starts its
@@ -203,7 +203,7 @@ local function show(group_name)
   local shown = show_next(group, place)
   if not shown then
     close()
-    UIErrorsFrame:AddMessage(group.none, 1, 0.82, 0)
+    ns.flash(group.none)
     return
   end
   shown_group, shown_place, shown_at = group_name, shown, now

@@ -149,16 +149,18 @@ frame:SetFrameStrata("DIALOG")
 frame:Hide()
 ButtonFrameTemplate_HidePortrait(frame)
 frame:SetTitle("PadKeys Key Map")
+-- Blizzard's window in black and white, its title in the PadKeys font.
+ns.monochrome(frame)
 tinsert(UISpecialFrames, "PadKeysKeyMap")
 
 local strings = {}
-local function string_at(i, template)
+local function string_at(i, size, shade)
   local fs = strings[i]
   if not fs then
-    fs = frame:CreateFontString(nil, "OVERLAY", template)
+    fs = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     strings[i] = fs
   end
-  fs:SetFontObject(template)
+  ns.style(fs, size, shade)
   fs:ClearAllPoints()
   fs:Show()
   return fs
@@ -175,19 +177,19 @@ local function layout()
     end
     local x = 20 + col * 300
     i = i + 1
-    local header = string_at(i, "GameFontNormal")
+    local header = string_at(i, 14, "white")
     header:SetPoint("TOPLEFT", frame, "TOPLEFT", x, y)
     header:SetText(section[1])
     y = y - 20
     for _, row in ipairs(section[2]) do
       i = i + 1
-      local label = string_at(i, "GameFontHighlightSmall")
+      local label = string_at(i, 12, "light")
       label:SetPoint("TOPLEFT", frame, "TOPLEFT", x + 6, y)
       label:SetWidth(150)
       label:SetJustifyH("LEFT")
       label:SetText(row[1])
       i = i + 1
-      local keys = string_at(i, "GameFontNormalSmall")
+      local keys = string_at(i, 12, "white")
       keys:SetPoint("TOPLEFT", frame, "TOPLEFT", x + 160, y)
       keys:SetWidth(130)
       keys:SetJustifyH("LEFT")

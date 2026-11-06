@@ -45,10 +45,10 @@ local DIRECTIONS = {
 local owner = CreateFrame("Frame", "PadKeysCursorOwner", UIParent)
 local active, manual, current = false, false, nil
 
--- What marks the current button, after the gamepad UI: a gold arrow that
+-- What marks the current button, after the gamepad UI: a white arrow that
 -- bobs at the button's left, the soft additive glow the quest log uses for
--- its rows (tinted the way the quest log tints it), and a pulsing gold glow
--- around the window the button is in.
+-- its rows (in grey), and a pulsing white glow around the window the
+-- button is in.
 local box = CreateFrame("Frame", nil, UIParent)
 box:SetFrameStrata("TOOLTIP")
 box:Hide()
@@ -56,10 +56,12 @@ local glow = box:CreateTexture(nil, "OVERLAY")
 glow:SetTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight")
 glow:SetBlendMode("ADD")
 glow:SetAllPoints()
+glow:SetDesaturated(true)
 
 local arrow = box:CreateTexture(nil, "OVERLAY")
 arrow:SetTexture("Interface\\ChatFrame\\ChatFrameExpandArrow")
 arrow:SetSize(16, 16)
+arrow:SetDesaturated(true)
 arrow:SetPoint("RIGHT", box, "LEFT", 2, 0)
 local bob = box:CreateAnimationGroup()
 bob:SetLooping("BOUNCE")
@@ -105,10 +107,9 @@ frame_glow:SetScript("OnShow", function() pulse:Play() end)
 frame_glow:SetScript("OnHide", function() pulse:Stop() end)
 
 local function tint(armed)
-  local r, g, b = 1, 0.82, 0.2
-  if armed then
-    r, g, b = 1, 0.6, 0.05
-  end
+  -- Light grey; white while armed.
+  local v = armed and 1 or ns.grey.light
+  local r, g, b = v, v, v
   glow:SetVertexColor(r, g, b, armed and 1 or 0.85)
   arrow:SetVertexColor(r, g, b)
   local edge, clear = CreateColor(r, g, b, 0.6), CreateColor(r, g, b, 0)

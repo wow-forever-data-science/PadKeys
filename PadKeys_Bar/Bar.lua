@@ -115,16 +115,11 @@ bar:SetSize(#FACE_KEYS * c.size + (#FACE_KEYS - 1) * c.spacing, c.size)
 bar:SetClampedToScreen(true)
 bar:SetMovable(true)
 
--- White text in c.font (Roboto Condensed ExtraBold, shipped in Fonts/) with a
--- drop shadow, which keeps it brighter than an outline; Blizzard's font
--- object stays if the file can't be loaded.
+-- White text in the PadKeys font (ns.config.theme) with a drop shadow,
+-- which keeps it brighter than an outline; Blizzard's font object stays if
+-- the file can't be loaded.
 local function text(parent, size, fallback)
-  local s = parent:CreateFontString(nil, "OVERLAY", fallback)
-  s:SetFont(c.font, size, "")
-  s:SetTextColor(1, 1, 1)
-  s:SetShadowColor(0, 0, 0, 1)
-  s:SetShadowOffset(1, -1)
-  return s
+  return ns.text(parent, size, "white", "OVERLAY", fallback)
 end
 
 local layer_text = text(bar, 15, "GameFontHighlightOutline")
@@ -163,7 +158,7 @@ for i, key in ipairs(FACE_KEYS) do
   b:SetSize(c.size, c.size)
   b:SetPoint("LEFT", bar, "LEFT", (i - 1) * (c.size + c.spacing), 0)
 
-  -- 1px border: a shape behind the icon, dark normally, gold while the
+  -- 1px border: a shape behind the icon, black normally, grey while the
   -- action is active (casting, auto attack, a pet stance), white while its
   -- key is down.
   b.border = b:CreateTexture(nil, "BACKGROUND", nil, 0)
@@ -182,6 +177,7 @@ for i, key in ipairs(FACE_KEYS) do
   b.icon:SetPoint("BOTTOMRIGHT", -1, 1)
   b.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
   round(b, b.icon, 1)
+  ns.icon(b.icon)
 
   b.cooldown = CreateFrame("Cooldown", nil, b, "CooldownFrameTemplate")
   b.cooldown:SetPoint("TOPLEFT", 1, -1)
@@ -190,6 +186,11 @@ for i, key in ipairs(FACE_KEYS) do
   if c.rounded then
     b.cooldown:SetSwipeTexture(ROUNDED)
     b.cooldown:SetSwipeColor(0, 0, 0, 0.8)
+  end
+  local countdown = b.cooldown.GetCountdownFontString and
+    b.cooldown:GetCountdownFontString()
+  if countdown then
+    ns.style(countdown, 16)
   end
 
   -- Text above the cooldown swipe.
@@ -235,12 +236,11 @@ for i, key in ipairs(FACE_KEYS) do
   b.name:SetPoint("BOTTOMRIGHT", -2, 2)
   b.name:SetHeight(10)
 
-  -- Fallback proc glow, for when no addon has loaded LibButtonGlow: a
-  -- pulsing gold ring.
+  -- Proc glow: a pulsing white ring.
   b.glow = top:CreateTexture(nil, "OVERLAY")
   b.glow:SetTexture("Interface\\Buttons\\UI-ActionButton-Border")
   b.glow:SetBlendMode("ADD")
-  b.glow:SetVertexColor(1, 0.85, 0.2)
+  ns.tint(b.glow, "white")
   b.glow:SetPoint("CENTER")
   b.glow:SetSize(c.size * 1.8, c.size * 1.8)
   b.glow:Hide()
@@ -258,8 +258,8 @@ end
 -- Proc glow. SpellActivationOverlay (and other addons) light up Blizzard's
 -- buttons with LibButtonGlow (button.__LBGoverlay), and Blizzard's own proc
 -- alerts go through ActionButtonSpellAlertManager. Both work on buttons of
--- hidden bars, so we copy the glow of the button a key presses. Our glow
--- uses LibButtonGlow too when it's loaded, so it looks the same.
+-- hidden bars, so we copy the glow of the button a key presses. Ours is a
+-- white ring rather than LibButtonGlow's gold one, to stay black and white.
 local function source_glows(button)
   if not button then
     return false
@@ -281,18 +281,10 @@ local function set_glow(b, on)
     return
   end
   b.glowing = on
-  local lbg = LibStub and LibStub("LibButtonGlow-1.0", true)
-  if on and lbg then
-    lbg.ShowOverlayGlow(b)
-    b.lbg = lbg
-  elseif on then
+  if on then
     b.glow:Show()
     b.pulse:Play()
   else
-    if b.lbg then
-      b.lbg.HideOverlayGlow(b)
-      b.lbg = nil
-    end
     b.pulse:Stop()
     b.glow:Hide()
   end
@@ -338,9 +330,9 @@ local function show_action(b, action)
   if usable then
     b.icon:SetVertexColor(1, 1, 1)
   elseif no_mana then
-    b.icon:SetVertexColor(0.5, 0.5, 1)
+    b.icon:SetVertexColor(0.6, 0.6, 0.6)
   else
-    b.icon:SetVertexColor(0.4, 0.4, 0.4)
+    b.icon:SetVertexColor(0.35, 0.35, 0.35)
   end
 
   local cd = ab.GetActionCooldown(action)
@@ -373,7 +365,7 @@ local function show_pet(b, slot)
   if GetPetActionSlotUsable(slot) then
     b.icon:SetVertexColor(1, 1, 1)
   else
-    b.icon:SetVertexColor(0.4, 0.4, 0.4)
+    b.icon:SetVertexColor(0.35, 0.35, 0.35)
   end
   -- The pet API has no duration object. If its numbers are secret,
   -- SetCooldown refuses them and the button shows no swipe.
@@ -406,7 +398,7 @@ local function update()
     end
     if src and b.icon:GetTexture() then
       if far then
-        b.hotkey:SetTextColor(1, 0.1, 0.1)
+        b.hotkey:SetTextColor(ns.grey.dark, ns.grey.dark, ns.grey.dark)
       else
         b.hotkey:SetTextColor(1, 1, 1)
       end
@@ -414,7 +406,7 @@ local function update()
       if pushed then
         set_border(b, 1, 1, 1)
       elseif active then
-        set_border(b, 1, 0.82, 0)
+        set_border(b, ns.grey.mid, ns.grey.mid, ns.grey.mid)
       else
         set_border(b, 0, 0, 0)
       end
@@ -456,7 +448,7 @@ mover:SetAllPoints()
 mover:SetFrameLevel(bar:GetFrameLevel() + 20)
 mover.tex = mover:CreateTexture(nil, "OVERLAY")
 mover.tex:SetAllPoints()
-mover.tex:SetColorTexture(0.2, 0.6, 1, 0.35)
+mover.tex:SetColorTexture(1, 1, 1, 0.25)
 mover:EnableMouse(true)
 mover:RegisterForDrag("LeftButton")
 mover:SetScript("OnDragStart", function() bar:StartMoving() end)
