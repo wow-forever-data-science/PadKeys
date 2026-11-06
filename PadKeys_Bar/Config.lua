@@ -23,6 +23,12 @@ ns.config.bar = {
   hotkey_background_alpha = 0.55,
   hotkey_outline = true,
   hotkey_outline_alpha = 0.9,
+  -- On cooldown the icon turns see-through (0 is invisible) with the
+  -- seconds left on top in this size; out of range it turns grey and a
+  -- little see-through. No cooldown swipe.
+  cooldown_alpha = 0.35,
+  range_alpha = 0.6,
+  countdown_size = 20,
   -- Name of the layer you hold ("Cmd", "Shift+Ctrl") above the bar.
   -- Nothing shows without a modifier.
   show_layer = true,
