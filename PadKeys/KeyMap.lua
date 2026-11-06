@@ -76,7 +76,9 @@ local function sections()
       "CLICK PadKeysTargetMode:LeftButton", "Toggle friendly / enemy targeting")
   end
   target_rows[#target_rows + 1] = {
-    friendly and "Next / previous friend" or "Next / previous enemy",
+    not targeting and "Next / previous enemy" or
+      (friendly and "Next / previous target (friend in combat)" or
+       "Next / previous target (enemy in combat)"),
     keys_for("TARGETNEARESTENEMY") .. " / " .. keys_for("TARGETPREVIOUSENEMY") }
   if targeting then
     target_rows[#target_rows + 1] = action_row(

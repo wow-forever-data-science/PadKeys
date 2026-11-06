@@ -17,6 +17,11 @@
 -- target's icons are forbidden frames, so its tooltips sit under the
 -- target frame. The key clicks a plain button: showing a tooltip needs
 -- nothing secure.
+--
+-- Your own aura shown is also marked on its icon: a white frame that
+-- pulses like the cursor's window glow and fades with the tooltip. The
+-- target's icons are forbidden frames, so nothing can be anchored to them;
+-- for those the tooltip's label ("Target debuff 2/5") says which one.
 
 local ns = PadKeys
 
@@ -45,6 +50,45 @@ local shows = 0
 -- a tooltip they own every frame, which would undo the fade, so the icon
 -- is only the anchor.
 local tooltip_owner = CreateFrame("Frame", nil, UIParent)
+
+-- The marker: four white edges just outside the icon, pulsing. It follows
+-- the tooltip's alpha, so it fades with it, and hides when the tooltip
+-- goes or shows something else.
+local marker = CreateFrame("Frame", nil, UIParent)
+marker:SetFrameStrata("TOOLTIP")
+marker:Hide()
+local EDGE = 2
+local function marker_edge(p1, r1, x1, y1, p2, r2, x2, y2)
+  local tex = marker:CreateTexture(nil, "OVERLAY")
+  tex:SetColorTexture(1, 1, 1)
+  tex:SetPoint(p1, marker, r1, x1, y1)
+  tex:SetPoint(p2, marker, r2, x2, y2)
+end
+marker_edge("BOTTOMLEFT", "TOPLEFT", -EDGE, 0, "TOPRIGHT", "TOPRIGHT", EDGE, EDGE)
+marker_edge("TOPLEFT", "BOTTOMLEFT", -EDGE, 0, "BOTTOMRIGHT", "BOTTOMRIGHT", EDGE, -EDGE)
+marker_edge("TOPRIGHT", "TOPLEFT", 0, 0, "BOTTOMLEFT", "BOTTOMLEFT", -EDGE, 0)
+marker_edge("TOPLEFT", "TOPRIGHT", 0, 0, "BOTTOMRIGHT", "BOTTOMRIGHT", EDGE, 0)
+local pulse_time = 0
+marker:SetScript("OnShow", function() pulse_time = 0 end)
+marker:SetScript("OnUpdate", function(self, elapsed)
+  if not GameTooltip:IsShown() or GameTooltip:GetOwner() ~= tooltip_owner then
+    self:Hide()
+    return
+  end
+  pulse_time = (pulse_time + elapsed) % 1.2
+  local pulse = 0.7 + 0.3 * math.cos(pulse_time / 1.2 * 2 * math.pi)
+  self:SetAlpha(GameTooltip:GetAlpha() * pulse)
+end)
+
+local function mark(icon)
+  if not icon then
+    marker:Hide()
+    return
+  end
+  marker:ClearAllPoints()
+  marker:SetAllPoints(icon.Icon or icon)
+  marker:Show()
+end
 
 -- The unit's aura indexes in the order to show them, or nil when they
 -- can't be read: in combat auras are secret, and reading them errors.
@@ -98,6 +142,7 @@ end
 
 -- Where the tooltip goes: at your aura's icon (below left, as Blizzard's
 -- hover puts it), or under the target frame.
+-- Returns your aura's icon, if found.
 local function place_tooltip(group, index)
   GameTooltip:SetOwner(tooltip_owner, "ANCHOR_NONE")
   GameTooltip:ClearAllPoints()
@@ -105,7 +150,7 @@ local function place_tooltip(group, index)
     local found, icon = pcall(find_icon, _G[group.anchor], index)
     if found and icon then
       GameTooltip:SetPoint("TOPRIGHT", icon, "BOTTOMLEFT")
-      return
+      return icon
     end
   end
   local anchor = _G[group.anchor] or UIParent
@@ -120,7 +165,7 @@ end
 -- (or the tooltip may not show it). The tooltip reads the aura itself, so
 -- this also works in combat.
 local function fill_tooltip(group, index, label)
-  place_tooltip(group, index)
+  local icon = place_tooltip(group, index)
   local ok = pcall(GameTooltip.SetUnitAura, GameTooltip, group.unit, index, group.filter)
   if not (ok and GameTooltip:NumLines() > 0) then
     GameTooltip:Hide()
@@ -128,6 +173,7 @@ local function fill_tooltip(group, index, label)
   end
   GameTooltip:AddLine(label, 0.6, 0.6, 0.6)
   GameTooltip:Show()
+  mark(icon)
   shown_owner = tooltip_owner
   return true
 end

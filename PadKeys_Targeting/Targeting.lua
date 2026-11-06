@@ -1,9 +1,12 @@
 -- Targeting, the keyboard version of the gamepad's targeting buttons.
 --
--- Friendly/enemy mode (gamepad LB "Target Friendly" / RB "Target Hostile"):
--- one key toggles the mode, and the next/previous target keys (Tab and
--- Shift+Tab) cycle enemies or friends. The toggle is a secure button whose
--- snippet rebinds those keys, so it works in combat.
+-- Tab and Shift+Tab (next / previous target):
+-- * Out of combat they cycle everything in front of you, friend or enemy
+--   (TARGETNEAREST).
+-- * In combat they follow friendly/enemy mode (gamepad LB "Target
+--   Friendly" / RB "Target Hostile"): one key toggles the mode.
+-- A secure header rebinds the keys as combat starts and ends (a state
+-- driver) and as the mode toggles, so it works in combat.
 --
 -- Group cycling, the keyboard version of the gamepad's party/raid targeting:
 -- each press targets the next (left button) or previous (right button) group
@@ -60,27 +63,43 @@ SecureHandlerWrapScript(button, "OnClick", header, ON_CLICK)
 
 ns.group_cycle = button
 
--- Friendly/enemy toggle. In friendly mode the header owns override bindings
--- that point the target keys at Blizzard's friendly targeting; enemy mode
--- clears them, so the layout's normal enemy bindings apply again.
-local TOGGLE_MODE = [[
-  local friendly = not self:GetAttribute("friendly")
-  self:SetAttribute("friendly", friendly)
-  if friendly then
-    owner:SetBinding(true, self:GetAttribute("nextkey"), "TARGETNEARESTFRIEND")
-    owner:SetBinding(true, self:GetAttribute("prevkey"), "TARGETPREVIOUSFRIEND")
-  else
-    owner:ClearBindings()
+-- Friendly/enemy toggle and combat. The header owns override bindings for
+-- the target keys: out of combat any unit, in combat friends in friendly
+-- mode. In combat in enemy mode it clears them, so the layout's normal
+-- enemy bindings apply again.
+local APPLY = [[
+  local next, prev
+  if not self:GetAttribute("combat") then
+    next, prev = "TARGETNEAREST", "TARGETPREVIOUS"
+  elseif self:GetAttribute("friendly") then
+    next, prev = "TARGETNEARESTFRIEND", "TARGETPREVIOUSFRIEND"
+  end
+  self:ClearBindings()
+  if next then
+    self:SetBinding(true, self:GetAttribute("nextkey"), next)
+    self:SetBinding(true, self:GetAttribute("prevkey"), prev)
   end
 ]]
 
+local TOGGLE_MODE = [[
+  owner:SetAttribute("friendly", not owner:GetAttribute("friendly"))
+  owner:RunAttribute("apply")
+]]
+
 local mode_header = CreateFrame("Frame", "PadKeysTargetModeHeader", UIParent,
-                                "SecureHandlerBaseTemplate")
+                                "SecureHandlerStateTemplate")
+mode_header:SetAttribute("nextkey", ns.config.target_mode.next)
+mode_header:SetAttribute("prevkey", ns.config.target_mode.previous)
+mode_header:SetAttribute("apply", APPLY)
+mode_header:SetAttribute("_onstate-combat", [[
+  self:SetAttribute("combat", newstate == "on")
+  self:RunAttribute("apply")
+]])
+RegisterStateDriver(mode_header, "combat", "[combat] on; off")
+
 local mode = CreateFrame("Button", "PadKeysTargetMode", UIParent,
                          "SecureActionButtonTemplate")
 mode:RegisterForClicks("AnyDown")
-mode:SetAttribute("nextkey", ns.config.target_mode.next)
-mode:SetAttribute("prevkey", ns.config.target_mode.previous)
 SecureHandlerWrapScript(mode, "OnClick", mode_header, TOGGLE_MODE)
 
 -- A small label while friendly mode is on, so you know which mode you're in.
@@ -88,14 +107,14 @@ local label = ns.text(UIParent, 16, "white", "OVERLAY", "GameFontNormalLarge")
 label:SetPoint("TOP", UIParent, "TOP", 0, -120)
 label:SetText("Friendly targeting")
 label:Hide()
-mode:HookScript("OnClick", function(self)
-  local friendly = self:GetAttribute("friendly")
+mode:HookScript("OnClick", function()
+  local friendly = mode_header:GetAttribute("friendly")
   label:SetShown(friendly)
   ns.flash(friendly and "Targeting: friendly" or "Targeting: enemy")
 end)
 
 function ns.is_friendly_mode()
-  return mode:GetAttribute("friendly") and true or false
+  return mode_header:GetAttribute("friendly") and true or false
 end
 
 -- Attack in combat: the header binds the key to the attack button while the
