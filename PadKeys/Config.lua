@@ -90,6 +90,6 @@ ns.modules = {
   { addon = "PadKeys_Radial", does = "Combat ring (G) and main-menu radial (Ctrl+G)" },
   { addon = "PadKeys_Bar", does = "One bar that shows the layer you hold" },
   { addon = "PadKeys_Fade", does = "Blizzard's bars fade in on mouseover or drag" },
-  { addon = "PadKeys_Combat", does = "\"Combat\" / \"Out of Combat\" text as you enter and leave combat" },
+  { addon = "PadKeys_Combat", does = "Combat banner, and missing buffs out of combat" },
   { addon = "PadKeys_Debug", does = "Saves errors to SavedVariables (/pkdebug)" },
 }

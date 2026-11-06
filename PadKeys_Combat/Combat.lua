@@ -1,7 +1,7 @@
--- Changes the UI when you enter and leave combat. For now that is a short
--- text in the middle of the screen ("Combat" / "Out of Combat") that fades
--- in and out; buff and debuff display, boss timers and PvP cooldowns are
--- meant to hang off the same two events later.
+-- Changes the UI when you enter and leave combat: a short text in the
+-- middle of the screen ("Combat" / "Out of Combat") that fades in and out.
+-- Buffs.lua adds the out-of-combat buff reminder; boss timers and PvP
+-- cooldowns are meant to hang off the same two events later.
 --
 -- PLAYER_REGEN_DISABLED fires as you enter combat and PLAYER_REGEN_ENABLED
 -- as you leave it. Nothing here is secure: a font string's text, colour
