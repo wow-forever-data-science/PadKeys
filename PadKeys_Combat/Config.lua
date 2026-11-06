@@ -41,12 +41,15 @@ ns.config.combat.buffs = {
   -- Hide the list while resting (in an inn or a city).
   hide_resting = false,
   -- Buffs to leave out: fortitude, mark, intellect, spirit, blessing,
-  -- mage_armor, demon_armor, inner_fire, omen, trueshot, poisons.
+  -- mage_armor, demon_armor, inner_fire, omen, trueshot, poisons,
+  -- lightning_shield, imbue.
   -- e.g. ignore = { spirit = true },
   ignore = {},
-  -- In combat, turn on Blizzard's buff consolidation (the consolidateBuffs
-  -- setting): buffs with no duration or a long one fold into one icon, so
-  -- the buff frame shows only the short ones. Your own setting comes back
-  -- as you leave combat.
-  consolidate_in_combat = true,
+  -- Consumables in your bags whose buff you don't have (elixirs, flasks,
+  -- scrolls, Well Fed food, sharpening stones and oils), out of combat.
+  consumables = true,
+  -- In combat, fade out the long buffs in Blizzard's buff frame (over 90
+  -- seconds left as combat starts, or no duration) and weapon enchants,
+  -- so it shows the short ones (LongBuffs.lua).
+  hide_long_in_combat = true,
 }

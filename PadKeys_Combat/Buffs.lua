@@ -10,11 +10,13 @@
 -- - if you can cast one yourself, every member in the group who is missing
 --   it (or has under 5 minutes left), by name;
 -- - your own class buffs (mage and warlock armor, Inner Fire, Omen of
---   Clarity, Trueshot Aura) and, for rogues, poisons on your weapons.
+--   Clarity, Trueshot Aura, Lightning Shield) and, for rogues and shamans,
+--   poisons or an imbue on your weapons;
+-- - consumables in your bags whose buff you don't have: elixirs, flasks,
+--   scrolls, food that makes you Well Fed, and sharpening stones or oils
+--   while your weapon has no enchant.
 --
--- In combat, Blizzard's own buff consolidation folds the long buffs into
--- one icon (Config.lua `consolidate_in_combat`), so the buff frame only
--- shows the short ones; it goes back to your setting as you leave combat.
+-- LongBuffs.lua hides the long buffs in Blizzard's buff frame in combat.
 -- The target frame's and nameplates' auras are Blizzard's protected frames,
 -- so they keep Blizzard's own filters; PadKeys_Auras (C) reads them.
 --
@@ -39,7 +41,8 @@ local MANA = {
 -- classes with mana; `own_only`: only when you know it (a talent nobody
 -- else can be seen to have); `per_caster`: one each from every caster in
 -- the group (blessings). `class`: a buff of your own, shown when you know
--- it. `weapon`: weapon enchants (rogue poisons). Turn one off with
+-- it. `weapon`: weapon enchants (rogue poisons, shaman imbues). `warn_at`:
+-- seconds left under which it shows, for buffs shorter than the usual. Turn one off with
 -- `ignore` in Config.lua.
 local BUFFS = {
   { key = "fortitude", caster = "PRIEST", who = "all", spells = { 1243, 21562 } },
@@ -55,6 +58,10 @@ local BUFFS = {
   { key = "omen", class = "DRUID", spells = { 16864 } },
   { key = "trueshot", class = "HUNTER", spells = { 19506 } },
   { key = "poisons", class = "ROGUE", weapon = true, spells = { 2842 } },
+  { key = "lightning_shield", class = "SHAMAN", spells = { 324 } },
+  -- Rockbiter lasts 5 minutes, so it warns under 1 minute.
+  { key = "imbue", class = "SHAMAN", weapon = true, label = "Imbue", warn_at = 60,
+    spells = { 8017, 8024, 8033, 8232 } },                      -- Rockbiter, Flametongue, Frostbrand, Windfury
 }
 
 -- --- Spells -----------------------------------------------------------------
@@ -204,8 +211,8 @@ local function time_left(unit, buff, source)
   return best
 end
 
-local function low(left)
-  return left == nil or left < cfg.warn_at
+local function low(left, warn_at)
+  return left == nil or left < (warn_at or cfg.warn_at)
 end
 
 local function clock(seconds)
@@ -289,7 +296,7 @@ local function own_row(buff, my_class)
     return nil
   end
   local left = time_left("player", buff)
-  if left == false or not low(left) then
+  if left == false or not low(left, buff.warn_at) then
     return nil
   end
   return {
@@ -347,7 +354,7 @@ local function weapon_rows(buff, my_class, rows)
     local item = GetInventoryItemID("player", slot.inv)
     if is_weapon(item) then
       local left = enchant_left(slot)
-      if left ~= false and low(left) then
+      if left ~= false and low(left, buff.warn_at) then
         rows[#rows + 1] = {
           icon = GetInventoryItemTexture("player", slot.inv),
           label = slot.name .. " " .. label_of(buff):lower(),
@@ -355,6 +362,108 @@ local function weapon_rows(buff, my_class, rows)
           left = left,
         }
       end
+    end
+  end
+end
+
+-- --- Consumables ------------------------------------------------------------
+
+-- Consumable subclasses (item class 0) that give a lasting buff.
+local ELIXIR, FLASK, SCROLL, FOOD, ENHANCEMENT = 2, 3, 4, 5, 6
+local WELL_FED = 19705
+
+local function item_info(id)
+  local get = C_Item and C_Item.GetItemInfoInstant or GetItemInfoInstant
+  local _, _, _, _, icon, class_id, subclass_id = get(id)
+  return icon, class_id, subclass_id
+end
+
+local function item_name(id)
+  if C_Item and C_Item.GetItemNameByID then
+    return C_Item.GetItemNameByID(id)
+  end
+  return (GetItemInfo(id))
+end
+
+-- The buff an item's use gives (its use spell's name), or nil until the
+-- client has it.
+local function item_buff(id)
+  local get = C_Item and C_Item.GetItemSpell or GetItemSpell
+  return get and (get(id))
+end
+
+-- Food that makes you Well Fed says so in its tooltip; remembered per item.
+local well_fed_food = {}
+local function makes_well_fed(id, bag, slot)
+  if well_fed_food[id] == nil then
+    local phrase = (spell_name(WELL_FED) or "Well Fed"):lower()
+    local data = C_TooltipInfo and C_TooltipInfo.GetBagItem(bag, slot)
+    if not data then
+      return false
+    end
+    local found = false
+    for _, tip_line in ipairs(data.lines or {}) do
+      if tip_line.leftText and tip_line.leftText:lower():find(phrase, 1, true) then
+        found = true
+      end
+    end
+    well_fed_food[id] = found
+  end
+  return well_fed_food[id]
+end
+
+local function has_buff(name)
+  for _, aura in ipairs(buffs_of("player") or {}) do
+    if aura.name == name then
+      return true
+    end
+  end
+  return false
+end
+
+-- Each consumable in your bags (once per item) whose buff you don't have.
+local function consumable_rows(rows)
+  if not cfg.consumables or not buffs_of("player") then
+    return
+  end
+  local seen, counts, found = {}, {}, {}
+  for bag = 0, NUM_BAG_SLOTS or 4 do
+    for slot = 1, C_Container.GetContainerNumSlots(bag) or 0 do
+      local id = C_Container.GetContainerItemID(bag, slot)
+      if id then
+        local info = C_Container.GetContainerItemInfo(bag, slot)
+        counts[id] = (counts[id] or 0) + (info and info.stackCount or 1)
+        if not seen[id] then
+          seen[id] = true
+          local icon, class_id, subclass_id = item_info(id)
+          local wanted
+          if class_id == 0 then
+            if subclass_id == ELIXIR or subclass_id == FLASK or subclass_id == SCROLL then
+              local buff = item_buff(id)
+              wanted = buff and not has_buff(buff)
+            elseif subclass_id == FOOD then
+              wanted = makes_well_fed(id, bag, slot) and
+                not has_buff(spell_name(WELL_FED) or "Well Fed")
+            elseif subclass_id == ENHANCEMENT then
+              wanted = is_weapon(GetInventoryItemID("player", SLOTS[1].inv)) and
+                enchant_left(SLOTS[1]) == nil
+            end
+          end
+          if wanted then
+            found[#found + 1] = { id = id, icon = icon }
+          end
+        end
+      end
+    end
+  end
+  for _, item in ipairs(found) do
+    local name = item_name(item.id)
+    if name then
+      rows[#rows + 1] = {
+        icon = item.icon,
+        label = format("%s (%d)", name, counts[item.id]),
+        missing = { "you" },
+      }
     end
   end
 end
@@ -388,6 +497,12 @@ local function collect()
       if #rows >= cfg.max_rows then
         break
       end
+    end
+  end
+  if #rows < cfg.max_rows then
+    pcall(consumable_rows, rows)
+    for i = #rows, cfg.max_rows + 1, -1 do
+      rows[i] = nil
     end
   end
   return rows
@@ -555,41 +670,6 @@ local function refresh_soon()
   end)
 end
 
--- --- Buff consolidation in combat -------------------------------------------
-
-local CVAR = "consolidateBuffs"
-
--- Long buffs still showed in combat; this notes what the setting did
--- (PadKeys_Debug) until that is found.
-local function note(text)
-  if PadKeysDebug_Note then
-    PadKeysDebug_Note("PadKeys_Combat " .. text)
-  end
-end
-
-local function consolidate(on)
-  if not cfg.consolidate_in_combat or not ns.db then
-    return
-  end
-  if on then
-    local current = GetCVar(CVAR)
-    local ok, err
-    if current and current ~= "1" then
-      ns.db.consolidate_restore = current
-      ok, err = pcall(SetCVar, CVAR, "1")
-    end
-    local consolidated = BuffFrame and BuffFrame.ConsolidatedBuffs
-    note(format("%s was %s, set ok %s %s, now %s, enabled %s, shown %s",
-      CVAR, tostring(current), tostring(ok), tostring(err or ""),
-      tostring(GetCVar(CVAR)),
-      tostring(consolidated and consolidated:IsEnabled()),
-      tostring(consolidated and consolidated:IsShown())))
-  elseif ns.db.consolidate_restore then
-    pcall(SetCVar, CVAR, ns.db.consolidate_restore)
-    ns.db.consolidate_restore = nil
-  end
-end
-
 -- --- Events -----------------------------------------------------------------
 
 local ticker
@@ -612,6 +692,7 @@ events:RegisterEvent("PLAYER_REGEN_ENABLED")
 events:RegisterEvent("GROUP_ROSTER_UPDATE")
 events:RegisterEvent("UNIT_AURA")
 events:RegisterEvent("UNIT_INVENTORY_CHANGED")
+events:RegisterEvent("BAG_UPDATE_DELAYED")
 events:RegisterEvent("SPELLS_CHANGED")
 events:RegisterEvent("PLAYER_UPDATE_RESTING")
 events:RegisterEvent("PLAYER_ALIVE")
@@ -622,10 +703,8 @@ events:SetScript("OnEvent", function(_, event, unit)
     in_combat = true
     stop_ticker()
     fade(0, c.fade_out or 0.6)
-    consolidate(true)
   elseif event == "PLAYER_REGEN_ENABLED" then
     in_combat = false
-    consolidate(false)
     wanted = false
     panel:SetAlpha(0)
     refresh()
@@ -633,7 +712,6 @@ events:SetScript("OnEvent", function(_, event, unit)
   elseif event == "PLAYER_ENTERING_WORLD" then
     in_combat = InCombatLockdown()
     if not in_combat then
-      consolidate(false) -- put back a setting left over from a logout in combat
       start_ticker()
       refresh_soon()
     end
