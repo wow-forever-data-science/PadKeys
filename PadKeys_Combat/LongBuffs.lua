@@ -4,10 +4,14 @@
 -- weapon enchants always count as long.
 --
 -- Forever has no buff consolidation (the consolidateBuffs setting is gone),
--- and in combat aura times are secret, already as combat starts. So the
--- long buffs are picked out of combat, by aura instance, on every aura
--- change and each second, and the last pick holds through combat. Buffs
--- gained in combat always show.
+-- and in combat every aura field is secret, already as combat starts. So
+-- the long buffs are picked out of combat, on every aura change and each
+-- second, by their place in your buff list, and the last pick holds
+-- through combat. In combat an icon is known by that place (Blizzard's own
+-- buttonInfo.index, a plain number): buffs gained in combat come after the
+-- picked ones, so they show. When a picked buff falls off, the places
+-- after it move up and can't be told apart, so everything shows again
+-- until combat ends.
 --
 -- Only the icons' alpha changes, as PadKeys_Fade does: they stay where
 -- they are, so the long ones leave gaps, and nothing here is secure. A
@@ -24,7 +28,8 @@ end
 
 local LONG = BUFF_DURATION_WARNING_TIME or 90
 
-local long_ids = {}
+-- long_at[place] for the long buffs, out of `picked` buffs in all.
+local long_at, picked = {}, 0
 local hiding = false
 
 -- Out of combat only; a failed read keeps the last pick.
@@ -32,34 +37,43 @@ local function remember_long()
   if hiding or InCombatLockdown() then
     return
   end
-  local now, picked = GetTime(), {}
+  local now, long, count = GetTime(), {}, 0
   local ok = pcall(function()
     for i = 1, 40 do
       local aura = C_UnitAuras.GetAuraDataByIndex("player", i, "HELPFUL")
       if not aura then
         break
       end
+      count = i
       local expires = aura.expirationTime
       if not expires or expires == 0 or expires - now > LONG then
-        picked[aura.auraInstanceID] = true
+        long[i] = true
       end
     end
   end)
   if ok then
-    long_ids = picked
+    long_at, picked = long, count
   end
 end
 
--- An icon whose aura can't be read counts as short, so it shows.
-local function is_long(icon)
+-- How many buffs (not weapon enchants) the buff frame has now.
+local function buff_count()
+  local n = 0
+  for _, info in ipairs(BuffFrame.auraInfo or {}) do
+    if info.auraType == "Buff" then
+      n = n + 1
+    end
+  end
+  return n
+end
+
+local function is_long(icon, places_hold)
   if icon.auraType == "TempEnchant" then
     return true
   end
-  local ok, long = pcall(function()
-    local info = icon.buttonInfo
-    return info and long_ids[info.auraInstanceID] or false
-  end)
-  return ok and long
+  local info = icon.buttonInfo
+  return places_hold and icon.auraType == "Buff" and info and
+    long_at[info.index] or false
 end
 
 -- Icons to keep at alpha 0, and the icons already hooked.
@@ -72,13 +86,22 @@ local function hold(icon)
 end
 
 local function apply()
-  for _, icon in ipairs(BuffFrame and BuffFrame.auraFrames or {}) do
+  if not BuffFrame then
+    return
+  end
+  -- Fewer buffs than picked: one of them fell off, places moved.
+  local ok, count = pcall(buff_count)
+  local places_hold = ok and count >= picked
+  if hiding and not places_hold then
+    picked = math.huge -- stays shown until combat ends
+  end
+  for _, icon in ipairs(BuffFrame.auraFrames or {}) do
     if not hooked[icon] then
       hooked[icon] = true
       hooksecurefunc(icon, "SetAlpha", hold)
     end
     local was = hidden[icon]
-    hidden[icon] = hiding and is_long(icon) or nil
+    hidden[icon] = hiding and is_long(icon, places_hold) or nil
     if hidden[icon] then
       hold(icon)
     elseif was then
