@@ -5,7 +5,7 @@
 -- * pings (Cmd+G): Blizzard's ping types, sent as /ping macros;
 -- * markers (Shift+G): target markers, sent as /tm macros;
 -- * menu (Ctrl+G): Blizzard's main-menu entries (Menu.lua), several pages
---   turned with Q/E or the mouse wheel while it is open.
+--   turned with the mouse wheel while it is open.
 --
 -- Everything runs through the secure button, so it works in combat and
 -- nothing it opens is tainted. The pick happens in a restricted snippet: on
@@ -40,34 +40,25 @@ local PINGS = {
 
 -- Runs in the restricted environment: self = the ring button, owner = the
 -- header (as large as the screen, so GetMousePosition always answers),
--- button = the page (or a menu page key), down = key down or up. The
+-- button = the page, down = key down or up. The
 -- direction rule is ns.pick_index's.
 local ON_CLICK = [[
-  if button == "menuprev" or button == "menunext" then
-    if down and menu_open then
-      local count = self:GetAttribute("menu-pages")
-      local step = (button == "menunext") and 1 or -1
-      local page = self:GetAttribute("menu-page") + step
-      self:SetAttribute("menu-page", (page - 1) % count + 1)
-    end
-    return false
-  end
   if down then
     origin_x, origin_y = owner:GetMousePosition()
     if button == "menu" then
-      menu_open = true
+      self:SetAttribute("menu-open", true)
       self:SetAttribute("menu-page", self:GetAttribute("menu-start"))
       for key in gmatch(self:GetAttribute("menu-prev-keys"), "[^,]+") do
-        owner:SetBindingClick(true, key, "PadKeysRing", "menuprev")
+        owner:SetBindingClick(true, key, "PadKeysRingPage", "previous")
       end
       for key in gmatch(self:GetAttribute("menu-next-keys"), "[^,]+") do
-        owner:SetBindingClick(true, key, "PadKeysRing", "menunext")
+        owner:SetBindingClick(true, key, "PadKeysRingPage", "next")
       end
     end
     return false
   end
-  if menu_open then
-    menu_open = false
+  if self:GetAttribute("menu-open") then
+    self:SetAttribute("menu-open", false)
     owner:ClearBindings()
   end
   local x, y = owner:GetMousePosition()
@@ -100,6 +91,27 @@ local button = CreateFrame("Button", "PadKeysRing", UIParent,
                            "SecureActionButtonTemplate")
 button:RegisterForClicks("AnyDown", "AnyUp")
 SecureHandlerWrapScript(button, "OnClick", header, ON_CLICK)
+
+-- Menu paging: its own button, so a page turn is never a second click on
+-- the ring while Ctrl+G still holds it down (paging through the ring
+-- itself lost the pick on the turned-to pages). The open menu binds the
+-- page keys to it; it only moves the ring's "menu-page".
+local PAGE_CLICK = [[
+  local ring = self:GetFrameRef("ring")
+  if down and ring:GetAttribute("menu-open") then
+    local count = ring:GetAttribute("menu-pages")
+    local step = (button == "next") and 1 or -1
+    local page = ring:GetAttribute("menu-page") + step
+    ring:SetAttribute("menu-page", (page - 1) % count + 1)
+  end
+  return false
+]]
+
+local pager = CreateFrame("Button", "PadKeysRingPage", UIParent,
+                          "SecureActionButtonTemplate")
+pager:RegisterForClicks("AnyDown")
+SecureHandlerSetFrameRef(pager, "ring", button)
+SecureHandlerWrapScript(pager, "OnClick", header, PAGE_CLICK)
 
 local wheel = ns.create_wheel("PadKeysRingRadial")
 
@@ -219,8 +231,15 @@ local function marker_entries()
   return entries
 end
 
+-- The page hint beside the dots: the first page key, short for the wheel.
 local function key_text(keys)
-  return keys[1] and GetBindingText(keys[1]) or ""
+  local key = keys[1]
+  if key == "MOUSEWHEELUP" then
+    return "Scroll up"
+  elseif key == "MOUSEWHEELDOWN" then
+    return "Scroll down"
+  end
+  return key and GetBindingText(key) or ""
 end
 
 -- The menu page the secure snippet is on.
@@ -238,17 +257,18 @@ local ENTRIES = {
   markers = marker_entries,
 }
 
+-- Runs after the paging snippet: show the page it moved to.
+pager:HookScript("OnClick", function(_, _, down)
+  if down and wheel:is_open() then
+    show_menu_page()
+    if SOUNDKIT.GAMEPAD_RADIAL_MENU_TAB_OVER then
+      PlaySound(SOUNDKIT.GAMEPAD_RADIAL_MENU_TAB_OVER)
+    end
+  end
+end)
+
 -- Runs after the secure snippet, with the original button name.
 button:HookScript("OnClick", function(_, page, down)
-  if page == "menuprev" or page == "menunext" then
-    if down and wheel:is_open() then
-      show_menu_page()
-      if SOUNDKIT.GAMEPAD_RADIAL_MENU_TAB_OVER then
-        PlaySound(SOUNDKIT.GAMEPAD_RADIAL_MENU_TAB_OVER)
-      end
-    end
-    return
-  end
   if not down then
     wheel:close()
     return
