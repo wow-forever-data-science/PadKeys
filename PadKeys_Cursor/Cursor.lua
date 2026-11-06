@@ -314,6 +314,70 @@ local function run_script(frame, script, ...)
   end
 end
 
+-- Unit frames, auras and action bars get their tooltip straight from
+-- GameTooltip. Running their own OnEnter / OnLeave from addon code left
+-- taint on those Blizzard frames: Edit Mode, the party frames and the pet
+-- bar then errored on secret values or were blocked in combat.
+local PLAIN_ROOTS = {}
+for _, name in ipairs(UNIT_ROOTS) do
+  PLAIN_ROOTS[name] = true
+end
+for _, name in ipairs(BAR_ROOTS) do
+  PLAIN_ROOTS[name] = true
+end
+
+local function plain(frame)
+  local root = root_of[frame]
+  local name = root and root:GetName()
+  return name and PLAIN_ROOTS[name] or false
+end
+
+local function plain_tooltip(frame)
+  GameTooltip:SetOwner(frame, "ANCHOR_RIGHT")
+  local info, root = frame.buttonInfo, root_of[frame]
+  if frame.auraType == "TempEnchant" and info then
+    GameTooltip:SetInventoryItem("player", info.ID)
+  elseif frame.auraType and info then
+    local filter = frame.auraType == "Buff" and "HELPFUL" or "HARMFUL"
+    GameTooltip:SetUnitAura("player", info.index, filter)
+  elseif root == PetActionBar then
+    GameTooltip:SetPetAction(frame:GetID())
+  elseif frame.action then
+    GameTooltip:SetAction(frame.action)
+  else
+    local unit = frame.unit or frame:GetAttribute("unit")
+    if not (unit and UnitExists(unit)) then
+      GameTooltip:Hide()
+      return
+    end
+    GameTooltip:SetUnit(unit)
+  end
+  GameTooltip:Show()
+end
+
+local function enter(frame)
+  if plain(frame) then
+    if not pcall(plain_tooltip, frame) then
+      GameTooltip:Hide()
+    end
+  else
+    run_script(frame, "OnEnter", true)
+  end
+end
+
+local function leave(frame)
+  if not frame then
+    return
+  end
+  if plain(frame) then
+    if GameTooltip:GetOwner() == frame then
+      GameTooltip:Hide()
+    end
+  else
+    run_script(frame, "OnLeave", true)
+  end
+end
+
 -- The glow turns deep gold while an entry waits for a second press to confirm
 -- (Services.lua: buy, train). Moving the cursor away cancels it.
 local armed
@@ -359,7 +423,7 @@ end)
 
 local function select_button(frame)
   if current and current ~= frame then
-    run_script(current, "OnLeave", true)
+    leave(current)
   end
   if armed and armed ~= frame then
     set_armed(nil)
@@ -376,7 +440,7 @@ local function select_button(frame)
     frame_glow:Hide()
   end
   if ns.config.cursor.tooltips ~= false then
-    run_script(frame, "OnEnter", true)
+    enter(frame)
   end
   proxy:SetAttribute("clickbutton", click_target(frame))
 end
@@ -389,7 +453,7 @@ local function stop()
   if not InCombatLockdown() then
     ClearOverrideBindings(owner)
   end
-  run_script(current, "OnLeave", true)
+  leave(current)
   current = nil
   set_armed(nil)
   box:Hide()
