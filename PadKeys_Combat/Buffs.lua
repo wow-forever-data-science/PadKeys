@@ -162,7 +162,7 @@ end
 
 -- --- Auras ------------------------------------------------------------------
 
--- A unit's buffs as { name, left, source }, read once per refresh; nil if
+-- A unit's buffs as { name, left, source, spell }, read once per refresh; nil if
 -- they can't be read. `left` is seconds, math.huge for no duration.
 local aura_cache = {}
 
@@ -184,6 +184,7 @@ local function buffs_of(unit)
         name = aura.name,
         left = (expires and expires > 0) and (expires - now) or math.huge,
         source = aura.sourceUnit,
+        spell = aura.spellId,
       }
     end
   end)
@@ -368,14 +369,12 @@ end
 
 -- --- Consumables ------------------------------------------------------------
 
--- Consumable subclasses (item class 0) that give a lasting buff.
-local ELIXIR, FLASK, SCROLL, FOOD, ENHANCEMENT = 2, 3, 4, 5, 6
 local WELL_FED = 19705
 
-local function item_info(id)
+local function item_icon_class(id)
   local get = C_Item and C_Item.GetItemInfoInstant or GetItemInfoInstant
-  local _, _, _, _, icon, class_id, subclass_id = get(id)
-  return icon, class_id, subclass_id
+  local _, _, _, _, icon, class_id = get(id)
+  return icon, class_id
 end
 
 local function item_name(id)
@@ -385,36 +384,56 @@ local function item_name(id)
   return (GetItemInfo(id))
 end
 
--- The buff an item's use gives (its use spell's name), or nil until the
--- client has it.
-local function item_buff(id)
-  local get = C_Item and C_Item.GetItemSpell or GetItemSpell
-  return get and (get(id))
-end
-
--- Food that makes you Well Fed says so in its tooltip; remembered per item.
-local well_fed_food = {}
-local function makes_well_fed(id, bag, slot)
-  if well_fed_food[id] == nil then
-    local phrase = (spell_name(WELL_FED) or "Well Fed"):lower()
-    local data = C_TooltipInfo and C_TooltipInfo.GetBagItem(bag, slot)
-    if not data then
-      return false
-    end
-    local found = false
-    for _, tip_line in ipairs(data.lines or {}) do
-      if tip_line.leftText and tip_line.leftText:lower():find(phrase, 1, true) then
-        found = true
-      end
-    end
-    well_fed_food[id] = found
+-- What a consumable gives, from its use spell's description (the "Use:"
+-- line), remembered per item: "food" (Well Fed), "weapon" (a temporary
+-- weapon enchant: stones, oils), "buff" (anything lasting 10 minutes or
+-- more: elixirs, flasks, scrolls), or false (potions, bandages, plain
+-- food). Classic item data files nearly all of these as plain consumables,
+-- so the item's category can't tell them apart. English descriptions only.
+-- Also returns the use spell's name and ID, to match against your auras.
+local kinds = {}
+local function consumable_kind(id)
+  local known = kinds[id]
+  if known ~= nil then
+    return known.kind, known.name, known.spell
   end
-  return well_fed_food[id]
+  local get = C_Item and C_Item.GetItemSpell or GetItemSpell
+  local name, spell = get(id)
+  if not spell then
+    return false -- not loaded yet, or no use spell; asked again next time
+  end
+  local describe = C_Spell and C_Spell.GetSpellDescription or GetSpellDescription
+  local text = describe and describe(spell)
+  if not text or text == "" then
+    if C_Spell and C_Spell.RequestLoadSpellData then
+      C_Spell.RequestLoadSpellData(spell)
+    end
+    return false
+  end
+  text = text:lower()
+  local minutes = 0
+  for n in text:gmatch("(%d+) ho?u?rs?") do
+    minutes = math.max(minutes, tonumber(n) * 60)
+  end
+  for n in text:gmatch("(%d+) min") do
+    minutes = math.max(minutes, tonumber(n))
+  end
+  local kind = false
+  if text:find("well fed", 1, true) then
+    kind = "food"
+  elseif minutes >= 10 and text:find("weapon", 1, true) then
+    kind = "weapon"
+  elseif minutes >= 10 then
+    kind = "buff"
+  end
+  kinds[id] = { kind = kind, name = name, spell = spell }
+  return kind, name, spell
 end
 
-local function has_buff(name)
+-- A buff on you by spell ID or name.
+local function has_buff(name, spell)
   for _, aura in ipairs(buffs_of("player") or {}) do
-    if aura.name == name then
+    if (spell and aura.spell == spell) or aura.name == name then
       return true
     end
   end
@@ -435,16 +454,15 @@ local function consumable_rows(rows)
         counts[id] = (counts[id] or 0) + (info and info.stackCount or 1)
         if not seen[id] then
           seen[id] = true
-          local icon, class_id, subclass_id = item_info(id)
+          local icon, class_id = item_icon_class(id)
           local wanted
           if class_id == 0 then
-            if subclass_id == ELIXIR or subclass_id == FLASK or subclass_id == SCROLL then
-              local buff = item_buff(id)
-              wanted = buff and not has_buff(buff)
-            elseif subclass_id == FOOD then
-              wanted = makes_well_fed(id, bag, slot) and
-                not has_buff(spell_name(WELL_FED) or "Well Fed")
-            elseif subclass_id == ENHANCEMENT then
+            local kind, buff, spell = consumable_kind(id)
+            if kind == "buff" then
+              wanted = not has_buff(buff, spell)
+            elseif kind == "food" then
+              wanted = not has_buff(spell_name(WELL_FED) or "Well Fed", WELL_FED)
+            elseif kind == "weapon" then
               wanted = is_weapon(GetInventoryItemID("player", SLOTS[1].inv)) and
                 enchant_left(SLOTS[1]) == nil
             end
