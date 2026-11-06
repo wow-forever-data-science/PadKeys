@@ -9,6 +9,11 @@
 -- each press targets the next (left button) or previous (right button) group
 -- member, in raid frame order. It is a secure button whose wrapped OnClick
 -- picks the next unit that exists, so it works in combat.
+--
+-- Attack in combat: Interact (F) prefers a soft target, a corpse to loot or
+-- an herb, over the enemy you are fighting. In combat, with a living enemy
+-- targeted, F starts your attack instead. A state driver swaps the binding,
+-- so it works in combat.
 
 local ns = PadKeys
 
@@ -92,3 +97,24 @@ end)
 function ns.is_friendly_mode()
   return mode:GetAttribute("friendly") and true or false
 end
+
+-- Attack in combat: the header binds the key to the attack button while the
+-- state is "on", and clears it (back to Interact) otherwise.
+local attack = CreateFrame("Button", "PadKeysAttack", UIParent,
+                           "SecureActionButtonTemplate")
+attack:RegisterForClicks("AnyDown")
+attack:SetAttribute("useOnKeyDown", true)
+attack:SetAttribute("type", "macro")
+attack:SetAttribute("macrotext", "/startattack")
+
+local attack_header = CreateFrame("Frame", "PadKeysAttackHeader", UIParent,
+                                  "SecureHandlerStateTemplate")
+attack_header:SetAttribute("key", ns.config.combat_attack.key)
+attack_header:SetAttribute("_onstate-attack", [[
+  if newstate == "on" then
+    self:SetBindingClick(true, self:GetAttribute("key"), "PadKeysAttack")
+  else
+    self:ClearBindings()
+  end
+]])
+RegisterStateDriver(attack_header, "attack", "[combat,harm,nodead] on; off")

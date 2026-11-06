@@ -13,3 +13,7 @@ b["CTRL-SHIFT-TAB"] = "CLICK PadKeysGroupCycle:RightButton"
 
 -- The keys friendly mode points at friends.
 ns.config.target_mode = { next = "TAB", previous = "SHIFT-TAB" }
+
+-- In combat, with a living enemy targeted, this key starts your attack
+-- instead of interacting with a soft target (a corpse or herb nearby).
+ns.config.combat_attack = { key = "F" }
