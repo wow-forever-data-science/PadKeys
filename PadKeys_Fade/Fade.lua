@@ -180,13 +180,13 @@ end
 local function hovered(group)
   local pad = c.padding or 0
   for _, frame in ipairs(group.frames) do
-    if frame:IsVisible() and MouseIsOver(frame, pad, -pad, -pad, pad) then
+    if frame:IsVisible() and frame:IsMouseOver(pad, -pad, -pad, pad) then
       return true
     end
   end
   for _, label in ipairs(group.labels) do
     if label.text:IsVisible() and label:GetAlpha() > 0 and
-       MouseIsOver(label.text, pad, -pad, -pad, pad) then
+       label.text:IsMouseOver(pad, -pad, -pad, pad) then
       return true
     end
   end
