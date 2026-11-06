@@ -17,9 +17,11 @@ without a gamepad, and adds its own code only where Blizzard's doesn't:
   and F takes it, accepts, continues or completes;
 - an in-game **key map** (F1), like Blizzard's Controller Map;
 - **one action bar** that shows the layer you hold, like a gamepad's
-  skill panel, so Blizzard's bars can be hidden.
+  skill panel, so Blizzard's bars can be hidden;
+- **fading bars**: Blizzard's bars, micro menu and bags stay out of sight
+  until you mouse over them or drag a spell, each labelled with its key.
 
-It comes as six addons, so you can switch them on one at a time and an
+It comes as seven addons, so you can switch them on one at a time and an
 error points at one part:
 
 | Addon | What it adds | Needs |
@@ -30,6 +32,7 @@ error points at one part:
 | **PadKeys_Targeting** | Friendly/enemy toggle (\`) and party/raid cycling (Ctrl+Tab) | PadKeys |
 | **PadKeys_Radial** | Radials: actions (G), pings (Cmd+G), markers (Shift+G), main menu (Ctrl+G) | PadKeys |
 | **PadKeys_Bar** | One bar that shows the layer you hold (Cmd, Shift, Option, Ctrl) | PadKeys (SpellActivationOverlay optional, for its proc glows) |
+| **PadKeys_Fade** | Blizzard's action bars, micro menu and bags fade out until you mouse over them or drag a spell; each bar is labelled with its PadKeys key (Cmd, Shift, G wheel) | PadKeys |
 | **PadKeys_Debug** | Saves Lua errors and blocked actions to a file, to send or read outside the game (`/pkdebug`) | — |
 
 It started in the wowforevR R package repository and moved here as a
@@ -109,7 +112,7 @@ keyboard with each layer's keys. It's also published at
    slot 5) **quits the game**, and other Cmd shortcuts go to macOS.
 
 Commands: `/padkeys preview`, `apply`, `restore`, `cursor`, `map`, `bar`,
-`status` (which PadKeys addons are loaded).
+`fade`, `status` (which PadKeys addons are loaded).
 Each addon has its own `Config.lua` with its keys and settings: edit it,
 `/reload` and `/padkeys apply`. On Windows, set `MOD = "ALT-"` at the top
 of `PadKeys/Config.lua` to use Alt instead of Cmd. Windows has no fifth
@@ -220,6 +223,8 @@ lets you hide Blizzard's bars:
 2. Open **Edit Mode** and set **Bar Visible: Hidden** on every action bar
    and the pet bar. The keys keep working: Blizzard's key handlers press
    hidden buttons just the same.
+   With PadKeys_Fade, set them to **Always** instead: they fade out and
+   come back when you point at them (see Fading bars).
 3. To put a spell on a bar, drag it out of the spellbook: Blizzard shows
    the hidden bars while you drag. Drop it on the bar and slot the key
    should fire (for example Bar 2, slot 5 for Cmd+Q).
@@ -233,6 +238,37 @@ spacing, scale, and switches for the layer name and macro names.
 
 You can't click it with the mouse: it is a display, so it can't be blocked
 in combat. Its tooltips and right-click menus are on Blizzard's bars.
+
+## Fading bars (PadKeys_Fade)
+
+Edit Mode can hide most action bars, but not Action Bar 1, the micro menu
+or the bags, and a hidden bar doesn't come back when you point at it.
+PadKeys_Fade keeps Blizzard's frames and makes them invisible instead:
+
+- **Hover** any action bar and all of them fade in, each with a label on
+  its left: the bar and the PadKeys key that fires it, read from your live
+  bindings: `Bar 1 No modifier`, `Bar 2 Cmd`, `Bar 3 Shift`, `Bar 5
+  Option`, `Bar 4 Ctrl · slots 1–4`, `Pet bar Ctrl · slots 1–4`, `Bar 6 G
+  wheel` (with PadKeys_Radial).
+- **Drag** a spell, item or macro and the action bars fade in until you
+  drop it.
+- The **micro menu and bags** are their own group: hover them to see them.
+  The experience and reputation bars fade with the action bars.
+- **Edit Mode** shows everything, labels included.
+
+Set up:
+
+1. Enable PadKeys_Fade, `/reload`.
+2. In **Edit Mode**, set **Bar Visible: Always** on every bar you want to
+   reach by mouse (a bar set to Hidden stays hidden), and stack them at the
+   bottom of the screen. Leave room on their left for the labels.
+3. `/padkeys fade` keeps them shown while you arrange things; again to fade.
+
+It only changes the frames' alpha, so it works in combat and the keys
+press the buttons as before. Invisible buttons still take clicks where
+they sit, which is why the bottom of the screen is the place for them.
+Groups, timings, the faded alpha (0 is invisible) and the labels are in
+`PadKeys_Fade/Config.lua`.
 
 ## Targeting (works in combat)
 

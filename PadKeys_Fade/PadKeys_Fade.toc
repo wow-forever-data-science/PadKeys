@@ -1,0 +1,10 @@
+## Interface: 11507, 16001
+## Title: PadKeys - Fade
+## Notes: Fades Blizzard's action bars, micro menu and bags out until you mouse over them or drag a spell, with a label on each bar naming its PadKeys key. Needs PadKeys.
+## Author: wow-forever-data-science
+## Version: 0.1.0
+## Dependencies: PadKeys
+## OptionalDeps: PadKeys_Radial, PadKeys_Bar, PadKeys_Debug
+
+Config.lua
+Fade.lua
