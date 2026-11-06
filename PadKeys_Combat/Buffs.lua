@@ -559,16 +559,31 @@ end
 
 local CVAR = "consolidateBuffs"
 
+-- Long buffs still showed in combat; this notes what the setting did
+-- (PadKeys_Debug) until that is found.
+local function note(text)
+  if PadKeysDebug_Note then
+    PadKeysDebug_Note("PadKeys_Combat " .. text)
+  end
+end
+
 local function consolidate(on)
   if not cfg.consolidate_in_combat or not ns.db then
     return
   end
   if on then
     local current = GetCVar(CVAR)
+    local ok, err
     if current and current ~= "1" then
       ns.db.consolidate_restore = current
-      pcall(SetCVar, CVAR, "1")
+      ok, err = pcall(SetCVar, CVAR, "1")
     end
+    local consolidated = BuffFrame and BuffFrame.ConsolidatedBuffs
+    note(format("%s was %s, set ok %s %s, now %s, enabled %s, shown %s",
+      CVAR, tostring(current), tostring(ok), tostring(err or ""),
+      tostring(GetCVar(CVAR)),
+      tostring(consolidated and consolidated:IsEnabled()),
+      tostring(consolidated and consolidated:IsShown())))
   elseif ns.db.consolidate_restore then
     pcall(SetCVar, CVAR, ns.db.consolidate_restore)
     ns.db.consolidate_restore = nil
