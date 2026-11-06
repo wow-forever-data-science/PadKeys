@@ -373,9 +373,12 @@ local WELL_FED = 19705
 
 local function item_icon_class(id)
   local get = C_Item and C_Item.GetItemInfoInstant or GetItemInfoInstant
-  local _, _, _, _, icon, class_id = get(id)
-  return icon, class_id
+  local _, _, _, _, icon, class_id, subclass_id = get(id)
+  return icon, class_id, subclass_id
 end
+
+-- Consumable subclasses that give a buff: elixir, flask, scroll.
+local BUFF_SUBCLASS = { [2] = true, [3] = true, [4] = true }
 
 local function item_name(id)
   if C_Item and C_Item.GetItemNameByID then
@@ -388,11 +391,12 @@ end
 -- line), remembered per item: "food" (Well Fed), "weapon" (a temporary
 -- weapon enchant: stones, oils), "buff" (anything lasting 10 minutes or
 -- more: elixirs, flasks, scrolls), or false (potions, bandages, plain
--- food). Classic item data files nearly all of these as plain consumables,
--- so the item's category can't tell them apart. English descriptions only.
+-- food). Classic item data files many of these as plain consumables, so
+-- an elixir, flask or scroll subclass counts as "buff" too, whatever the
+-- description says. English descriptions only.
 -- Also returns the use spell's name and ID, to match against your auras.
 local kinds = {}
-local function consumable_kind(id)
+local function consumable_kind(id, subclass_id)
   local known = kinds[id]
   if known ~= nil then
     return known.kind, known.name, known.spell
@@ -401,6 +405,10 @@ local function consumable_kind(id)
   local name, spell = get(id)
   if not spell then
     return false -- not loaded yet, or no use spell; asked again next time
+  end
+  if BUFF_SUBCLASS[subclass_id] then
+    kinds[id] = { kind = "buff", name = name, spell = spell }
+    return "buff", name, spell
   end
   local describe = C_Spell and C_Spell.GetSpellDescription or GetSpellDescription
   local text = describe and describe(spell)
@@ -454,10 +462,10 @@ local function consumable_rows(rows)
         counts[id] = (counts[id] or 0) + (info and info.stackCount or 1)
         if not seen[id] then
           seen[id] = true
-          local icon, class_id = item_icon_class(id)
+          local icon, class_id, subclass_id = item_icon_class(id)
           local wanted
           if class_id == 0 then
-            local kind, buff, spell = consumable_kind(id)
+            local kind, buff, spell = consumable_kind(id, subclass_id)
             if kind == "buff" then
               wanted = not has_buff(buff, spell)
             elseif kind == "food" then
