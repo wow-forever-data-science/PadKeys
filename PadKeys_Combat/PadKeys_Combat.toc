@@ -1,10 +1,11 @@
 ## Interface: 11507, 16001
 ## Title: PadKeys - Combat
-## Notes: Changes the UI when you enter and leave combat. For now: a short "Combat" / "Out of Combat" text in the middle of the screen. Needs PadKeys.
+## Notes: Changes the UI when you enter and leave combat: a short "Combat" / "Out of Combat" text, and out of combat a list of missing or expiring long buffs for your class and group that fades out in combat. Needs PadKeys.
 ## Author: wow-forever-data-science
-## Version: 0.1.0
+## Version: 0.2.0
 ## Dependencies: PadKeys
 ## OptionalDeps: PadKeys_Debug
 
 Config.lua
 Combat.lua
+Buffs.lua
