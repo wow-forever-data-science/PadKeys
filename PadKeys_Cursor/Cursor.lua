@@ -170,6 +170,22 @@ local function unclipped(frame, x, y)
   return true
 end
 
+-- Windows can make frames that aren't buttons into targets (Professions.lua:
+-- the side tabs). Each handler gets a frame and returns true for a target.
+local target_handlers = {}
+function ns.cursor_on_target(handler)
+  target_handlers[#target_handlers + 1] = handler
+end
+
+local function extra_target(frame)
+  for _, handler in ipairs(target_handlers) do
+    if handler(frame) then
+      return true
+    end
+  end
+  return false
+end
+
 -- Buttons, and text fields (a search box): the cursor can type in those.
 local function clickable(frame)
   if frame:IsObjectType("EditBox") then
@@ -178,7 +194,8 @@ local function clickable(frame)
       return false
     end
   elseif not (frame:IsObjectType("Button") and frame:IsVisible() and
-                frame:IsEnabled() and frame:IsMouseClickEnabled()) then
+                frame:IsEnabled() and frame:IsMouseClickEnabled()) and
+    not (frame:IsVisible() and extra_target(frame)) then
     return false
   end
   local width, height = frame:GetSize()
