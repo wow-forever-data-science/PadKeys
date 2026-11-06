@@ -5,8 +5,9 @@
 -- takes the cursor (followWindows, autoFrames in Config.lua).
 --
 -- Clicks go through a secure proxy button bound with an override binding,
--- so they count as real key presses: spells in the spellbook can be cast and
--- items in bags used. Pointing the proxy at a new button is blocked in
+-- so they count as real key presses: spells in the spellbook can be cast
+-- and items in bags used (the click key uses a bag item, as right-click
+-- does). Pointing the proxy at a new button is blocked in
 -- combat, so the cursor switches off when combat starts.
 
 local ns = PadKeys
@@ -783,6 +784,31 @@ bags:HookScript("OnClick", function()
       ns.cursor_focus_in(root)
     end
   end)
+end)
+
+-- A bag item under the cursor: the click key uses it, as right-clicking
+-- does (drink, eat, equip, sell to an open vendor), through the proxy's
+-- secure "item" action for the left button. With something already on the
+-- mouse (picked up with the pickup key) it clicks as usual, so the item
+-- drops into the slot.
+local function bag_slot(frame)
+  local mixin = ContainerFrameItemButtonMixin
+  if not (frame and mixin and frame.GetBagID == mixin.GetBagID) then
+    return nil
+  end
+  local bag, slot = frame:GetBagID(), frame:GetID()
+  if bag and slot and C_Container.GetContainerItemID(bag, slot) then
+    return bag, slot
+  end
+end
+
+proxy:SetScript("PreClick", function(self)
+  local bag, slot = bag_slot(current)
+  if GetCursorInfo() then
+    bag = nil
+  end
+  self:SetAttribute("type1", bag and "item" or nil)
+  self:SetAttribute("item1", bag and (bag .. " " .. slot) or nil)
 end)
 
 -- A click often opens a new page or closes the window.
