@@ -63,15 +63,19 @@ arrow:SetTexture("Interface\\ChatFrame\\ChatFrameExpandArrow")
 arrow:SetSize(16, 16)
 arrow:SetDesaturated(true)
 arrow:SetPoint("RIGHT", box, "LEFT", 2, 0)
-local bob = box:CreateAnimationGroup()
-bob:SetLooping("BOUNCE")
-local nudge = bob:CreateAnimation("Translation")
-nudge:SetOffset(-3, 0)
-nudge:SetDuration(0.5)
-nudge:SetSmoothing("IN_OUT")
-nudge:SetTarget(arrow)
-box:SetScript("OnShow", function() bob:Play() end)
-box:SetScript("OnHide", function() bob:Stop() end)
+-- The game draws textures on whole screen pixels, so a 3-pixel bob moved
+-- in three jumps. Let the arrow sit between pixels and move it along a
+-- sine wave each frame instead: 3 pixels left and back once a second.
+arrow:SetSnapToPixelGrid(false)
+arrow:SetTexelSnappingBias(0)
+local BOB_DISTANCE, BOB_PERIOD = 3, 1
+local bob_time = 0
+box:SetScript("OnUpdate", function(_, dt)
+  bob_time = (bob_time + dt) % BOB_PERIOD
+  local x = 2 - BOB_DISTANCE * (1 - math.cos(bob_time / BOB_PERIOD * 2 * math.pi)) / 2
+  arrow:SetPoint("RIGHT", box, "LEFT", x, 0)
+end)
+box:SetScript("OnShow", function() bob_time = 0 end)
 
 local frame_glow = CreateFrame("Frame", nil, UIParent)
 frame_glow:SetFrameStrata("TOOLTIP")
