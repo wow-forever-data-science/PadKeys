@@ -202,6 +202,31 @@ for i, key in ipairs(FACE_KEYS) do
   b.hotkey:SetJustifyH("LEFT")
   b.hotkey:SetText(GetBindingText and GetBindingText(key) or key)
 
+  -- A see-through black box behind the key label, tucked into the top left
+  -- corner of the icon. The button's border already edges its top and left,
+  -- so the outline only needs the right and bottom sides. The font string
+  -- sizes itself to its text, so the box follows the label's corners.
+  if c.hotkey_background then
+    local box = top:CreateTexture(nil, "BACKGROUND", nil, 0)
+    box:SetPoint("TOPLEFT", b, "TOPLEFT", 1, -1)
+    box:SetPoint("BOTTOMRIGHT", b.hotkey, "BOTTOMRIGHT", 3, -2)
+    box:SetColorTexture(0, 0, 0, c.hotkey_background_alpha)
+    round(top, box, 1)
+    if c.hotkey_outline then
+      local right = top:CreateTexture(nil, "BACKGROUND", nil, 1)
+      right:SetPoint("TOPLEFT", box, "TOPRIGHT", 0, 0)
+      right:SetPoint("BOTTOMLEFT", box, "BOTTOMRIGHT", 0, -1)
+      right:SetWidth(1)
+      right:SetColorTexture(0, 0, 0, c.hotkey_outline_alpha)
+      local bottom = top:CreateTexture(nil, "BACKGROUND", nil, 1)
+      bottom:SetPoint("TOPLEFT", box, "BOTTOMLEFT", 0, 0)
+      bottom:SetPoint("TOPRIGHT", box, "BOTTOMRIGHT", 0, 0)
+      bottom:SetHeight(1)
+      bottom:SetColorTexture(0, 0, 0, c.hotkey_outline_alpha)
+      round(top, bottom, 1)
+    end
+  end
+
   b.count = text(top, 15, "NumberFontNormal")
   b.count:SetPoint("BOTTOMRIGHT", -2, 2)
 
