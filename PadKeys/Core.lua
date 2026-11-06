@@ -8,7 +8,7 @@ BINDING_HEADER_PADKEYS = "PadKeys"
 BINDING_NAME_PADKEYS_KEYMAP = "Show key map"
 
 function ns.say(msg)
-  print("|cff33ccffPadKeys|r: " .. msg)
+  print(ns.paint("PadKeys", "white") .. ": " .. msg)
 end
 
 local HELP = {
@@ -30,8 +30,8 @@ local function status()
   ns.say("PadKeys (base): loaded")
   for _, m in ipairs(ns.modules) do
     ns.say(format("%s: %s - %s", m.addon,
-                  IsAddOnLoaded(m.addon) and "|cff33ff33loaded|r" or
-                    "|cff999999not loaded|r", m.does))
+                  IsAddOnLoaded(m.addon) and ns.paint("loaded", "white") or
+                    ns.paint("not loaded", "mid"), m.does))
   end
 end
 

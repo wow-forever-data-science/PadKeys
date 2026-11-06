@@ -93,3 +93,14 @@ ns.modules = {
   { addon = "PadKeys_Combat", does = "Combat banner, and missing buffs out of combat" },
   { addon = "PadKeys_Debug", does = "Saves errors to SavedVariables (/pkdebug)" },
 }
+
+-- The look every PadKeys addon shares: black and white, one font. Roboto
+-- Condensed ExtraBold comes with PadKeys (Fonts/, SIL Open Font License);
+-- WoW's own fonts work too, e.g. "Fonts\\FRIZQT__.TTF" or
+-- "Fonts\\ARIALN.TTF".
+ns.config.theme = {
+  font = "Interface\\AddOns\\PadKeys\\Fonts\\RobotoCondensed-ExtraBold.ttf",
+  -- Spell, item and menu icons keep their own colours; true shows them in
+  -- grey as well.
+  grey_icons = false,
+}

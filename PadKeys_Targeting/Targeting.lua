@@ -79,16 +79,14 @@ mode:SetAttribute("prevkey", ns.config.target_mode.previous)
 SecureHandlerWrapScript(mode, "OnClick", mode_header, TOGGLE_MODE)
 
 -- A small label while friendly mode is on, so you know which mode you're in.
-local label = UIParent:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+local label = ns.text(UIParent, 16, "white", "OVERLAY", "GameFontNormalLarge")
 label:SetPoint("TOP", UIParent, "TOP", 0, -120)
 label:SetText("Friendly targeting")
-label:SetTextColor(0.3, 1, 0.3)
 label:Hide()
 mode:HookScript("OnClick", function(self)
   local friendly = self:GetAttribute("friendly")
   label:SetShown(friendly)
-  UIErrorsFrame:AddMessage(friendly and "Targeting: friendly" or
-                             "Targeting: enemy", 1, 0.82, 0)
+  ns.flash(friendly and "Targeting: friendly" or "Targeting: enemy")
 end)
 
 function ns.is_friendly_mode()

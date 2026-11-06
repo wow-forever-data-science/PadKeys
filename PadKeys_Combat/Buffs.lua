@@ -29,8 +29,6 @@ if not (cfg and cfg.enabled) then
   return
 end
 
-local DEFAULT_FONT = "Interface\\AddOns\\PadKeys_Bar\\Fonts\\RobotoCondensed-ExtraBold.ttf"
-
 local MANA = {
   DRUID = true, HUNTER = true, MAGE = true, PALADIN = true,
   PRIEST = true, SHAMAN = true, WARLOCK = true,
@@ -395,10 +393,12 @@ local function collect()
   return rows
 end
 
+-- In the PadKeys theme: the buff's name in light grey, what is wrong in
+-- white.
 local function row_text(row)
-  local text = "|cffffffff" .. row.label .. "|r  "
+  local text = ns.paint(row.label, "light") .. "  "
   if row.count then
-    return text .. "|cffff5050" .. row.count .. "|r"
+    return text .. ns.paint(row.count, "white")
   end
   local missing = row.missing or {}
   if #missing > 0 then
@@ -411,16 +411,16 @@ local function row_text(row)
       who = who .. format(" +%d", #missing - cfg.max_names)
     end
     if #missing == 1 and missing[1] == "you" then
-      return text .. "|cffff5050missing|r"
+      return text .. ns.paint("missing", "white")
     end
-    return text .. "|cffff5050missing:|r " .. who
+    return text .. ns.paint("missing: " .. who, "white")
   end
   if row.left == math.huge then
     return text
   end
-  text = text .. "|cffffd200" .. clock(row.left) .. "|r"
+  text = text .. ns.paint(clock(row.left), "white")
   if row.who and row.who ~= "you" then
-    text = text .. " " .. row.who
+    text = text .. " " .. ns.paint(row.who, "light")
   end
   return text
 end
@@ -435,7 +435,6 @@ panel:EnableMouse(false)
 panel:SetAlpha(0)
 panel:Hide()
 
-local font = ns.config.bar and ns.config.bar.font or DEFAULT_FONT
 local ICON = cfg.size + 6
 local lines = {}
 
@@ -447,10 +446,8 @@ local function line(i)
   l.icon = panel:CreateTexture(nil, "ARTWORK")
   l.icon:SetSize(ICON, ICON)
   l.icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
-  l.text = panel:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-  l.text:SetFont(font, cfg.size, "")
-  l.text:SetShadowColor(0, 0, 0, 1)
-  l.text:SetShadowOffset(1, -1)
+  ns.icon(l.icon)
+  l.text = ns.text(panel, cfg.size)
   l.text:SetJustifyH("LEFT")
   l.icon:SetPoint("TOPLEFT", panel, "TOPLEFT", 0, -(i - 1) * (ICON + 4))
   l.text:SetPoint("LEFT", l.icon, "RIGHT", 6, 0)

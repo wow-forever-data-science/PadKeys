@@ -37,7 +37,7 @@ error points at one part:
 | **PadKeys_Radial** | Radials: actions (G), pings (Cmd+G), markers (Shift+G), main menu (Ctrl+G) | PadKeys |
 | **PadKeys_Bar** | One bar that shows the layer you hold (Cmd, Shift, Option, Ctrl) | PadKeys (SpellActivationOverlay optional, for its proc glows) |
 | **PadKeys_Fade** | Blizzard's action bars, micro menu and bags fade out until you mouse over them or drag a spell; each bar is labelled with its PadKeys key (Cmd, Shift, G wheel) | PadKeys |
-| **PadKeys_Combat** | "Combat" / "Out of Combat" fades in the middle of the screen as you enter and leave combat, in the action bar's font; out of combat, a list of missing or expiring long buffs for your class and group | PadKeys |
+| **PadKeys_Combat** | "Combat" / "Out of Combat" fades in the middle of the screen as you enter and leave combat, in white; out of combat, a list of missing or expiring long buffs for your class and group | PadKeys |
 | **PadKeys_Debug** | Saves Lua errors and blocked actions to a file, to send or read outside the game (`/pkdebug`) | — |
 
 It started in the wowforevR R package repository and moved here as a
@@ -123,6 +123,21 @@ Each addon has its own `Config.lua` with its keys and settings: edit it,
 of `PadKeys/Config.lua` to use Alt instead of Cmd. Windows has no fifth
 modifier, so there's no Action Bar 5 layer there.
 
+## Look: black and white, one font
+
+Everything PadKeys draws is black, white and grey, in one font: Roboto
+Condensed ExtraBold, shipped in `PadKeys/Fonts/` with its SIL Open Font
+License. That covers the bar, the fade labels, the radial wheels (Blizzard's
+art in grey), the UI cursor's arrow and glow, the key map window, the
+friendly-targeting label, the combat banner and PadKeys' messages. Grey
+means dimmed: out of range, not usable, a bar's name next to its key.
+
+Set the font once in the `theme` block at the end of `PadKeys/Config.lua`
+(WoW's own fonts work too, e.g. `Fonts\\FRIZQT__.TTF`). Spell, item and menu
+icons keep their colours so you can tell them apart; `grey_icons = true`
+there shows them in grey too. Blizzard's own windows and tooltips (the
+aura tooltips included) keep Blizzard's look.
+
 ## Key layout
 
 Eight action keys, each with a layer per modifier, like the eight gamepad
@@ -186,8 +201,7 @@ Cmd is `META` and Option is `ALT` in WoW's key names.
 ## One bar for every layer (PadKeys_Bar)
 
 A single row of eight slightly rounded buttons on a dark background, with
-white key labels in Roboto Condensed ExtraBold (shipped in
-`PadKeys_Bar/Fonts/` with its SIL Open Font License), that shows what
+white key labels in the PadKeys font (see [Look](#look-black-and-white-one-font)), that shows what
 1 2 3 4 Q E R T
 do **with the modifiers you hold right now**: Bar 1 with none, Bar 2 while
 you hold Cmd, Bar 3 with Shift, Bar 5 with Option, and the pet bar plus
@@ -196,18 +210,17 @@ you press or let go of a modifier, in combat too. The layer name ("Cmd")
 shows above it while a modifier is held.
 
 Each button shows the icon, cooldown, charges or item count, macro name,
-a dim icon when the spell can't be used now (blue: not enough mana), a red
-key label when the target is out of range, a gold border while the action
-is active (casting, auto attack, a pet stance) and a white border while its
-key is down. Stance and form paging of Bar 1 carries over.
+a dim icon when the spell can't be used now (a little less dim: not
+enough mana), a dark grey key label when the target is out of range, a
+grey border while the action is active (casting, auto attack, a pet
+stance) and a white border while its key is down. Stance and form paging of Bar 1 carries over.
 
 **Proc glow:** when a Blizzard button lights up, the bar's button for that
 key lights up too, on whichever layer you hold. That covers
 **SpellActivationOverlay** and other addons that glow buttons with
 LibButtonGlow, including its custom events, and Blizzard's own proc alerts.
 Those addons keep lighting up Blizzard's buttons while their bars are
-hidden; the bar copies the glow, with LibButtonGlow's look when it's loaded
-and a pulsing gold ring otherwise. Turn it off with `glow = false` in
+hidden; the bar copies the glow as a pulsing white ring. Turn it off with `glow = false` in
 `PadKeys_Bar/Config.lua`. Pet buttons don't glow.
 
 SpellActivationOverlay is **optional**: PadKeys_Bar works without it, and
@@ -279,8 +292,7 @@ Groups, timings, the faded alpha (0 is invisible) and the labels are in
 
 As you enter combat, **Combat** fades in above the middle of the screen in
 white and fades out a second later; as you leave it, **Out of Combat** does
-the same. It uses PadKeys_Bar's font (Roboto Condensed
-ExtraBold, or whatever `font` is set to in `PadKeys_Bar/Config.lua`).
+the same, in the PadKeys font.
 Texts, size, position and timings are in
 `PadKeys_Combat/Config.lua`; `banner = false` turns it off.
 
@@ -602,7 +614,7 @@ Known risks:
   procs never glow with the bars hidden, set the bars to "Always" to
   check, and send what you see.
 - PadKeys_Bar checks range from Blizzard's range events. If the key label
-  never turns red out of range, the hidden bars may have stopped range
+  never turns dark grey out of range, the hidden bars may have stopped range
   checks; send what you see.
 - The radial reads its entries from Blizzard's `GamepadRadial` frame. If
   Blizzard changes that table, or an entry's action only works in gamepad

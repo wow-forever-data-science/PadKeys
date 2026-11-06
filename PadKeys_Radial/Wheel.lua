@@ -81,6 +81,7 @@ function ns.create_wheel(name)
     background:SetSize(width, height)
   end
   art:SetSize(width, height)
+  background:SetDesaturated(true)
   w.art = art
   w.background = background
 
@@ -94,31 +95,32 @@ function ns.create_wheel(name)
     disabled:SetAtlas("gamepad-radial-menu-disabled", true)
     disabled:SetPoint("CENTER", polar(i, HIGHLIGHT_DISTANCE))
     disabled:SetRotation(rotation(i))
+    disabled:SetDesaturated(true)
     w.segments[i] = { icon = art:CreateTexture(nil, "OVERLAY"), disabled = disabled }
   end
 
-  w.label = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+  w.label = ns.text(frame, 13, "white", "OVERLAY", "GameFontHighlight")
   -- Under the wheel: the centre is too small for text at small scales.
   w.label:SetPoint("TOP", art, "BOTTOM", 0, -6)
   w.label:SetWidth(160)
 
-  w.title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-  w.title:SetTextColor(1, 1, 1)
+  w.title = ns.text(frame, 16, "white", "OVERLAY", "GameFontNormalLarge")
   w.title:SetPoint("BOTTOM", art, "TOP", 0, 22)
 
   w.dots = {}
   for i = 1, 3 do
     local dot = frame:CreateTexture(nil, "OVERLAY")
     dot:SetSize(10, 10)
+    dot:SetDesaturated(true)
     w.dots[i] = dot
   end
   w.dots[2]:SetPoint("TOP", w.title, "BOTTOM", 0, -6)
   w.dots[1]:SetPoint("RIGHT", w.dots[2], "LEFT", -4, 0)
   w.dots[3]:SetPoint("LEFT", w.dots[2], "RIGHT", 4, 0)
 
-  w.previous_hint = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+  w.previous_hint = ns.text(frame, 11, "light", "OVERLAY", "GameFontNormalSmall")
   w.previous_hint:SetPoint("RIGHT", w.dots[1], "LEFT", -6, 0)
-  w.next_hint = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+  w.next_hint = ns.text(frame, 11, "light", "OVERLAY", "GameFontNormalSmall")
   w.next_hint:SetPoint("LEFT", w.dots[3], "RIGHT", 6, 0)
 
   frame:SetScript("OnUpdate", function() w:track() end)
@@ -159,7 +161,8 @@ function Wheel:set_entries(entries)
     local entry = entries[i]
     if entry then
       draw_icon(segment.icon, i, entry.icon)
-      segment.icon:SetDesaturated(entry.desaturate or false)
+      segment.icon:SetDesaturated(entry.desaturate or
+                                  ns.config.theme.grey_icons or false)
       segment.icon:Show()
       segment.disabled:SetShown(not entry.enabled)
     else
@@ -198,11 +201,11 @@ function Wheel:select(index, refresh)
   self.highlight:ClearAllPoints()
   self.highlight:SetPoint("CENTER", polar(index, HIGHLIGHT_DISTANCE))
   self.highlight:SetRotation(rotation(index))
-  self.highlight:SetDesaturated(not entry.enabled)
+  self.highlight:SetDesaturated(true)
   self.highlight:Show()
   self.label:SetText(entry.label or "")
-  local color = entry.enabled and HIGHLIGHT_FONT_COLOR or DISABLED_FONT_COLOR
-  self.label:SetTextColor(color:GetRGB())
+  local v = entry.enabled and ns.grey.white or ns.grey.mid
+  self.label:SetTextColor(v, v, v)
   if moved then
     play("GAMEPAD_RADIAL_MENU_HIGHLIGHT")
   end
