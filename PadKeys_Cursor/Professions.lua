@@ -7,6 +7,7 @@
 -- * The second F crafts it, as the Create button does
 --   (ProfessionsCraftingPageMixin:Create, with the amount in its box).
 -- * F on the Create / Create All buttons runs them.
+-- * F on a side tab (a profession, or the overview) opens it.
 --
 -- These call Blizzard's functions instead of clicking: the cursor's click
 -- did nothing on the professions window's buttons.
@@ -83,5 +84,60 @@ stepper:SetScript("OnClick", step)
 ns.cursor_on_click(function(frame)
   if recipe_row(frame) or create_button(frame) then
     return stepper
+  end
+end)
+
+-- The side tabs are frames, not buttons, so the cursor only stops on them
+-- because they are named here. A profession tab's click casts the
+-- profession's spell (ProfessionsFrameRightTabMixin:OnClick), which addon
+-- code may not do: a secure button casts it, then runs the rest of the
+-- tab's click. The overview tab casts nothing, so its own click runs.
+local function side_tab(frame)
+  local professions = ProfessionsFrame
+  if not professions then
+    return nil
+  end
+  if frame == professions.ProfessionsOverviewTab or
+    tContains(professions.rightProfessionTabs or {}, frame) then
+    return frame
+  end
+end
+
+local tab
+local caster = CreateFrame("Button", "PadKeysProfessionTab", UIParent,
+                           "SecureActionButtonTemplate")
+caster:SetAttribute("useOnKeyDown", false)
+-- Cast only when the tab isn't the open profession: casting it again
+-- would close it (ProfessionsLargeRightTabMixin:CastProfessionSpell).
+caster:SetScript("PreClick", function(self)
+  local spell
+  if tab and tab.spellOffsetIndex and
+    not Professions.IsSelectedProfession(tab.skillLine) then
+    local info = C_SpellBook.GetSpellBookItemInfo(tab.spellOffsetIndex + 1,
+                                                  Enum.SpellBookSpellBank.Player)
+    spell = info and info.spellID
+  end
+  self:SetAttribute("type", spell and "spell" or nil)
+  self:SetAttribute("spell", spell)
+end)
+caster:SetScript("PostClick", function()
+  if not tab then
+    return
+  end
+  if tab == ProfessionsFrame.ProfessionsOverviewTab then
+    tab:OnClick()
+    return
+  end
+  ProfessionsFrame.BookPage:Hide()
+  ProfessionsFrame.CraftingPage:Show()
+  ProfessionsFrame:RightTabSelected(tab)
+end)
+
+ns.cursor_on_target(side_tab)
+
+ns.cursor_on_click(function(frame)
+  tab = side_tab(frame)
+  if tab then
+    return caster
   end
 end)
