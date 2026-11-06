@@ -4,8 +4,10 @@
 -- weapon enchants always count as long.
 --
 -- Forever has no buff consolidation (the consolidateBuffs setting is gone),
--- and in combat aura times are secret, so the long buffs are picked as
--- combat starts, by aura instance. Buffs gained in combat always show.
+-- and in combat aura times are secret, already as combat starts. So the
+-- long buffs are picked out of combat, by aura instance, on every aura
+-- change and each second, and the last pick holds through combat. Buffs
+-- gained in combat always show.
 --
 -- Only the icons' alpha changes, as PadKeys_Fade does: they stay where
 -- they are, so the long ones leave gaps, and nothing here is secure. A
@@ -25,10 +27,13 @@ local LONG = BUFF_DURATION_WARNING_TIME or 90
 local long_ids = {}
 local hiding = false
 
+-- Out of combat only; a failed read keeps the last pick.
 local function remember_long()
-  wipe(long_ids)
-  local now = GetTime()
-  pcall(function()
+  if hiding or InCombatLockdown() then
+    return
+  end
+  local now, picked = GetTime(), {}
+  local ok = pcall(function()
     for i = 1, 40 do
       local aura = C_UnitAuras.GetAuraDataByIndex("player", i, "HELPFUL")
       if not aura then
@@ -36,10 +41,13 @@ local function remember_long()
       end
       local expires = aura.expirationTime
       if not expires or expires == 0 or expires - now > LONG then
-        long_ids[aura.auraInstanceID] = true
+        picked[aura.auraInstanceID] = true
       end
     end
   end)
+  if ok then
+    long_ids = picked
+  end
 end
 
 -- An icon whose aura can't be read counts as short, so it shows.
@@ -93,11 +101,18 @@ hook_frame()
 local events = CreateFrame("Frame")
 events:RegisterEvent("PLAYER_REGEN_DISABLED")
 events:RegisterEvent("PLAYER_REGEN_ENABLED")
+events:RegisterEvent("PLAYER_ENTERING_WORLD")
+events:RegisterUnitEvent("UNIT_AURA", "player")
 events:SetScript("OnEvent", function(_, event)
+  if event == "UNIT_AURA" or event == "PLAYER_ENTERING_WORLD" then
+    remember_long()
+    return
+  end
   hook_frame()
   hiding = event == "PLAYER_REGEN_DISABLED"
-  if hiding then
-    remember_long()
-  end
   apply()
+  remember_long()
 end)
+
+-- Buffs run down below 90 seconds without an aura change.
+C_Timer.NewTicker(1, remember_long)
