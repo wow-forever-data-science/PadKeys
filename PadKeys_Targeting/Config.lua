@@ -3,9 +3,9 @@
 local ns = PadKeys
 
 local b = ns.config.bindings
--- The next/previous target keys (Tab / Shift+Tab) cycle the enemies in
--- front of you out of combat, or the friends when there is no enemy. In combat they follow friendly/enemy mode,
--- which ` toggles.
+-- ` toggles friendly/enemy mode, which points the next/previous target keys
+-- (Tab / Shift+Tab, set in PadKeys/Config.lua) at friends or enemies, in
+-- and out of combat.
 b["`"] = "CLICK PadKeysTargetMode:LeftButton"
 -- Ctrl+Tab / Ctrl+Shift+Tab: next / previous party or raid member, in raid
 -- frame order. All of these work in combat.

@@ -1,13 +1,11 @@
 -- Targeting, the keyboard version of the gamepad's targeting buttons.
 --
--- Tab and Shift+Tab (next / previous target):
--- * Out of combat they cycle the enemies in front of you, and the friends
---   when there is no enemy (a secure macro). Blizzard's TARGETNEAREST,
---   meant for any unit, only found friends.
--- * In combat they follow friendly/enemy mode (gamepad LB "Target
---   Friendly" / RB "Target Hostile"): one key toggles the mode.
--- A secure header rebinds the keys as combat starts and ends (a state
--- driver) and as the mode toggles, so it works in combat.
+-- Friendly/enemy mode (gamepad LB "Target Friendly" / RB "Target Hostile"):
+-- one key toggles the mode, and the next/previous target keys (Tab and
+-- Shift+Tab) cycle enemies or friends, in and out of combat. The toggle is
+-- a secure button whose snippet rebinds those keys, so it works in combat.
+-- (Blizzard has no command that cycles enemies and friends together: its
+-- TARGETNEAREST only found friends.)
 --
 -- Group cycling, the keyboard version of the gamepad's party/raid targeting:
 -- each press targets the next (left button) or previous (right button) group
@@ -64,49 +62,24 @@ SecureHandlerWrapScript(button, "OnClick", header, ON_CLICK)
 
 ns.group_cycle = button
 
--- Friendly/enemy toggle and combat. The header owns override bindings for
--- the target keys: out of combat any unit, in combat friends in friendly
--- mode. In combat in enemy mode it clears them, so the layout's normal
--- enemy bindings apply again.
-local APPLY = [[
-  self:ClearBindings()
-  local nextkey, prevkey = self:GetAttribute("nextkey"), self:GetAttribute("prevkey")
-  if not self:GetAttribute("combat") then
-    self:SetBindingClick(true, nextkey, "PadKeysTargetAny", "LeftButton")
-    self:SetBindingClick(true, prevkey, "PadKeysTargetAny", "RightButton")
-  elseif self:GetAttribute("friendly") then
-    self:SetBinding(true, nextkey, "TARGETNEARESTFRIEND")
-    self:SetBinding(true, prevkey, "TARGETPREVIOUSFRIEND")
+-- Friendly/enemy toggle. In friendly mode the header owns override bindings
+-- that point the target keys at Blizzard's friendly targeting; enemy mode
+-- clears them, so the layout's normal enemy bindings apply again.
+local TOGGLE_MODE = [[
+  local friendly = not owner:GetAttribute("friendly")
+  owner:SetAttribute("friendly", friendly)
+  if friendly then
+    owner:SetBinding(true, owner:GetAttribute("nextkey"), "TARGETNEARESTFRIEND")
+    owner:SetBinding(true, owner:GetAttribute("prevkey"), "TARGETPREVIOUSFRIEND")
+  else
+    owner:ClearBindings()
   end
 ]]
 
--- Out of combat: the next (left button) or previous (right button) enemy;
--- if that leaves no living enemy targeted, the next or previous friend.
-local any = CreateFrame("Button", "PadKeysTargetAny", UIParent,
-                        "SecureActionButtonTemplate")
-any:RegisterForClicks("AnyDown")
-any:SetAttribute("useOnKeyDown", true)
-any:SetAttribute("type", "macro")
-any:SetAttribute("macrotext1",
-  "/targetenemy\n/stopmacro [harm,nodead]\n/targetfriend")
-any:SetAttribute("macrotext2",
-  "/targetenemy 1\n/stopmacro [harm,nodead]\n/targetfriend 1")
-
-local TOGGLE_MODE = [[
-  owner:SetAttribute("friendly", not owner:GetAttribute("friendly"))
-  owner:RunAttribute("apply")
-]]
-
 local mode_header = CreateFrame("Frame", "PadKeysTargetModeHeader", UIParent,
-                                "SecureHandlerStateTemplate")
+                                "SecureHandlerBaseTemplate")
 mode_header:SetAttribute("nextkey", ns.config.target_mode.next)
 mode_header:SetAttribute("prevkey", ns.config.target_mode.previous)
-mode_header:SetAttribute("apply", APPLY)
-mode_header:SetAttribute("_onstate-combat", [[
-  self:SetAttribute("combat", newstate == "on")
-  self:RunAttribute("apply")
-]])
-RegisterStateDriver(mode_header, "combat", "[combat] on; off")
 
 local mode = CreateFrame("Button", "PadKeysTargetMode", UIParent,
                          "SecureActionButtonTemplate")
