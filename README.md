@@ -174,7 +174,10 @@ F needs soft targeting on for keyboard. PadKeys sets only key bindings;
 the console settings live in the `wow-settings` repository
 (`settings/account/config-cache.wtf`, applied with `./wow.sh apply`):
 `SoftTargetInteract` and `SoftTargetEnemy` at 3 (Blizzard's "Enable
-Interact Key" and "Action Targeting" options), the other soft-targeting
+Interact Key" and "Action Targeting" options). `SoftTargetEnemy` and
+`SoftTargetEnemyArc` are per character, so they sit in
+`settings/characters/_default/config-cache.wtf`; a new character needs one
+more apply after its first login. The other soft-targeting
 settings at the values Blizzard's gamepad mode uses (F reaches 20 yards in
 a cone in front of you, and an icon shows over the NPC, herb, ore or chest
 it will use), key-down casting and auto loot. Without `wow-settings`, tick
@@ -555,7 +558,9 @@ is loaded.
 3. **Interact and soft targeting**: an icon should show over the NPC, herb
    or chest in front of you; press F. No icon and F does nothing: the
    `wow-settings` apply didn't take (`/dump GetCVar("SoftTargetInteract")`
-   should print 3). Tab / Shift+Tab cycle enemies,
+   should print 3). Facing a mob in range should soft-target it, so F or
+   an ability attacks it; if not, `/dump GetCVar("SoftTargetEnemy")` on that character
+   should print 3. Tab / Shift+Tab cycle enemies,
    Shift+F assists, Ctrl+F and Cmd+F go back to earlier targets.
 4. **Key map**: press F1 and check it matches what the keys do.
 5. **Pings** (in a group): hold G and click a mob, then drag for the wheel.
