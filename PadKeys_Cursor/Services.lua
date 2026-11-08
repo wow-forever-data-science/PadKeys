@@ -6,7 +6,7 @@
 -- * Vendor: the first F on an item marks it, the second buys one (the
 --   gamepad's A, MerchantFrame_SetupGamepad). On the Buyback tab the second
 --   F buys it back. Shift-Space still buys at once.
--- * Vendor: the all key (Option+F) buys a full stack, or as many as you
+-- * Vendor: the all key (Cmd+F) buys a full stack, or as many as you
 --   can afford, as Shift-click's stack split would (or one, for items that
 --   don't stack). On the Buyback tab it buys back.
 -- * Vendor: the mouse wheel steps through the items, turning the page at

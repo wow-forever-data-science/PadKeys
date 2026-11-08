@@ -30,8 +30,9 @@ ns.config.cursor = {
     rightclick = { "SHIFT-F" },            -- use item, sell to vendor
     pickup = { "CTRL-F" },                 -- drag a spell or item
     -- The most at once: a vendor item buys a full stack (or what you can
-    -- afford), a recipe or the Create button creates all. Option on a Mac.
-    all = { "ALT-F" },
+    -- afford), a recipe or the Create button creates all. Cmd+F on a Mac
+    -- (the base MOD); takes over last hostile target while the cursor is on.
+    all = { ns.config.mod .. "F" },
     -- gamepad B: close the window the cursor is in, or leave the cursor
     -- where there is nothing to close. Only taken over while the cursor is
     -- on; otherwise Escape opens the game menu as usual.

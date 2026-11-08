@@ -78,7 +78,7 @@ keyboard with each layer's keys. It's also published at
 
 | Context | Keys |
 |---|---|
-| UI cursor | WASD / arrows move · F / Space click (uses a bag item) · Shift+F right-click · Ctrl+F pick up · Option+F buy a stack / create all · Tab / Shift+Tab next / previous window · Esc leave |
+| UI cursor | WASD / arrows move · F / Space click (uses a bag item) · Shift+F right-click · Ctrl+F pick up · Cmd+F buy a stack / create all · Tab / Shift+Tab next / previous window · Esc leave |
 | Radials | point with the mouse · release G: run · Ctrl+G only: mouse wheel pages |
 | NPC dialog | W / S move to an option or reward · F choose, accept, continue, complete · Esc close |
 | Auras | C: target's first aura, then the next · Ctrl+C: your debuffs · hold Shift+C: tooltip |
@@ -445,7 +445,7 @@ it is already on. Where it lands depends on the window:
 - popup: its text field or accept button.
 
 On a recipe, the first F selects it and the second crafts it (the amount
-in Blizzard's box); F on Create / Create All runs them. **Option+F** does
+in Blizzard's box); F on Create / Create All runs them. **Cmd+F** does
 the most at once: on a selected recipe it creates all (on another recipe
 the first press selects it), on a vendor
 item it buys a full stack (or as many as you can afford). **B** opens your bags with the
@@ -459,7 +459,7 @@ the bags aren't tainted.
 | F / Space | Click: cast from the spellbook, pick a gossip line, use a bag item (eat, drink, equip, sell to an open vendor); on a text field (search box), type in it, and Escape or Enter goes back to moving |
 | Shift+F | Right-click: use or sell an item, cancel a buff (takes over Assist while the cursor is on) |
 | Ctrl+F | Pick up a spell or item; move to an action bar slot or bag slot and click to place it (takes over Last target while the cursor is on) |
-| Option+F | Most at once: create all of a recipe, buy a full stack of a vendor item (or what you can afford), buy back on the Buyback tab |
+| Cmd+F | Most at once: create all of a recipe, buy a full stack of a vendor item (or what you can afford), buy back on the Buyback tab |
 | Tab / Shift+Tab | Jump to the next / previous open window (the gamepad's "Next Frame") |
 | Esc / Backspace | Close the window the cursor is in (the gamepad's B). Where there's nothing to close (unit frames, auras, popups), leave the cursor. |
 
@@ -659,8 +659,8 @@ is loaded.
     background.
 20. **Menu cursor** (PadKeys_Cursor): open a profession; the cursor should
     sit on the first tab on the right, and F should open it and move to
-    its first recipe. Option+F on a recipe selects it, a second press
-    creates all; Option+F on a
+    its first recipe. Cmd+F on a recipe selects it, a second press
+    creates all; Cmd+F on a
     vendor's reagent buys a stack.
 
 Known risks:
