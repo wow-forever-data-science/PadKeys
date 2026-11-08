@@ -85,7 +85,7 @@ ns.config = {
 -- ns.config.bindings from its Config.lua; /padkeys status lists them.
 ns.modules = {
   { addon = "PadKeys_Cursor", does = "UI cursor and NPC dialogs" },
-  { addon = "PadKeys_Auras", does = "Debuff and buff tooltips (C)" },
+  { addon = "PadKeys_Auras", does = "Target aura highlight (C), tooltip (Shift+C)" },
   { addon = "PadKeys_Targeting", does = "Friendly/enemy toggle, group cycling" },
   { addon = "PadKeys_Radial", does = "Combat ring (G) and main-menu radial (Ctrl+G)" },
   { addon = "PadKeys_Bar", does = "One bar that shows the layer you hold" },

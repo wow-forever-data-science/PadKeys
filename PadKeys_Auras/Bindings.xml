@@ -1,6 +1,4 @@
 <Bindings>
-	<Binding name="CLICK PadKeysAura:mydebuffs" header="PADKEYS_AURAS"/>
-	<Binding name="CLICK PadKeysAura:mybuffs"/>
-	<Binding name="CLICK PadKeysAura:targetdebuffs"/>
-	<Binding name="CLICK PadKeysAura:targetbuffs"/>
+	<Binding name="CLICK PadKeysAura:next" header="PADKEYS_AURAS"/>
+	<Binding name="CLICK PadKeysAura:tooltip"/>
 </Bindings>

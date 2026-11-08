@@ -106,10 +106,8 @@ local function sections()
     menu_rows[#menu_rows + 1] = action_row("CLICK PadKeysBags:LeftButton")
   end
   if loaded("PadKeys_Auras") then
-    menu_rows[#menu_rows + 1] = action_row("CLICK PadKeysAura:mydebuffs")
-    menu_rows[#menu_rows + 1] = action_row("CLICK PadKeysAura:mybuffs")
-    menu_rows[#menu_rows + 1] = action_row("CLICK PadKeysAura:targetdebuffs")
-    menu_rows[#menu_rows + 1] = action_row("CLICK PadKeysAura:targetbuffs")
+    menu_rows[#menu_rows + 1] = action_row("CLICK PadKeysAura:next")
+    menu_rows[#menu_rows + 1] = action_row("CLICK PadKeysAura:tooltip")
   end
   menu_rows[#menu_rows + 1] = action_row("PADKEYS_KEYMAP")
   list[#list + 1] = { "Menus and info", menu_rows }

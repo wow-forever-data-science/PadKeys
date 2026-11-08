@@ -2,22 +2,24 @@
 
 local ns = PadKeys
 
--- Inspect auras, in combat too: a press shows the tooltip of the next aura
--- in that group (wrapping around) at the aura, and it fades. C
--- replaces the character window (it's on the menu radial, Ctrl+G).
+-- Your target's auras, in combat too: C highlights the next one, holding
+-- Shift+C shows its tooltip. C replaces the character window (it's on the
+-- menu radial, Ctrl+G).
 local b = ns.config.bindings
-b.C = "CLICK PadKeysAura:targetdebuffs"
-b[ns.config.mod .. "C"] = "CLICK PadKeysAura:targetbuffs"
-b["SHIFT-C"] = "CLICK PadKeysAura:mydebuffs"
-b["CTRL-C"] = "CLICK PadKeysAura:mybuffs"
+b.C = "CLICK PadKeysAura:next"
+b["SHIFT-C"] = "CLICK PadKeysAura:tooltip"
 
 ns.config.auras = {
-  -- Shortest time left first, auras without a duration last. false keeps
-  -- Blizzard's order (roughly the order they were applied).
-  shortest_first = true,
-  -- Seconds without a press before the next press starts at the first
-  -- aura again.
-  reset_after = 3,
-  -- Seconds a tooltip stays before it fades.
-  show_for = 3,
+  -- The auras C steps through, in order: Blizzard's aura filters closest
+  -- to what the nameplate shows. Debuffs: yours (and your pet's). Buffs:
+  -- the ones Blizzard flags as important to see on an enemy.
+  lists = {
+    { name = "Debuff", filter = "HARMFUL|PLAYER|INCLUDE_NAME_PLATE_ONLY" },
+    { name = "Buff", filter = "HELPFUL|IMPORTANT|INCLUDE_NAME_PLATE_ONLY" },
+  },
+  -- The label: text size, and pixels above the nameplate.
+  label_size = 13,
+  label_gap = 4,
+  -- Seconds the tooltip takes to fade after Shift+C is let go.
+  fade_time = 1,
 }
