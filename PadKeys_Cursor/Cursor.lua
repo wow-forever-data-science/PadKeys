@@ -875,7 +875,9 @@ end)
 -- does (drink, eat, equip, sell to an open vendor), through the proxy's
 -- secure "item" action for the left button. With something already on the
 -- mouse (picked up with the pickup key) it clicks as usual, so the item
--- drops into the slot.
+-- drops into the slot. Blizzard's "item" action equips gear instead of
+-- selling it, so with a vendor open the click sells through the proxy's
+-- own "sell" action (C_Container.UseContainerItem, as right-click does).
 local function bag_slot(frame)
   local mixin = ContainerFrameItemButtonMixin
   if not (frame and mixin and frame.GetBagID == mixin.GetBagID) then
@@ -892,9 +894,17 @@ proxy:SetScript("PreClick", function(self)
   if GetCursorInfo() then
     bag = nil
   end
-  self:SetAttribute("type1", bag and "item" or nil)
+  local selling = bag and MerchantFrame and MerchantFrame:IsShown()
+  self.sell_slot = selling and { bag, slot } or nil
+  self:SetAttribute("type1", selling and "sell" or bag and "item" or nil)
   self:SetAttribute("item1", bag and (bag .. " " .. slot) or nil)
 end)
+
+function proxy.sell(self)
+  if self.sell_slot then
+    C_Container.UseContainerItem(unpack(self.sell_slot))
+  end
+end
 
 -- A click often opens a new page or closes the window.
 proxy:HookScript("PostClick", function()
