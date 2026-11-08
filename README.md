@@ -446,7 +446,8 @@ it is already on. Where it lands depends on the window:
 
 On a recipe, the first F selects it and the second crafts it (the amount
 in Blizzard's box); F on Create / Create All runs them. **Option+F** does
-the most at once: on a recipe it selects it and creates all, on a vendor
+the most at once: on a selected recipe it creates all (on another recipe
+the first press selects it), on a vendor
 item it buys a full stack (or as many as you can afford). **B** opens your bags with the
 cursor on sort bags (in combat it only opens them; press B again to
 close). It clicks Blizzard's backpack button through a secure button, so
@@ -658,7 +659,8 @@ is loaded.
     background.
 20. **Menu cursor** (PadKeys_Cursor): open a profession; the cursor should
     sit on the first tab on the right, and F should open it and move to
-    its first recipe. Option+F on a recipe creates all; Option+F on a
+    its first recipe. Option+F on a recipe selects it, a second press
+    creates all; Option+F on a
     vendor's reagent buys a stack.
 
 Known risks:

@@ -10,8 +10,8 @@
 -- * F on a side tab (a profession, or the overview) opens it, and the
 --   cursor moves to the first recipe. The window opens with the cursor on
 --   the first tab (autoFocus in Config.lua).
--- * The all key (Option+F) on a recipe selects it and creates all; on
---   either button it creates all.
+-- * The all key (Option+F) on a selected recipe, or on either button,
+--   creates all; on another recipe it selects it first.
 --
 -- These call Blizzard's functions instead of clicking: the cursor's click
 -- did nothing on the professions window's buttons.
@@ -91,13 +91,21 @@ ns.cursor_on_click(function(frame)
   end
 end)
 
--- The Create All button updates a moment after a recipe is selected.
+-- Crafting must run in the key press itself (a timer after it is
+-- blocked), and the Create All button only updates a moment after a recipe
+-- is selected: on a recipe that isn't selected yet, the first press
+-- selects it and the second creates all.
 ns.cursor_on_all(function(frame)
   local row = recipe_row(frame)
   if row then
     ns.cursor_arm(false)
-    crafting_page().RecipeList.selectionBehavior:Select(row)
-    C_Timer.After(0.1, function() run("CreateAll") end)
+    local selection = crafting_page().RecipeList.selectionBehavior
+    if selection:IsSelected(row) then
+      run("CreateAll")
+    else
+      selection:Select(row)
+      ns.flash("Press again to create all.")
+    end
     return true
   elseif create_button(frame) then
     run("CreateAll")
