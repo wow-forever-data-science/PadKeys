@@ -506,6 +506,26 @@ local function nav_button(name, func)
   button:RegisterForClicks("AnyDown")
   button:SetScript("OnClick", func)
 end
+
+-- The "all" key: windows take it for the entry under the cursor (vendor:
+-- buy a full stack, recipe: create all). Each handler gets the button and
+-- returns true if it handled it.
+local all_handlers = {}
+function ns.cursor_on_all(handler)
+  all_handlers[#all_handlers + 1] = handler
+end
+
+local function all()
+  if not (active and current) or InCombatLockdown() then
+    return
+  end
+  for _, handler in ipairs(all_handlers) do
+    if handler(current) then
+      return
+    end
+  end
+end
+nav_button("PadKeysNavAll", all)
 -- Scrolling the mouse wheel steps through entries one at a time, in reading
 -- order (left to right, then down), as the gamepad's shoulder buttons page:
 --
@@ -751,6 +771,7 @@ local function start(by_hand, root)
   bind(keys.click, "PadKeysCursorClick", "LeftButton")
   bind(keys.rightclick, "PadKeysCursorClick", "RightButton")
   bind(keys.pickup, "PadKeysNavPickup")
+  bind(keys.all, "PadKeysNavAll")
   bind(keys.back, "PadKeysNavBack")
   bind(keys.next_window, "PadKeysNavNextWindow")
   bind(keys.previous_window, "PadKeysNavPrevWindow")
@@ -890,7 +911,8 @@ owner:SetScript("OnUpdate", function(_, dt)
 end)
 
 -- The child of a window that autoFocus names ("CraftingPage.SearchBox",
--- or a list of paths: the first one shown), if it is shown.
+-- or a list of paths: the first one shown), if it is shown. A number in a
+-- path is a list index ("rightProfessionTabs.1").
 local function focus_child(name)
   local paths = (ns.config.cursor.autoFocus or {})[name]
   if type(paths) ~= "table" then
@@ -899,7 +921,7 @@ local function focus_child(name)
   for _, path in ipairs(paths) do
     local frame = _G[name]
     for key in path:gmatch("[^.]+") do
-      frame = frame and frame[key]
+      frame = frame and frame[tonumber(key) or key]
     end
     if frame and frame.IsVisible and frame:IsVisible() then
       return frame

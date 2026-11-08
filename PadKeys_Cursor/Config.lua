@@ -29,6 +29,9 @@ ns.config.cursor = {
     -- (previous target) from PadKeys/Config.lua.
     rightclick = { "SHIFT-F" },            -- use item, sell to vendor
     pickup = { "CTRL-F" },                 -- drag a spell or item
+    -- The most at once: a vendor item buys a full stack (or what you can
+    -- afford), a recipe or the Create button creates all. Option on a Mac.
+    all = { "ALT-F" },
     -- gamepad B: close the window the cursor is in, or leave the cursor
     -- where there is nothing to close. Only taken over while the cursor is
     -- on; otherwise Escape opens the game menu as usual.
@@ -54,13 +57,17 @@ ns.config.cursor = {
     "StaticPopup1", "StaticPopup2", "StaticPopup3", "StaticPopup4",
     "ProfessionsFrame",
   },
-  -- Where the cursor lands when one of those opens: a path of child keys,
-  -- or a list of paths where the first one shown wins; otherwise the
-  -- top-left button. Space or F on a text field lets you type in it;
+  -- Where the cursor lands when one of those opens: a path of child keys
+  -- (a number is a list index), or a list of paths where the first one
+  -- shown wins; otherwise the top-left button. Vendors land on the first
+  -- item and trainers on the next skill you can learn (Services.lua).
+  -- Professions land on the first profession tab on the right, to pick one
+  -- with W/S and F; the cursor then moves into its recipes. Space or F on a text field lets you type in it;
   -- Escape or Enter goes back to moving. Popups land on their text field
   -- (e.g. "type DELETE") or else on the accept button.
   autoFocus = {
-    ProfessionsFrame = "CraftingPage.RecipeList.SearchBox",
+    ProfessionsFrame = { "rightProfessionTabs.1",
+                         "CraftingPage.RecipeList.SearchBox" },
     StaticPopup1 = { "EditBox", "ButtonContainer.Button1" },
     StaticPopup2 = { "EditBox", "ButtonContainer.Button1" },
     StaticPopup3 = { "EditBox", "ButtonContainer.Button1" },

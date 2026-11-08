@@ -23,7 +23,9 @@ without a gamepad, and adds its own code only where Blizzard's doesn't:
 - a **combat banner**: "Combat" / "Out of Combat" fades in and out in the
   middle of the screen as you enter and leave combat;
 - a **buff reminder**: out of combat, the long buffs your class and group
-  are missing or about to lose; it fades away as combat starts.
+  are missing or about to lose; it fades away as combat starts;
+- one **look** for the whole game: every font in Roboto Condensed, and
+  black chat windows.
 
 It comes as several addons, so you can switch them on one at a time and an
 error points at one part:
@@ -37,6 +39,7 @@ error points at one part:
 | **PadKeys_Radial** | Radials: actions (G, Alt+G), pings (Cmd+G), markers (Shift+G), main menu (Ctrl+G) | PadKeys |
 | **PadKeys_Bar** | One bar that shows the layer you hold (Cmd, Shift, Option, Ctrl) | PadKeys (SpellActivationOverlay optional, for its proc glows) |
 | **PadKeys_Fade** | Blizzard's action bars, micro menu and bags fade out until you mouse over them or drag a spell; each bar is labelled with its PadKeys key (Cmd, Shift, G wheel) | PadKeys |
+| **PadKeys_Look** | Every font in the game in the theme font (Roboto Condensed), and chat windows on a black background | PadKeys |
 | **PadKeys_Combat** | "Combat" / "Out of Combat" fades in the middle of the screen as you enter and leave combat, in white; out of combat, a list of missing or expiring long buffs for your class and group | PadKeys |
 | **PadKeys_Debug** | Saves Lua errors and blocked actions to a file, to send or read outside the game (`/pkdebug`) | — |
 
@@ -75,7 +78,7 @@ keyboard with each layer's keys. It's also published at
 
 | Context | Keys |
 |---|---|
-| UI cursor | WASD / arrows move · F / Space click (uses a bag item) · Shift+F right-click · Ctrl+F pick up · Tab / Shift+Tab next / previous window · Esc leave |
+| UI cursor | WASD / arrows move · F / Space click (uses a bag item) · Shift+F right-click · Ctrl+F pick up · Option+F buy a stack / create all · Tab / Shift+Tab next / previous window · Esc leave |
 | Radials | point with the mouse · release G: run · Ctrl+G only: mouse wheel pages |
 | NPC dialog | W / S move to an option or reward · F choose, accept, continue, complete · Esc close |
 | Aura tooltips | C, Cmd+C, Shift+C, Ctrl+C: next aura in that group, fades after 3 s |
@@ -301,6 +304,15 @@ they sit, which is why the bottom of the screen is the place for them.
 Groups, timings, the faded alpha (0 is invisible) and the labels are in
 `PadKeys_Fade/Config.lua`.
 
+## Look (PadKeys_Look)
+
+Every font object in the game takes the theme font (Roboto Condensed
+ExtraBold, `ns.config.theme.font` in `PadKeys/Config.lua`), keeping
+Blizzard's sizes and outlines. Names and damage numbers above heads change
+after a relog. Chat windows get a black background through Blizzard's own
+chat window settings, so they still fade with the mouse as before.
+`game_font` and `chat_alpha` are in `PadKeys_Look/Config.lua`.
+
 ## Combat banner (PadKeys_Combat)
 
 As you enter combat, **Combat** fades in above the middle of the screen in
@@ -423,10 +435,18 @@ contextual ping, or drag for Blizzard's ping wheel.
 
 Press **Shift+\`**. The cursor also starts by itself when a gossip, quest,
 merchant, loot or professions window or a popup opens, and moves there if
-it is already on; in professions it lands on the search box, in a popup on
-its text field or accept button. On a recipe, the first F selects it and the
-second crafts it (the amount in Blizzard's box); F on Create / Create All
-runs them. **B** opens your bags with the
+it is already on. Where it lands depends on the window:
+
+- vendor: the first item;
+- trainer: the next skill you can learn;
+- professions: the first profession tab on the right, to pick one with
+  W/S and F; the cursor then moves to its first recipe;
+- popup: its text field or accept button.
+
+On a recipe, the first F selects it and the second crafts it (the amount
+in Blizzard's box); F on Create / Create All runs them. **Option+F** does
+the most at once: on a recipe it selects it and creates all, on a vendor
+item it buys a full stack (or as many as you can afford). **B** opens your bags with the
 cursor on the first slot (in combat it only opens them; press B again to
 close). It clicks Blizzard's backpack button through a secure button, so
 the bags aren't tainted.
@@ -437,6 +457,7 @@ the bags aren't tainted.
 | F / Space | Click: cast from the spellbook, pick a gossip line, use a bag item (eat, drink, equip, sell to an open vendor); on a text field (search box), type in it, and Escape or Enter goes back to moving |
 | Shift+F | Right-click: use or sell an item, cancel a buff (takes over Assist while the cursor is on) |
 | Ctrl+F | Pick up a spell or item; move to an action bar slot or bag slot and click to place it (takes over Last target while the cursor is on) |
+| Option+F | Most at once: create all of a recipe, buy a full stack of a vendor item (or what you can afford), buy back on the Buyback tab |
 | Tab / Shift+Tab | Jump to the next / previous open window (the gamepad's "Next Frame") |
 | Esc / Backspace | Close the window the cursor is in (the gamepad's B). Where there's nothing to close (unit frames, auras, popups), leave the cursor. |
 
@@ -621,6 +642,17 @@ is loaded.
     Pull a mob: the list fades out with the banner, and the buff frame
     folds its long buffs into one icon; after the fight both come back.
     In a group where you cast a buff, the list should name who lacks it.
+
+**Stage 8: + PadKeys_Look**
+
+18. **Fonts**: windows, chat, tooltips and quest text should all be in
+    Roboto Condensed; names and damage numbers above heads after a relog.
+19. **Chat**: every chat window, and a new whisper tab, on a black
+    background.
+20. **Menu cursor** (PadKeys_Cursor): open a profession; the cursor should
+    sit on the first tab on the right, and F should open it and move to
+    its first recipe. Option+F on a recipe creates all; Option+F on a
+    vendor's reagent buys a stack.
 
 Known risks:
 - The buff reminder reads auras by name out of combat. If a list stays
