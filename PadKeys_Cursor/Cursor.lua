@@ -869,8 +869,9 @@ bags:HookScript("OnClick", function()
     if not root then
       return
     end
-    for _, frame in ipairs({ BagItemAutoSortButton, BagItemSearchBox }) do
-      if frame:IsVisible() then
+    for _, name in ipairs({ "BagItemAutoSortButton", "BagItemSearchBox" }) do
+      local frame = _G[name]
+      if frame and frame:IsVisible() then
         ns.cursor_select(frame)
         return
       end
