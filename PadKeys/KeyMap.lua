@@ -106,7 +106,8 @@ local function sections()
     menu_rows[#menu_rows + 1] = action_row("CLICK PadKeysBags:LeftButton")
   end
   if loaded("PadKeys_Auras") then
-    menu_rows[#menu_rows + 1] = action_row("CLICK PadKeysAura:next")
+    menu_rows[#menu_rows + 1] = action_row("CLICK PadKeysAura:target")
+    menu_rows[#menu_rows + 1] = action_row("CLICK PadKeysAura:mine")
     menu_rows[#menu_rows + 1] = action_row("CLICK PadKeysAura:tooltip")
   end
   menu_rows[#menu_rows + 1] = action_row("PADKEYS_KEYMAP")
