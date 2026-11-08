@@ -842,7 +842,8 @@ end
 
 -- The bags key: opens the bags by clicking Blizzard's backpack button
 -- through a secure button (opened from addon code they would be tainted),
--- then puts the cursor on the first slot. In combat the cursor is off, so
+-- then puts the cursor on the bag search box (BagItemSearchBox), or the
+-- first slot without one. In combat the cursor is off, so
 -- it only opens the bags; a second press closes them.
 local function open_bag()
   if ContainerFrameCombinedBags and ContainerFrameCombinedBags:IsVisible() then
@@ -865,7 +866,9 @@ bags:SetAttribute("macrotext", "/click MainMenuBarBackpackButton")
 bags:HookScript("OnClick", function()
   C_Timer.After(0.05, function()
     local root = open_bag()
-    if root then
+    if root and BagItemSearchBox and BagItemSearchBox:IsVisible() then
+      ns.cursor_select(BagItemSearchBox)
+    elseif root then
       ns.cursor_focus_in(root)
     end
   end)
