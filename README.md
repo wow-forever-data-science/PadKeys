@@ -262,7 +262,8 @@ lets you hide Blizzard's bars:
 
 `/padkeys bar` unlocks the bar so you can drag it; `/padkeys bar` again
 locks it, and the spot is saved. `/padkeys bar reset` goes back to the
-position in `PadKeys_Bar/Config.lua`, which also has the button size,
+position in `PadKeys_Bar/Config.lua`, which also has the button size and
+height (60% of the width by default, for a flatter bar), text sizes,
 spacing, scale, and switches for the layer name and macro names.
 
 You can't click it with the mouse: it is a display, so it can't be blocked
@@ -274,15 +275,15 @@ Edit Mode can hide most action bars, but not Action Bar 1, the micro menu
 or the bags, and a hidden bar doesn't come back when you point at it.
 PadKeys_Fade keeps Blizzard's frames and makes them invisible instead:
 
-- **Hover** any action bar and all of them fade in, each with a label on
-  its left: the bar and the PadKeys key that fires it, read from your live
+- **Hover** any action bar and all of them fade in, each with a label
+  above its top left corner: the bar and the PadKeys key that fires it, read from your live
   bindings: `Bar 1 No modifier`, `Bar 2 Cmd`, `Bar 3 Shift`, `Bar 5
   Option`, `Bar 4 Ctrl · slots 1–4`, `Pet bar Ctrl · slots 1–4`, `Bar 6 G
   wheel` (with PadKeys_Radial).
 - **Drag** a spell, item or macro and the action bars fade in until you
   drop it.
 - The **micro menu and bags** are their own group: hover them to see them.
-  The experience and reputation bars fade with the action bars.
+  The experience and reputation bars don't fade: they always show.
 - **Edit Mode** shows everything, labels included.
 
 Set up:
@@ -290,7 +291,8 @@ Set up:
 1. Enable PadKeys_Fade, `/reload`.
 2. In **Edit Mode**, set **Bar Visible: Always** on every bar you want to
    reach by mouse (a bar set to Hidden stays hidden), and stack them at the
-   bottom of the screen. Leave room on their left for the labels.
+   bottom of the screen. Leave about 18 pixels between stacked bars for
+   the labels above them.
 3. `/padkeys fade` keeps them shown while you arrange things; again to fade.
 
 It only changes the frames' alpha, so it works in combat and the keys

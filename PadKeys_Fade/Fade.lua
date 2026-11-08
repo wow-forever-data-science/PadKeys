@@ -134,11 +134,12 @@ local function make_label(frame, name)
   local holder = CreateFrame("Frame", nil, UIParent)
   holder:SetFrameStrata("MEDIUM")
   holder:SetSize(1, 1)
-  holder:SetPoint("RIGHT", frame, "LEFT", -8, 0)
+  -- Above the bar's top left corner, so it never covers a button.
+  holder:SetPoint("BOTTOMLEFT", frame, "TOPLEFT", 0, c.label_gap or 2)
   local text = ns.text(holder, c.label_size or 12, "white", "OVERLAY",
                        "GameFontHighlightSmall")
-  text:SetPoint("RIGHT")
-  text:SetJustifyH("RIGHT")
+  text:SetPoint("BOTTOMLEFT")
+  text:SetJustifyH("LEFT")
   holder.text = text
   holder.bar = frame
   holder.name = name

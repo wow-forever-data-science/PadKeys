@@ -17,6 +17,14 @@ local c = ns.config.bar
 local FACE_KEYS = ns.config.face_keys
 local UPDATE_INTERVAL = 0.1
 
+-- Buttons are c.size wide and HEIGHT tall. A short button shows the middle
+-- band of the icon (ICON_TOP to ICON_BOTTOM) so it isn't squashed; 0.07 and
+-- 0.93 trim Blizzard's icon border, as on a square button.
+local HEIGHT = c.size * math.min(c.height or 1, 1)
+local ICON_SPAN = 0.86 * HEIGHT / c.size
+local ICON_TOP = 0.5 - ICON_SPAN / 2
+local ICON_BOTTOM = 0.5 + ICON_SPAN / 2
+
 -- Blizzard's multi bars by binding number: MULTIACTIONBAR1BUTTON1 presses
 -- MultiBarBottomLeft's first button (Bindings_Standard.xml).
 local MULTI_BARS = {
@@ -125,7 +133,7 @@ end
 
 local bar = CreateFrame("Frame", "PadKeysBar", UIParent)
 bar:SetScale(c.scale or 1)
-bar:SetSize(#FACE_KEYS * c.size + (#FACE_KEYS - 1) * c.spacing, c.size)
+bar:SetSize(#FACE_KEYS * c.size + (#FACE_KEYS - 1) * c.spacing, HEIGHT)
 bar:SetClampedToScreen(true)
 bar:SetMovable(true)
 
@@ -168,7 +176,7 @@ end
 local buttons = {}
 for i, key in ipairs(FACE_KEYS) do
   local b = CreateFrame("Frame", nil, bar)
-  b:SetSize(c.size, c.size)
+  b:SetSize(c.size, HEIGHT)
   b:SetPoint("LEFT", bar, "LEFT", (i - 1) * (c.size + c.spacing), 0)
 
   -- 1px border: a shape behind the icon, black normally, grey while the
@@ -188,7 +196,7 @@ for i, key in ipairs(FACE_KEYS) do
   b.icon = b:CreateTexture(nil, "ARTWORK")
   b.icon:SetPoint("TOPLEFT", 1, -1)
   b.icon:SetPoint("BOTTOMRIGHT", -1, 1)
-  b.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+  b.icon:SetTexCoord(0.07, 0.93, ICON_TOP, ICON_BOTTOM)
   round(b, b.icon, 1)
   ns.icon(b.icon)
 
@@ -212,7 +220,7 @@ for i, key in ipairs(FACE_KEYS) do
   top:SetAllPoints()
   top:SetFrameLevel(b.cooldown:GetFrameLevel() + 1)
 
-  b.hotkey = text(top, 13, "NumberFontNormalSmall")
+  b.hotkey = text(top, c.hotkey_size or 13, "NumberFontNormalSmall")
   b.hotkey:SetPoint("TOPRIGHT", -3, -3)
   b.hotkey:SetJustifyH("RIGHT")
   b.hotkey:SetText(GetBindingText and GetBindingText(key) or key)
@@ -242,13 +250,15 @@ for i, key in ipairs(FACE_KEYS) do
     end
   end
 
-  b.count = text(top, 15, "NumberFontNormal")
-  b.count:SetPoint("BOTTOMRIGHT", -2, 2)
+  -- Stack count top left, across from the key label, so the macro name has
+  -- the bottom edge to itself on a short button.
+  b.count = text(top, c.count_size or 15, "NumberFontNormal")
+  b.count:SetPoint("TOPLEFT", 3, -3)
 
-  b.name = text(top, 11, "GameFontHighlightSmallOutline")
+  b.name = text(top, c.name_size or 11, "GameFontHighlightSmallOutline")
   b.name:SetPoint("BOTTOMLEFT", 2, 2)
   b.name:SetPoint("BOTTOMRIGHT", -2, 2)
-  b.name:SetHeight(10)
+  b.name:SetHeight((c.name_size or 11) - 1)
 
   -- Proc glow: a pulsing white ring.
   b.glow = top:CreateTexture(nil, "OVERLAY")
@@ -256,7 +266,7 @@ for i, key in ipairs(FACE_KEYS) do
   b.glow:SetBlendMode("ADD")
   ns.tint(b.glow, "white")
   b.glow:SetPoint("CENTER")
-  b.glow:SetSize(c.size * 1.8, c.size * 1.8)
+  b.glow:SetSize(c.size * 1.8, HEIGHT * 1.8)
   b.glow:Hide()
   b.pulse = b.glow:CreateAnimationGroup()
   b.pulse:SetLooping("BOUNCE")
