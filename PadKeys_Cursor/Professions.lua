@@ -10,7 +10,7 @@
 -- * F on a side tab (a profession, or the overview) opens it, and the
 --   cursor moves to the first recipe. The window opens with the cursor on
 --   the first tab (autoFocus in Config.lua).
--- * The all key (Option+F) on a selected recipe, or on either button,
+-- * The all key (Cmd+F) on a selected recipe, or on either button,
 --   creates all; on another recipe it selects it first.
 --
 -- These call Blizzard's functions instead of clicking: the cursor's click
