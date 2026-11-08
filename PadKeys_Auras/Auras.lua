@@ -1,273 +1,205 @@
--- Inspect auras with keys, in combat too. One key per group (Config.lua):
--- your debuffs, your buffs, your target's debuffs, your target's buffs.
--- A press shows the tooltip at the aura, as hovering it would, and it fades
--- after a few seconds (Config.lua). Each press shows the next aura of that
--- group, wrapping around,
--- in Blizzard's own aura tooltip (GameTooltip:SetUnitAura, what hovering
--- an aura shows), with a line saying which one it is ("Target debuff 2/5").
--- Out of combat the shortest time left comes first (the strong effects
--- are usually short), auras without a duration last. In combat the auras
--- are secret to addons, so it steps in Blizzard's order and lets the
--- tooltip read them. After a pause the next press starts at the first
--- again (Config.lua).
+-- Your target's auras, the ones its nameplate shows, in combat too
+-- (Config.lua):
 --
--- It reads the auras from the unit, not from the aura icons, so it works
--- the same for you and your target (Forever's target aura icons are
--- private frames). Your own auras' tooltips sit at their icon; the
--- target's icons are forbidden frames, so its tooltips sit under the
--- target frame. The key clicks a plain button: showing a tooltip needs
--- nothing secure.
+-- * A label above the target's nameplate highlights one aura: its name
+--   and place ("Debuff 2/5"). A new target highlights its first aura.
+-- * C highlights the next one: debuffs first, then buffs, wrapping around.
+-- * Holding Shift+C shows the highlighted aura's tooltip (Blizzard's own,
+--   GameTooltip:SetUnitAura); letting go fades it out over a second.
 --
--- Your own aura shown is also marked on its icon: a white frame that
--- pulses like the cursor's window glow and fades with the tooltip. The
--- target's icons are forbidden frames, so nothing can be anchored to them;
--- for those the tooltip's label ("Target debuff 2/5") says which one.
+-- In combat auras are secret to addons, so nothing here reads them. A
+-- hidden tooltip of our own is filled with each aura instead: it has lines
+-- when there is an aura at that place, and none past the last one. The
+-- name comes from the same tooltip; where the client keeps it secret the
+-- label shows only the place.
+--
+-- The nameplate's own choice of auras reads aura fields addons can't
+-- compare in combat, so the lists are Blizzard's aura filters that come
+-- closest (Config.lua). Without a nameplate (off screen, or nameplates
+-- off) the label sits under the target frame. The keys click a plain
+-- button: nothing here is secure.
 
 local ns = PadKeys
+local c = ns.config.auras
 
 BINDING_HEADER_PADKEYS_AURAS = "PadKeys: auras"
-_G["BINDING_NAME_CLICK PadKeysAura:mydebuffs"] = "Inspect your next debuff"
-_G["BINDING_NAME_CLICK PadKeysAura:mybuffs"] = "Inspect your next buff"
-_G["BINDING_NAME_CLICK PadKeysAura:targetdebuffs"] = "Inspect target's next debuff"
-_G["BINDING_NAME_CLICK PadKeysAura:targetbuffs"] = "Inspect target's next buff"
+_G["BINDING_NAME_CLICK PadKeysAura:next"] = "Highlight target's next aura"
+_G["BINDING_NAME_CLICK PadKeysAura:tooltip"] = "Show highlighted aura (hold)"
 
--- The click's button name is the group.
-local GROUPS = {
-  mydebuffs = { unit = "player", filter = "HARMFUL", name = "Your debuff", none = "You have no debuffs.", anchor = "DebuffFrame" },
-  mybuffs = { unit = "player", filter = "HELPFUL", name = "Your buff", none = "You have no buffs.", anchor = "BuffFrame" },
-  targetdebuffs = { unit = "target", filter = "HARMFUL", name = "Target debuff", none = "Your target has no debuffs.", anchor = "TargetFrame" },
-  targetbuffs = { unit = "target", filter = "HELPFUL", name = "Target buff", none = "Your target has no buffs.", anchor = "TargetFrame" },
-}
-
+local UNIT = "target"
 local MAX_AURAS = 40
 
--- The last aura shown: its group, its place in the order, when, and the
--- tooltip's owner. Kept after it fades, so the next press steps on.
-local shown_group, shown_place, shown_at, shown_owner
--- Counts shows, so a fade timer only hides its own tooltip.
-local shows = 0
--- The tooltip's owner, placed at the aura. Blizzard's aura icons refresh
--- a tooltip they own every frame, which would undo the fade, so the icon
--- is only the anchor.
-local tooltip_owner = CreateFrame("Frame", nil, UIParent)
+-- The highlighted aura: a list from c.lists and a place in it.
+local list, place
 
--- The marker: four white edges just outside the icon, pulsing. It follows
--- the tooltip's alpha, so it fades with it, and hides when the tooltip
--- goes or shows something else.
-local marker = CreateFrame("Frame", nil, UIParent)
-marker:SetFrameStrata("TOOLTIP")
-marker:Hide()
-local EDGE = 2
-local function marker_edge(p1, r1, x1, y1, p2, r2, x2, y2)
-  local tex = marker:CreateTexture(nil, "OVERLAY")
-  tex:SetColorTexture(1, 1, 1)
-  tex:SetPoint(p1, marker, r1, x1, y1)
-  tex:SetPoint(p2, marker, r2, x2, y2)
-end
-marker_edge("BOTTOMLEFT", "TOPLEFT", -EDGE, 0, "TOPRIGHT", "TOPRIGHT", EDGE, EDGE)
-marker_edge("TOPLEFT", "BOTTOMLEFT", -EDGE, 0, "BOTTOMRIGHT", "BOTTOMRIGHT", EDGE, -EDGE)
-marker_edge("TOPRIGHT", "TOPLEFT", 0, 0, "BOTTOMLEFT", "BOTTOMLEFT", -EDGE, 0)
-marker_edge("TOPLEFT", "TOPRIGHT", 0, 0, "BOTTOMRIGHT", "BOTTOMRIGHT", EDGE, 0)
-local pulse_time = 0
-marker:SetScript("OnShow", function() pulse_time = 0 end)
-marker:SetScript("OnUpdate", function(self, elapsed)
-  if not GameTooltip:IsShown() or GameTooltip:GetOwner() ~= tooltip_owner then
-    self:Hide()
-    return
-  end
-  pulse_time = (pulse_time + elapsed) % 1.2
-  local pulse = 0.7 + 0.3 * math.cos(pulse_time / 1.2 * 2 * math.pi)
-  self:SetAlpha(GameTooltip:GetAlpha() * pulse)
-end)
+local scan = CreateFrame("GameTooltip", "PadKeysAuraScan", nil, "GameTooltipTemplate")
 
-local function mark(icon)
-  if not icon then
-    marker:Hide()
-    return
-  end
-  marker:ClearAllPoints()
-  marker:SetAllPoints(icon.Icon or icon)
-  marker:Show()
-end
-
--- The unit's aura indexes in the order to show them, or nil when they
--- can't be read: in combat auras are secret, and reading them errors.
-local function ordered_auras(unit, filter)
-  local list, data = {}, {}
-  local readable = pcall(function()
-    while #list < MAX_AURAS do
-      local aura = C_UnitAuras.GetAuraDataByIndex(unit, #list + 1, filter)
-      if not aura then
-        break
-      end
-      list[#list + 1] = #list + 1
-      data[#list] = aura
-    end
-  end)
-  if not readable then
+-- The aura's name if there is an aura at this place, else nil. The name
+-- may be a secret value, which only a widget can show.
+local function aura_at(filter, index)
+  scan:SetOwner(WorldFrame, "ANCHOR_NONE")
+  scan:ClearLines()
+  local ok = pcall(scan.SetUnitAura, scan, UNIT, index, filter)
+  if not (ok and scan:NumLines() > 0) then
     return nil
   end
-  if not ns.config.auras.shortest_first then
-    return list
-  end
-  local now = GetTime()
-  local function time_left(index)
-    local expires = data[index].expirationTime
-    return (expires and expires > 0) and expires - now or math.huge
-  end
-  -- If the timers are secret after all, comparing them errors; then keep
-  -- Blizzard's order.
-  local sorted = { unpack(list) }
-  local ok = pcall(table.sort, sorted, function(a, b)
-    local ta, tb = time_left(a), time_left(b)
-    if ta ~= tb then
-      return ta < tb
-    end
-    return a < b
-  end)
-  return ok and sorted or list
+  return PadKeysAuraScanTextLeft1:GetText() or ""
 end
 
--- Your aura's icon in BuffFrame / DebuffFrame (Blizzard's buttons keep
--- the aura index in buttonInfo.index), or nil.
-local function find_icon(frame, index)
-  for _, icon in ipairs(frame and frame.auraFrames or {}) do
-    local info = icon.buttonInfo
-    if icon:IsShown() and info and icon.auraType ~= "TempEnchant"
-       and info.index == index then
-      return icon
+local function count(filter)
+  local n = 0
+  while n < MAX_AURAS and aura_at(filter, n + 1) do
+    n = n + 1
+  end
+  return n
+end
+
+-- The first aura from list `from` on, wrapping around: list and place.
+local function first_from(from)
+  for step = 0, #c.lists - 1 do
+    local i = (from + step - 1) % #c.lists + 1
+    if aura_at(c.lists[i].filter, 1) then
+      return i, 1
     end
   end
 end
 
--- Where the tooltip goes: at your aura's icon (below left, as Blizzard's
--- hover puts it), or under the target frame.
--- Returns your aura's icon, if found.
-local function place_tooltip(group, index)
-  GameTooltip:SetOwner(tooltip_owner, "ANCHOR_NONE")
-  GameTooltip:ClearAllPoints()
-  if group.unit == "player" then
-    local found, icon = pcall(find_icon, _G[group.anchor], index)
-    if found and icon then
-      GameTooltip:SetPoint("TOPRIGHT", icon, "BOTTOMLEFT")
-      return icon
-    end
-  end
-  local anchor = _G[group.anchor] or UIParent
-  if group.unit == "target" then
-    GameTooltip:SetPoint("TOP", anchor, "BOTTOM")
+-- The label, above the nameplate or under the target frame.
+local label = CreateFrame("Frame", "PadKeysAuraLabel", UIParent)
+label:SetSize(1, 1)
+label:SetFrameStrata("HIGH")
+label:Hide()
+local name_text = ns.text(label, c.label_size, "white")
+name_text:SetPoint("BOTTOM", label, "CENTER")
+local place_text = ns.text(label, c.label_size - 2, "light")
+place_text:SetPoint("TOP", label, "CENTER", 0, -1)
+
+local function anchor_label()
+  label:ClearAllPoints()
+  local ok, plate = pcall(C_NamePlate.GetNamePlateForUnit, UNIT)
+  if ok and plate then
+    label:SetPoint("BOTTOM", plate, "TOP", 0, c.label_gap + c.label_size)
   else
-    GameTooltip:SetPoint("TOPRIGHT", anchor, "BOTTOMLEFT")
+    label:SetPoint("TOP", TargetFrame, "BOTTOM", 0, -c.label_size)
   end
 end
 
--- Fill the tooltip with the aura at index; false if there is none there
--- (or the tooltip may not show it). The tooltip reads the aura itself, so
--- this also works in combat.
-local function fill_tooltip(group, index, label)
-  local icon = place_tooltip(group, index)
-  local ok = pcall(GameTooltip.SetUnitAura, GameTooltip, group.unit, index, group.filter)
-  if not (ok and GameTooltip:NumLines() > 0) then
-    GameTooltip:Hide()
-    return false
-  end
-  GameTooltip:AddLine(label, 0.6, 0.6, 0.6)
-  GameTooltip:Show()
-  mark(icon)
-  shown_owner = tooltip_owner
-  return true
-end
-
-local function hide()
-  if shown_owner and GameTooltip:GetOwner() == shown_owner then
-    GameTooltip:Hide()
-  end
-end
-
-local function close()
-  hide()
-  shown_group, shown_place, shown_at, shown_owner = nil, nil, nil, nil
-end
-
--- Fade the tooltip after show_for seconds, unless another press came.
-local function fade_later()
-  shows = shows + 1
-  local this_show = shows
-  C_Timer.After(ns.config.auras.show_for, function()
-    if this_show ~= shows or GameTooltip:GetOwner() ~= shown_owner then
-      return
-    end
-    if GameTooltip.FadeOut then
-      GameTooltip:FadeOut()
-    else
-      GameTooltip:Hide()
-    end
-  end)
-end
-
--- The place shown, or nil if there was nothing to show.
-local function show_next(group, place)
-  local order = ordered_auras(group.unit, group.filter)
-  if order then
-    local n = #order
-    if n == 0 then
-      return nil
-    end
-    place = (place - 1) % n + 1
-    local label = format("%s %d/%d", group.name, place, n)
-    return fill_tooltip(group, order[place], label) and place or nil
-  end
-  -- Unreadable (combat): Blizzard's order, without a total; past the last
-  -- aura the tooltip comes back empty, and it wraps to the first.
-  if fill_tooltip(group, place, format("%s %d", group.name, place)) then
-    return place
-  end
-  if place > 1 and fill_tooltip(group, 1, format("%s %d", group.name, 1)) then
-    return 1
-  end
-  return nil
-end
-
-local function show(group_name)
-  local group = GROUPS[group_name]
-  if not group then
+local function refresh_label()
+  if not list then
+    label:Hide()
     return
   end
-  if group.unit == "target" and not UnitExists("target") then
-    close()
+  local entry = c.lists[list]
+  local name = aura_at(entry.filter, place)
+  -- A secret name can be shown but not checked or joined to other text.
+  if not pcall(name_text.SetText, name_text, name) then
+    name_text:SetText("")
+  end
+  place_text:SetText(format("%s %d/%d", entry.name, place, count(entry.filter)))
+  anchor_label()
+  label:Show()
+end
+
+-- Keep the highlighted aura while it lasts; else the first one.
+local function update()
+  if not UnitExists(UNIT) then
+    list, place = nil, nil
+  elseif not (list and aura_at(c.lists[list].filter, place)) then
+    list, place = first_from(1)
+  end
+  refresh_label()
+end
+
+local function highlight_next()
+  if not UnitExists(UNIT) then
     ns.flash("No target.")
     return
   end
-  -- The same key steps on, unless it has rested; another key starts its
-  -- group at the first aura.
-  local now = GetTime()
-  local place = 1
-  if shown_group == group_name and shown_place
-     and now - shown_at < ns.config.auras.reset_after then
-    place = shown_place + 1
+  if list and aura_at(c.lists[list].filter, place + 1) then
+    place = place + 1
+  else
+    list, place = first_from(list and list + 1 or 1)
   end
-  local shown = show_next(group, place)
-  if not shown then
-    close()
-    ns.flash(group.none)
-    return
+  if not list then
+    ns.flash("Your target has no auras.")
   end
-  shown_group, shown_place, shown_at = group_name, shown, now
-  fade_later()
+  refresh_label()
 end
 
--- A new target makes a target aura view stale.
-local events = CreateFrame("Frame")
-events:RegisterEvent("PLAYER_TARGET_CHANGED")
-events:SetScript("OnEvent", function()
-  if shown_group and GROUPS[shown_group].unit == "target" then
-    close()
+-- The tooltip: shown while the key is held, then faded by alpha. Its
+-- owner is the label, so the fade only touches a tooltip it showed.
+local fader = CreateFrame("Frame")
+fader:Hide()
+fader:SetScript("OnUpdate", function(self, elapsed)
+  self.left = self.left - elapsed
+  if GameTooltip:GetOwner() ~= label then
+    self:Hide()
+  elseif self.left <= 0 then
+    self:Hide()
+    GameTooltip:Hide()
+    GameTooltip:SetAlpha(1)
+  else
+    GameTooltip:SetAlpha(self.left / c.fade_time)
   end
 end)
 
--- The click's button name is the group.
+local function show_tooltip()
+  fader:Hide()
+  if not list then
+    ns.flash(UnitExists(UNIT) and "Your target has no auras." or "No target.")
+    return
+  end
+  GameTooltip:SetOwner(label, "ANCHOR_NONE")
+  GameTooltip:ClearAllPoints()
+  GameTooltip:SetPoint("BOTTOM", name_text, "TOP", 0, 4)
+  GameTooltip:SetAlpha(1)
+  local ok = pcall(GameTooltip.SetUnitAura, GameTooltip, UNIT, place,
+                   c.lists[list].filter)
+  if ok and GameTooltip:NumLines() > 0 then
+    GameTooltip:Show()
+  else
+    GameTooltip:Hide()
+  end
+end
+
+local function fade_tooltip()
+  if GameTooltip:GetOwner() == label and GameTooltip:IsShown() then
+    fader.left = c.fade_time
+    fader:Show()
+  end
+end
+
+local events = CreateFrame("Frame")
+events:RegisterEvent("PLAYER_TARGET_CHANGED")
+events:RegisterUnitEvent("UNIT_AURA", UNIT)
+events:RegisterEvent("NAME_PLATE_UNIT_ADDED")
+events:RegisterEvent("NAME_PLATE_UNIT_REMOVED")
+events:SetScript("OnEvent", function(_, event, unit)
+  if event == "PLAYER_TARGET_CHANGED" then
+    list, place = nil, nil
+    if GameTooltip:GetOwner() == label then
+      GameTooltip:Hide()
+    end
+    update()
+  elseif event == "UNIT_AURA" then
+    update()
+  elseif unit and UnitIsUnit(unit, UNIT) and label:IsShown() then
+    -- The target's nameplate came or went: follow it once it has.
+    C_Timer.After(0, anchor_label)
+  end
+end)
+
+-- The click's button name is the action; Shift+C acts on press and release.
 local button = CreateFrame("Button", "PadKeysAura", UIParent)
-button:RegisterForClicks("AnyDown")
-button:SetScript("OnClick", function(_, group)
-  show(group)
+button:RegisterForClicks("AnyDown", "AnyUp")
+button:SetScript("OnClick", function(_, action, down)
+  if action == "next" and down then
+    highlight_next()
+  elseif action == "tooltip" then
+    if down then
+      show_tooltip()
+    else
+      fade_tooltip()
+    end
+  end
 end)
