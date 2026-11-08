@@ -12,7 +12,7 @@ ns.config.bar = {
   size = 44,          -- button width
   -- Button height as a share of the width: 1 is square. Icons are cropped
   -- to the middle band so they don't stretch.
-  height = 0.6,
+  height = 0.7,
   spacing = 3,        -- gap between buttons
   scale = 1,
   -- Behind each button; 0 is see-through, 1 is solid black.

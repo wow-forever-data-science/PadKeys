@@ -266,7 +266,7 @@ lets you hide Blizzard's bars:
 `/padkeys bar` unlocks the bar so you can drag it; `/padkeys bar` again
 locks it, and the spot is saved. `/padkeys bar reset` goes back to the
 position in `PadKeys_Bar/Config.lua`, which also has the button size and
-height (60% of the width by default, for a flatter bar), text sizes,
+height (70% of the width by default, for a flatter bar), text sizes,
 spacing, scale, and switches for the layer name and macro names.
 
 You can't click it with the mouse: it is a display, so it can't be blocked
