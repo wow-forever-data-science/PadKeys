@@ -12,11 +12,11 @@ b["CTRL-C"] = "CLICK PadKeysAura:mine"
 b["SHIFT-C"] = "CLICK PadKeysAura:tooltip"
 
 ns.config.auras = {
-  -- The auras C steps through, in order: Blizzard's aura filters closest
-  -- to what the nameplate shows. Debuffs: yours (and your pet's). Buffs:
-  -- the ones Blizzard flags as important to see on an enemy.
+  -- The auras C steps through, in order, as Blizzard's aura filters.
+  -- Debuffs: all of them ("HARMFUL|PLAYER" for only yours). Buffs: the
+  -- ones Blizzard flags as important to see on an enemy.
   target_lists = {
-    { name = "Debuff", filter = "HARMFUL|PLAYER|INCLUDE_NAME_PLATE_ONLY" },
+    { name = "Debuff", filter = "HARMFUL|INCLUDE_NAME_PLATE_ONLY" },
     { name = "Buff", filter = "HELPFUL|IMPORTANT|INCLUDE_NAME_PLATE_ONLY" },
   },
   -- The auras Ctrl+C steps through: your debuffs, in Blizzard's order.
