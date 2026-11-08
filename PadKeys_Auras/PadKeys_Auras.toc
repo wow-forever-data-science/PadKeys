@@ -1,6 +1,6 @@
 ## Interface: 11507, 16001
 ## Title: PadKeys - Auras
-## Notes: Your target's nameplate auras: C highlights the next one, hold Shift+C for its tooltip. Works in combat. Needs PadKeys.
+## Notes: Aura highlight, in combat too: your target's nameplate auras (C) and your debuffs (Ctrl+C); hold Shift+C for the tooltip. Needs PadKeys.
 ## Author: wow-forever-data-science
 ## Version: 0.3.0
 ## Dependencies: PadKeys

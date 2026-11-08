@@ -1,4 +1,5 @@
 <Bindings>
-	<Binding name="CLICK PadKeysAura:next" header="PADKEYS_AURAS"/>
+	<Binding name="CLICK PadKeysAura:target" header="PADKEYS_AURAS"/>
+	<Binding name="CLICK PadKeysAura:mine"/>
 	<Binding name="CLICK PadKeysAura:tooltip"/>
 </Bindings>

@@ -12,7 +12,7 @@ without a gamepad, and adds its own code only where Blizzard's doesn't:
   target markers in combat, and Blizzard's main-menu entries;
 - a **keyboard UI cursor** that moves through open windows, unit frames and
   your buffs;
-- **aura inspection**: step through your target's nameplate auras in combat, with a tooltip on hold;
+- **aura inspection**: step through your target's nameplate auras and your own debuffs in combat, with a tooltip on hold;
 - **NPC dialogs** as on the gamepad: the cursor lands on the first option
   and F takes it, accepts, continues or completes;
 - an in-game **key map** (F1), like Blizzard's Controller Map;
@@ -34,7 +34,7 @@ error points at one part:
 |---|---|---|
 | **PadKeys** | Key layout (action bars, movement, F interact, X sit, G pings, targeting keys), soft targeting, F1 key map, `/padkeys` | — |
 | **PadKeys_Cursor** | UI cursor (windows, unit frames, buffs) and NPC dialogs (F = A, Esc = B) | PadKeys |
-| **PadKeys_Auras** | Your target's nameplate auras: C highlights the next one, hold Shift+C for its tooltip | PadKeys |
+| **PadKeys_Auras** | Aura highlight: your target's nameplate auras (C), your debuffs (Ctrl+C); hold Shift+C for the tooltip | PadKeys |
 | **PadKeys_Targeting** | Friendly/enemy toggle (\`) and party/raid cycling (Ctrl+Tab) | PadKeys |
 | **PadKeys_Radial** | Radials: actions (G, Alt+G), pings (Cmd+G), markers (Shift+G), main menu (Ctrl+G) | PadKeys |
 | **PadKeys_Bar** | One bar that shows the layer you hold (Cmd, Shift, Option, Ctrl) | PadKeys (SpellActivationOverlay optional, for its proc glows) |
@@ -81,7 +81,7 @@ keyboard with each layer's keys. It's also published at
 | UI cursor | WASD / arrows move · F / Space click (uses a bag item) · Shift+F right-click · Ctrl+F pick up · Option+F buy a stack / create all · Tab / Shift+Tab next / previous window · Esc leave |
 | Radials | point with the mouse · release G: run · Ctrl+G only: mouse wheel pages |
 | NPC dialog | W / S move to an option or reward · F choose, accept, continue, complete · Esc close |
-| Target auras | C: highlight the next one · hold Shift+C: its tooltip, fades 1 s after you let go |
+| Auras | C: target's first aura, then the next · Ctrl+C: your debuffs · hold Shift+C: tooltip |
 
 ## Install
 
@@ -475,17 +475,20 @@ Clicks go through a secure button bound to the key, so they count as real
 key presses, and spells and items work. Moving the cursor is blocked in
 combat, so it switches off when combat starts.
 
-## Target auras (works in combat)
+## Auras (works in combat)
 
 | Key | Does |
 |---|---|
-| C | Highlight your target's next aura: debuffs first, then buffs, wrapping around |
-| Shift+C (hold) | Show the highlighted aura's tooltip; it fades over 1 s after you let go |
+| C | Highlight your target's first aura, then the next with each press: debuffs first, then buffs, wrapping around |
+| Ctrl+C | The same for your own debuffs |
+| Shift+C (hold) | Show the highlighted aura's tooltip |
 
-A label above your target's nameplate highlights one aura, with its name
-and place ("Debuff 2/5"). A new target highlights its first aura, and the
-highlight stays on an aura while it lasts. Without a nameplate (off screen,
-or nameplates off) the label sits under the target frame.
+A label names the highlighted aura and its place ("Debuff 2/5"): above
+your target's nameplate (under the target frame without one), or under
+your debuff's icon, which also gets a white frame. The highlight stays 4 s
+after the last press and the tooltip 2 s after you let go of Shift+C; then
+they fade over 1 s. A press after that starts at the first aura again.
+Timings are in `PadKeys_Auras/Config.lua`.
 
 The auras are your target's, close to what its nameplate shows: your own
 debuffs, and the buffs Blizzard flags as important on an enemy. The
@@ -493,8 +496,8 @@ nameplate picks its auras from fields addons can't read in combat, so
 PadKeys uses the Blizzard aura filters that come closest; they're in
 `PadKeys_Auras/Config.lua`. In combat the client hides auras from addons,
 so PadKeys fills a hidden tooltip of its own to find them. Where the client
-keeps the name secret the label shows only the place. Your own buffs and
-debuffs have no keys now.
+keeps the name secret the label shows only the place. Your own buffs have
+no key.
 
 ## NPC dialogs (gossip and quests)
 
@@ -596,10 +599,12 @@ is loaded.
 
 **Stage 3: + PadKeys_Auras**
 
-8. **Target auras in combat**: put a debuff on a mob. The label above its
-   nameplate should name it ("Debuff 1/1"); C steps on, Shift+C held shows
-   the tooltip and it fades 1 s after you let go. Check that the label
-   follows the nameplate and that the name shows in combat.
+8. **Auras in combat**: put a debuff on a mob and press C. The label above
+   its nameplate should name it ("Debuff 1/1"); C again steps on, Shift+C
+   held shows the tooltip, which stays 2 s after you let go and then
+   fades. On a mob that debuffs you, Ctrl+C should frame your debuff's
+   icon. Check that the label follows the nameplate and that the name
+   shows in combat.
 
 **Stage 4: + PadKeys_Targeting**
 
