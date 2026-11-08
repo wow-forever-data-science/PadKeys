@@ -3,6 +3,11 @@
 -- key was, so restore can put it back. Binding changes are blocked in
 -- combat. Console variables (soft targeting and so on) are not set here:
 -- they are defaults in the wow-settings repository.
+--
+-- Config.lua is the source of truth for these keys: once applied, each
+-- login applies the layout again if anything changed one of them (a
+-- wow-settings apply of older bindings, a changed Config.lua). After
+-- /padkeys restore nothing is applied until the next /padkeys apply.
 
 local _, ns = ...
 
@@ -44,7 +49,16 @@ function ns.preview_layout()
   end
 end
 
-function ns.apply_layout()
+local function out_of_date()
+  for _, row in ipairs(planned_changes()) do
+    if row.old ~= (row.action or "") then
+      return true
+    end
+  end
+  return false
+end
+
+function ns.apply_layout(quiet)
   if blocked() then
     return
   end
@@ -63,7 +77,8 @@ function ns.apply_layout()
     end
   end
   SaveBindings(GetCurrentBindingSet())
-  ns.say("layout applied. /padkeys restore undoes it.")
+  ns.say(quiet and "keys were out of date; layout applied again." or
+         "layout applied. /padkeys restore undoes it.")
 end
 
 function ns.restore_layout()
@@ -86,3 +101,14 @@ function ns.restore_layout()
   ns.db.keys = nil
   ns.say("previous keys restored.")
 end
+
+-- The client loads the saved bindings around login, so this waits a moment.
+local sync = CreateFrame("Frame")
+sync:RegisterEvent("PLAYER_LOGIN")
+sync:SetScript("OnEvent", function()
+  C_Timer.After(1, function()
+    if ns.db.keys and not InCombatLockdown() and out_of_date() then
+      ns.apply_layout(true)
+    end
+  end)
+end)
