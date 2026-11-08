@@ -74,6 +74,12 @@ end
 for i = 2, 5 do
   bindings["F" .. i] = false
 end
+-- Shift+wheel and Shift+Up / Down page the main bar by default; Shift is
+-- the Action Bar 3 layer, so a scroll or arrow turn while holding it would
+-- swap the main bar for another page.
+for _, key in ipairs({ "MOUSEWHEELUP", "MOUSEWHEELDOWN", "UP", "DOWN" }) do
+  bindings["SHIFT-" .. key] = false
+end
 
 ns.config = {
   bindings = bindings,
