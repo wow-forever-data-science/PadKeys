@@ -6,6 +6,9 @@
 -- * Vendor: the first F on an item marks it, the second buys one (the
 --   gamepad's A, MerchantFrame_SetupGamepad). On the Buyback tab the second
 --   F buys it back. Shift-Space still buys at once.
+-- * Vendor: the all key (Option+F) buys a full stack, or as many as you
+--   can afford, as Shift-click's stack split would (or one, for items that
+--   don't stack). On the Buyback tab it buys back.
 -- * Vendor: the mouse wheel steps through the items, turning the page at
 --   the end of one.
 -- * Vendor: gear is repaired from your own money, and junk (grey items)
@@ -86,6 +89,42 @@ ns.cursor_on_click(function(button)
   if is_merchant_item(button) or is_trainer_skill(button) then
     return stepper
   end
+end)
+
+-- The most of a vendor item you can buy at once: the stack size, capped by
+-- your money and the items it costs (MerchantItemButton_OnModifiedClick).
+local function most_affordable(index)
+  local most = GetMerchantItemMaxStack(index)
+  local _, _, price, stack_count, _, _, _, extended_cost = GetMerchantItemInfo(index)
+  if price and price > 0 then
+    most = min(most, floor(GetMoney() / (price / stack_count)))
+  end
+  if extended_cost then
+    for i = 1, MAX_ITEM_COST do
+      local _, value, link, currency = GetMerchantItemCostItem(index, i)
+      if link and not currency then
+        local owned = C_Item.GetItemCount(link, false, false, true)
+        most = min(most, floor(owned / (value / stack_count)))
+      end
+    end
+  end
+  return most
+end
+
+-- SplitStack is the stack split's buy, with Blizzard's confirmations for
+-- items that cost other items or can't be refunded.
+ns.cursor_on_all(function(button)
+  if not is_merchant_item(button) then
+    return false
+  end
+  ns.cursor_arm(false)
+  local most = MerchantFrame.selectedTab == 1 and most_affordable(button:GetID())
+  if most and most > 1 then
+    button.SplitStack(button, most)
+  else
+    MerchantItemButton_OnClick(button, "RightButton")
+  end
+  return true
 end)
 
 -- The mouse wheel on a vendor item: the next or previous item, turning the

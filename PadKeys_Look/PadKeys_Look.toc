@@ -1,0 +1,10 @@
+## Interface: 11507, 16001
+## Title: PadKeys - Look
+## Notes: The PadKeys look for the whole game: every font in Roboto, and black chat windows. Needs PadKeys.
+## Author: wow-forever-data-science
+## Version: 0.1.0
+## Dependencies: PadKeys
+## OptionalDeps: PadKeys_Debug
+
+Config.lua
+Look.lua

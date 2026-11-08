@@ -7,7 +7,11 @@
 -- * The second F crafts it, as the Create button does
 --   (ProfessionsCraftingPageMixin:Create, with the amount in its box).
 -- * F on the Create / Create All buttons runs them.
--- * F on a side tab (a profession, or the overview) opens it.
+-- * F on a side tab (a profession, or the overview) opens it, and the
+--   cursor moves to the first recipe. The window opens with the cursor on
+--   the first tab (autoFocus in Config.lua).
+-- * The all key (Option+F) on a recipe selects it and creates all; on
+--   either button it creates all.
 --
 -- These call Blizzard's functions instead of clicking: the cursor's click
 -- did nothing on the professions window's buttons.
@@ -87,6 +91,20 @@ ns.cursor_on_click(function(frame)
   end
 end)
 
+-- The Create All button updates a moment after a recipe is selected.
+ns.cursor_on_all(function(frame)
+  local row = recipe_row(frame)
+  if row then
+    ns.cursor_arm(false)
+    crafting_page().RecipeList.selectionBehavior:Select(row)
+    C_Timer.After(0.1, function() run("CreateAll") end)
+    return true
+  elseif create_button(frame) then
+    run("CreateAll")
+    return true
+  end
+end)
+
 -- The side tabs are frames, not buttons, so the cursor only stops on them
 -- because they are named here. A profession tab's click casts the
 -- profession's spell (ProfessionsFrameRightTabMixin:OnClick), which addon
@@ -131,6 +149,10 @@ caster:SetScript("PostClick", function()
   ProfessionsFrame.BookPage:Hide()
   ProfessionsFrame.CraftingPage:Show()
   ProfessionsFrame:RightTabSelected(tab)
+  -- Into the recipes once the list has filled.
+  C_Timer.After(0.2, function()
+    ns.cursor_focus_in(ProfessionsFrame.CraftingPage.RecipeList.ScrollBox)
+  end)
 end)
 
 ns.cursor_on_target(side_tab)
