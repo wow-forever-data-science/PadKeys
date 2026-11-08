@@ -5,7 +5,7 @@ local ns = PadKeys
 
 -- Toggle the cursor by hand.
 ns.config.bindings["SHIFT-`"] = "PADKEYS_CURSOR"
--- Open / close the bags; out of combat the cursor lands on the search box.
+-- Open / close the bags; out of combat the cursor lands on sort bags.
 ns.config.bindings.B = "CLICK PadKeysBags:LeftButton"
 
 ns.config.cursor = {
