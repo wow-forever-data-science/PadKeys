@@ -106,10 +106,12 @@ keyboard with each layer's keys. It's also published at
    **SpellActivationOverlay** is optional: enable it if you want its proc
    glows and effects, or leave it off.
 4. In game, type `/padkeys preview` to see which keys would change, then
-   `/padkeys apply`. `/padkeys restore` puts your old keys back. **Run
-   `/padkeys apply` again whenever you enable or disable a `PadKeys_*`
-   addon**: it binds the keys of the loaded ones and gives back the keys of
-   ones you turned off.
+   `/padkeys apply`. `/padkeys restore` puts your old keys back. After the
+   first apply, every login applies the layout again if a key drifted (an
+   enabled or disabled `PadKeys_*` addon, a changed `Config.lua`, or a
+   `wow-settings` apply of older bindings), so `Config.lua` stays the
+   source of truth. After `/padkeys restore` this stops until the next
+   apply.
 5. Check that **Action Bars 2, 3, 4 and 5** are on (Options or Edit Mode;
    `wow-settings` turns them on). The Cmd, Shift, Ctrl and Option layers
    fire those bars, so their buttons must exist. Only the first four
@@ -496,8 +498,7 @@ they fade over 1 s. A press after that starts at the first aura again.
 Timings are in `PadKeys_Auras/Config.lua`.
 
 The auras are your target's: all its debuffs, then the buffs Blizzard
-flags as important on an enemy. Keys bound by an older version do nothing;
-PadKeys says so at login, and `/padkeys apply` fixes it. The
+flags as important on an enemy. The
 nameplate picks its auras from fields addons can't read in combat, so
 PadKeys uses the Blizzard aura filters that come closest; they're in
 `PadKeys_Auras/Config.lua`. In combat the client hides auras from addons,
