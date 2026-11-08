@@ -180,7 +180,8 @@ the console settings live in the `wow-settings` repository
 Interact Key" and "Action Targeting" options). `SoftTargetEnemy` and
 `SoftTargetEnemyArc` are per character, so they sit in
 `settings/characters/_default/config-cache.wtf`; a new character needs one
-more apply after its first login. The other soft-targeting
+more apply after its first login. `SoftTargetWithLocked` is 0, so a
+locked target stays until Tab, even with other mobs in front of you. The other soft-targeting
 settings at the values Blizzard's gamepad mode uses (F reaches 20 yards in
 a cone in front of you, and an icon shows over the NPC, herb, ore or chest
 it will use), key-down casting and auto loot. Without `wow-settings`, tick
