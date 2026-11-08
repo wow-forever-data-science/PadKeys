@@ -9,6 +9,7 @@
 -- * Vendor: the all key (Cmd+F) buys a full stack, or as many as you
 --   can afford, as Shift-click's stack split would (or one, for items that
 --   don't stack). On the Buyback tab it buys back.
+-- * Mailbox: the all key (Cmd+F) opens all mail.
 -- * Vendor: the mouse wheel steps through the items, turning the page at
 --   the end of one.
 -- * Vendor: gear is repaired from your own money, and junk (grey items)
@@ -124,6 +125,17 @@ ns.cursor_on_all(function(button)
   else
     MerchantItemButton_OnClick(button, "RightButton")
   end
+  return true
+end)
+
+-- The mailbox: the all key opens all mail, as Blizzard's Open All button
+-- (and the gamepad's X) does.
+ns.cursor_on_all(function()
+  local button = OpenAllMail
+  if not (button and button:IsVisible() and button:IsEnabled()) then
+    return false
+  end
+  button:OnClick()
   return true
 end)
 
