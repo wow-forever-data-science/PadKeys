@@ -314,6 +314,24 @@ events:SetScript("OnEvent", function(_, event, unit)
   end
 end)
 
+-- Keys still bound to actions an older PadKeys_Auras had do nothing:
+-- say so once at login.
+local ACTIONS = { target = true, mine = true, tooltip = true }
+local function stale_keys()
+  for _, key in ipairs({ "C", "SHIFT-C", "CTRL-C", ns.config.mod .. "C" }) do
+    local action = GetBindingAction(key):match("^CLICK PadKeysAura:(.+)$")
+    if action and not ACTIONS[action] then
+      return true
+    end
+  end
+end
+events:RegisterEvent("PLAYER_LOGIN")
+events:HookScript("OnEvent", function(_, event)
+  if event == "PLAYER_LOGIN" and stale_keys() then
+    ns.say("aura keys are out of date; type /padkeys apply.")
+  end
+end)
+
 -- The click's button name is the action; Shift+C acts on press and release.
 local button = CreateFrame("Button", "PadKeysAura", UIParent)
 button:RegisterForClicks("AnyDown", "AnyUp")

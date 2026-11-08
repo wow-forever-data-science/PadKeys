@@ -492,8 +492,9 @@ Shift+C; then
 they fade over 1 s. A press after that starts at the first aura again.
 Timings are in `PadKeys_Auras/Config.lua`.
 
-The auras are your target's, close to what its nameplate shows: your own
-debuffs, and the buffs Blizzard flags as important on an enemy. The
+The auras are your target's: all its debuffs, then the buffs Blizzard
+flags as important on an enemy. Keys bound by an older version do nothing;
+PadKeys says so at login, and `/padkeys apply` fixes it. The
 nameplate picks its auras from fields addons can't read in combat, so
 PadKeys uses the Blizzard aura filters that come closest; they're in
 `PadKeys_Auras/Config.lua`. In combat the client hides auras from addons,
