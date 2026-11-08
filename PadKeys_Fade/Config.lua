@@ -18,8 +18,9 @@ ns.config.fade = {
       "MultiBar7",            -- Action Bar 8
       "PetActionBar",
       "StanceBar",
-      "MainStatusTrackingBarContainer",      -- experience / reputation
-      "SecondaryStatusTrackingBarContainer",
+      -- The experience and reputation bars are left out, so they always
+      -- show. Add "MainStatusTrackingBarContainer" and
+      -- "SecondaryStatusTrackingBarContainer" here to fade them too.
     },
     menu = {
       "MicroMenuContainer",
@@ -36,8 +37,11 @@ ns.config.fade = {
   linger = 0.6,
   -- Extra pixels around each frame that still count as hovering it.
   padding = 10,
-  -- A label left of each action bar: its name and the PadKeys key that
-  -- fires it ("Bar 2 · Cmd", "Bar 6 · G wheel").
+  -- A label above the top left corner of each action bar: its name and the
+  -- PadKeys key that fires it ("Bar 2 · Cmd", "Bar 6 · G wheel"). It needs
+  -- about label_size + label_gap + 4 pixels free above the bar, so leave
+  -- that much between stacked bars in Edit Mode.
   labels = true,
   label_size = 12,
+  label_gap = 2,      -- pixels between the label and the bar
 }

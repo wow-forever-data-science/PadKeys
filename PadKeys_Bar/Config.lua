@@ -8,8 +8,11 @@ ns.config.bar = {
   -- the same point of the screen, plus an offset in pixels.
   point = "BOTTOM",
   x = 0,
-  y = 60,
-  size = 44,          -- button size
+  y = 40,
+  size = 44,          -- button width
+  -- Button height as a share of the width: 1 is square. Icons are cropped
+  -- to the middle band so they don't stretch.
+  height = 0.6,
   spacing = 3,        -- gap between buttons
   scale = 1,
   -- Behind each button; 0 is see-through, 1 is solid black.
@@ -28,7 +31,12 @@ ns.config.bar = {
   -- little see-through. No cooldown swipe.
   cooldown_alpha = 0.35,
   range_alpha = 0.6,
-  countdown_size = 20,
+  countdown_size = 16,
+  -- Text sizes on each button, small enough that the key label (top
+  -- right), stack count (top left) and macro name (bottom) don't touch.
+  hotkey_size = 11,
+  count_size = 11,
+  name_size = 9,
   -- Name of the layer you hold ("Cmd", "Shift+Ctrl") above the bar.
   -- Nothing shows without a modifier. Off: the key labels are enough.
   show_layer = false,
