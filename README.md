@@ -167,13 +167,11 @@ more key held.
 Movement is W/S, with **A/D strafing** (turn with the mouse or the arrow
 keys). **F interacts** with whatever you face: loot, NPCs, herbs, ore.
 
-The keys bound to Blizzard's own actions are in both places: PadKeys binds
-them, and `wow-settings` binds them too
-(`settings/account/bindings-cache.wtf`), so they work even with PadKeys
-disabled. That's the plain, Shift, Option and Ctrl layers, F, Shift+F, Ctrl+F,
-Cmd+F, Tab / Shift+Tab, A/D, X and G. Only PadKeys binds the Cmd layer
-(Cmd+Q quits the game until install step 6 is done), F2–F5 and the keys
-for PadKeys' own actions.
+PadKeys alone binds its keys, from `Config.lua`, and binds them again at
+login if anything changed one. `wow-settings` leaves them out of its
+snapshot and apply (it reads them from `PadKeysDB.keys`), so the two never
+undo each other. With PadKeys disabled these keys go back to the client
+defaults. Cmd+Q quits the game until install step 6 is done.
 
 F needs soft targeting on for keyboard. PadKeys sets only key bindings;
 the console settings live in the `wow-settings` repository
@@ -183,7 +181,8 @@ Interact Key" and "Action Targeting" options). `SoftTargetEnemy` and
 `SoftTargetEnemyArc` are per character, so they sit in
 `settings/characters/_default/config-cache.wtf`; a new character needs one
 more apply after its first login. `SoftTargetWithLocked` is 0, so a
-locked target stays until Tab, even with other mobs in front of you. The other soft-targeting
+locked target stays until Tab, even with other mobs in front of you. The
+client does not save it, so `wow-settings`' own addon sets it at every login. The other soft-targeting
 settings at the values Blizzard's gamepad mode uses (F reaches 20 yards in
 a cone in front of you, and an icon shows over the NPC, herb, ore or chest
 it will use), key-down casting and auto loot. Without `wow-settings`, tick
@@ -193,8 +192,7 @@ Options → Controls → **Enable Interact Key** and Options → Combat →
 What you lose from WoW's defaults:
 - Q/E strafe (now A/D) and R reply to whisper (type `/r`);
 - T attack (soft targeting starts attacks), Z sheathe, and C character
-  window (it's on the Ctrl+G menu radial; PadKeys_Auras takes Shift+C,
-  where `wow-settings` binds it);
+  window (it's on the Ctrl+G menu radial; PadKeys_Auras takes Shift+C);
 - G target last hostile (now Cmd+F) and Ctrl+Tab nearest friend (now
   friendly mode);
 - F1–F5 targeting yourself and party members (F1 is now the key map);

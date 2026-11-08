@@ -28,6 +28,20 @@ what is untested.
 - Decide with the plain flags Blizzard returns (`isActive`, `isEnabled`), as Blizzard's own code does
 - Taint - calling Blizzard UI functions that open windows from addon code taints them, and tainted Blizzard code then errors on secret values; open windows by `/click`ing Blizzard's button through a secure button instead
 
+## Ownership with wow-settings
+
+One owner per setting, so this repo and `wow-settings` never undo each other.
+
+| Setting | Owner | Other repo |
+|---|---|---|
+| Bindings of PadKeys' keys (`Config.lua`, saved in `PadKeysDB.keys`) | PadKeys | `wow-settings` leaves them out of snapshot and apply |
+| All other key bindings | `wow-settings` | PadKeys does not bind them |
+| CVars, incl. soft targeting | `wow-settings` (incl. its `WowSettings` addon for CVars the client does not save) | PadKeys sets no CVars |
+
+- Never edit `wow-settings` files from a session here - say what should change there instead
+- A CVar PadKeys needs goes into `wow-settings`, not `SetCVar` in an addon here
+- Sessions on both repos at once - use a worktree each, never switch branches in a checkout another session uses
+
 ## Workflow
 
 - Work on a branch, open a PR, and merge it yourself once the checks pass
