@@ -56,7 +56,7 @@ ns.config.cursor = {
   autoFrames = {
     "GossipFrame", "QuestFrame", "MerchantFrame", "LootFrame",
     "StaticPopup1", "StaticPopup2", "StaticPopup3", "StaticPopup4",
-    "ProfessionsFrame",
+    "ProfessionsFrame", "MailFrame",
   },
   -- Where the cursor lands when one of those opens: a path of child keys
   -- (a number is a list index), or a list of paths where the first one
