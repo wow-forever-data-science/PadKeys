@@ -7,9 +7,13 @@
 --   again on every ADDON_LOADED.
 -- * Names and damage numbers above heads are drawn by the game from the
 --   UNIT_NAME_FONT and DAMAGE_TEXT_FONT globals, read once at login.
--- * Chat windows get a black background through Blizzard's own chat window
---   settings (FCF_SetWindowColor / FCF_SetWindowAlpha), which the game
---   saves, so Blizzard's fade on mouseover keeps working.
+-- * Chat windows get a black background, saved in the game's own chat
+--   window settings (SetChatWindowColor / SetChatWindowAlpha), so
+--   Blizzard's fade on mouseover keeps working. Blizzard's FCF_SetWindow*
+--   functions aren't called: they store the alpha on the chat frame, which
+--   taints Blizzard's chat fade. The colour shows at once; Blizzard reads
+--   the saved alpha when the chat loads, so a changed chat_alpha shows
+--   after the next /reload.
 --
 -- Nothing here is secure: fonts and colours only.
 
@@ -29,12 +33,27 @@ local function restyle_fonts()
   end
 end
 
+-- The textures FCF_SetWindowColor colours, without its writes to the frame.
+local function paint_black(name)
+  for _, part in pairs(CHAT_FRAME_TEXTURES or {}) do
+    local object = _G[name .. part]
+    if object and object:GetObjectType() == "Button" then
+      object:GetNormalTexture():SetVertexColor(0, 0, 0)
+      object:GetHighlightTexture():SetVertexColor(0, 0, 0)
+      object:GetPushedTexture():SetVertexColor(0, 0, 0)
+    elseif object and object:GetObjectType() == "Texture" then
+      object:SetVertexColor(0, 0, 0)
+    end
+  end
+end
+
 local function black_chat()
   for _, name in ipairs(CHAT_FRAMES or {}) do
     local frame = _G[name]
     if frame then
-      FCF_SetWindowColor(frame, 0, 0, 0)
-      FCF_SetWindowAlpha(frame, c.chat_alpha)
+      SetChatWindowColor(frame:GetID(), 0, 0, 0)
+      SetChatWindowAlpha(frame:GetID(), c.chat_alpha)
+      paint_black(name)
     end
   end
 end
