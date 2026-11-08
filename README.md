@@ -448,7 +448,7 @@ On a recipe, the first F selects it and the second crafts it (the amount
 in Blizzard's box); F on Create / Create All runs them. **Option+F** does
 the most at once: on a recipe it selects it and creates all, on a vendor
 item it buys a full stack (or as many as you can afford). **B** opens your bags with the
-cursor on the search box (in combat it only opens them; press B again to
+cursor on sort bags (in combat it only opens them; press B again to
 close). It clicks Blizzard's backpack button through a secure button, so
 the bags aren't tainted.
 
