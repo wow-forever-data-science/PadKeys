@@ -479,14 +479,16 @@ combat, so it switches off when combat starts.
 
 | Key | Does |
 |---|---|
-| C | Highlight your target's first aura, then the next with each press: debuffs first, then buffs, wrapping around |
+| C | Highlight your target's first aura and show its tooltip, then the next with each press: debuffs first, then buffs, wrapping around |
 | Ctrl+C | The same for your own debuffs |
-| Shift+C (hold) | Show the highlighted aura's tooltip |
+| Shift+C (hold) | Keep the highlighted aura's tooltip up |
 
 A label names the highlighted aura and its place ("Debuff 2/5"): above
 your target's nameplate (under the target frame without one), or under
 your debuff's icon, which also gets a white frame. The highlight stays 4 s
-after the last press and the tooltip 2 s after you let go of Shift+C; then
+after the last press (with its tooltip; `tooltip_on_step = false` shows
+the tooltip only on Shift+C) and the tooltip 2 s after you let go of
+Shift+C; then
 they fade over 1 s. A press after that starts at the first aura again.
 Timings are in `PadKeys_Auras/Config.lua`.
 
