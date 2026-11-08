@@ -3,7 +3,7 @@
 -- * C highlights your target's first aura (close to what its nameplate
 --   shows: debuffs, then buffs); each press after that highlights the
 --   next, wrapping around. A label above the nameplate names it and its
---   place ("Debuff 2/5").
+--   place ("Debuff 2/5"), and its tooltip shows (tooltip_on_step).
 -- * Ctrl+C does the same for your own debuffs; the highlighted one is
 --   framed on its icon, with the label under it.
 -- * Holding Shift+C shows the highlighted aura's tooltip (Blizzard's own,
@@ -200,6 +200,26 @@ local function fade_after(wait)
   fader:Show()
 end
 
+-- The highlighted aura's tooltip, at the label.
+local function fill_tooltip()
+  local g = GROUPS[group]
+  GameTooltip:SetOwner(label, "ANCHOR_NONE")
+  GameTooltip:ClearAllPoints()
+  if g.icons then
+    GameTooltip:SetPoint("TOP", place_text, "BOTTOM", 0, -4)
+  else
+    GameTooltip:SetPoint("BOTTOM", name_text, "TOP", 0, 4)
+  end
+  GameTooltip:SetAlpha(1)
+  local ok = pcall(GameTooltip.SetUnitAura, GameTooltip, g.unit, place,
+                   g.lists[list].filter)
+  if ok and GameTooltip:NumLines() > 0 then
+    GameTooltip:Show()
+  else
+    GameTooltip:Hide()
+  end
+end
+
 local function highlight(group_name)
   local g = GROUPS[group_name]
   if g.unit == "target" and not UnitExists("target") then
@@ -223,6 +243,9 @@ local function highlight(group_name)
   end
   refresh()
   view:Show()
+  if c.tooltip_on_step or held then
+    fill_tooltip()
+  end
   if not held then
     fade_after(c.show_for)
   end
@@ -239,22 +262,7 @@ local function show_tooltip()
   fader:Hide()
   view:Show()
   set_alpha(1)
-  local g = GROUPS[group]
-  GameTooltip:SetOwner(label, "ANCHOR_NONE")
-  GameTooltip:ClearAllPoints()
-  if g.icons then
-    GameTooltip:SetPoint("TOP", place_text, "BOTTOM", 0, -4)
-  else
-    GameTooltip:SetPoint("BOTTOM", name_text, "TOP", 0, 4)
-  end
-  GameTooltip:SetAlpha(1)
-  local ok = pcall(GameTooltip.SetUnitAura, GameTooltip, g.unit, place,
-                   g.lists[list].filter)
-  if ok and GameTooltip:NumLines() > 0 then
-    GameTooltip:Show()
-  else
-    GameTooltip:Hide()
-  end
+  fill_tooltip()
 end
 
 local function release_tooltip()
@@ -287,6 +295,11 @@ events:SetScript("OnEvent", function(_, event, unit)
       end
       if list then
         refresh()
+        if own_tooltip() then
+          local alpha = GameTooltip:GetAlpha()
+          fill_tooltip()
+          GameTooltip:SetAlpha(alpha)
+        end
       else
         close()
       end

@@ -23,6 +23,9 @@ ns.config.auras = {
   my_lists = {
     { name = "Your debuff", filter = "HARMFUL" },
   },
+  -- Each C / Ctrl+C press also shows the highlighted aura's tooltip,
+  -- fading with the highlight. false: only while Shift+C is held.
+  tooltip_on_step = true,
   -- The label: text size, and pixels above the nameplate.
   label_size = 13,
   label_gap = 4,
