@@ -930,8 +930,8 @@ owner:SetScript("OnUpdate", function(_, dt)
 end)
 
 -- The child of a window that autoFocus names ("CraftingPage.SearchBox",
--- or a list of paths: the first one shown), if it is shown. A number in a
--- path is a list index ("rightProfessionTabs.1").
+-- or a list of paths: the first one shown), if it is shown and not greyed
+-- out. A number in a path is a list index ("rightProfessionTabs.1").
 local function focus_child(name)
   local paths = (ns.config.cursor.autoFocus or {})[name]
   if type(paths) ~= "table" then
@@ -942,7 +942,8 @@ local function focus_child(name)
     for key in path:gmatch("[^.]+") do
       frame = frame and frame[tonumber(key) or key]
     end
-    if frame and frame.IsVisible and frame:IsVisible() then
+    if frame and frame.IsVisible and frame:IsVisible() and
+      (not frame.IsEnabled or frame:IsEnabled()) then
       return frame
     end
   end
@@ -973,6 +974,9 @@ local function take_cursor(frame)
     end
   end)
 end
+
+-- For a window that changes pages without opening again (Auctions.lua).
+ns.cursor_take = take_cursor
 
 -- Start the cursor when an autoFrames window opens. Some windows
 -- (professions) belong to Blizzard addons that load later, so this runs
