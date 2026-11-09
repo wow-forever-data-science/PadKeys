@@ -65,8 +65,16 @@ ns.config.cursor = {
   -- Professions land on the first profession tab on the right, to pick one
   -- with W/S and F; the cursor then moves into its recipes. Space or F on a text field lets you type in it;
   -- Escape or Enter goes back to moving. Popups land on their text field
-  -- (e.g. "type DELETE") or else on the accept button.
+  -- (e.g. "type DELETE") or else on the accept button. The auction house
+  -- lands on Search, and its sell tab on Create Auction, or on the item
+  -- slot while there is nothing to post (Auctions.lua). A greyed-out button
+  -- is skipped.
   autoFocus = {
+    AuctionHouseFrame = { "ItemSellFrame.PostButton",
+                          "CommoditiesSellFrame.PostButton",
+                          "ItemSellFrame.ItemDisplay",
+                          "CommoditiesSellFrame.ItemDisplay",
+                          "SearchBar.SearchButton" },
     ProfessionsFrame = { "rightProfessionTabs.1",
                          "CraftingPage.RecipeList.SearchBox" },
     StaticPopup1 = { "EditBox", "ButtonContainer.Button1" },

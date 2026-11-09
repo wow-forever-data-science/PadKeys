@@ -11,3 +11,4 @@ Cursor.lua
 Dialogs.lua
 Services.lua
 Professions.lua
+Auctions.lua
