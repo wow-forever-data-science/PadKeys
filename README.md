@@ -41,6 +41,9 @@ error points at one part:
 | **PadKeys_Fade** | Blizzard's action bars, micro menu and bags fade out until you mouse over them or drag a spell; each bar is labelled with its PadKeys key (Cmd, Shift, G wheel) | PadKeys |
 | **PadKeys_Look** | Every font in the game in the theme font (Roboto Condensed), and chat windows on a black background | PadKeys |
 | **PadKeys_Combat** | "Combat" / "Out of Combat" fades in the middle of the screen as you enter and leave combat, in white; out of combat, a list of missing or expiring long buffs for your class and group | PadKeys |
+| **PadKeys_Cooldowns** | Blizzard's Cooldown Manager (cooldowns, buff icons, buff bars) in the PadKeys look: black borders, grey tints, the countdown without a swipe | PadKeys |
+| **PadKeys_Totems** | Blizzard's totem bar in the PadKeys look: black borders, no gold or element frames | PadKeys |
+| **PadKeys_Combo** | Combo points as a row of black and white pips above the bar, in place of Blizzard's (rogues, druids in Cat Form) | PadKeys |
 | **PadKeys_Debug** | Saves Lua errors and blocked actions to a file, to send or read outside the game (`/pkdebug`) | — |
 
 It started in the wowforevR R package repository and moved here as a
@@ -313,6 +316,30 @@ Blizzard's sizes and outlines. Names and damage numbers above heads change
 after a relog. Chat windows get a black background through Blizzard's own
 chat window settings, so they still fade with the mouse as before.
 `game_font` and `chat_alpha` are in `PadKeys_Look/Config.lua`.
+
+## Cooldown Manager, totem bar and combo points
+
+Three addons put Blizzard's own frames in the PadKeys bar's look, one at a
+time so an error points at one of them. They only change how things look:
+the frames still work, and Edit Mode still moves them.
+
+- **PadKeys_Cooldowns**: every icon of the Cooldown Manager (Essential,
+  Utility, buff icons and buff bars) gets the bar's 1px black border and
+  rounded corners instead of Blizzard's round mask and ring. Spells on
+  cooldown lose the swipe, as on the bar: Blizzard greys them and the
+  countdown shows the seconds, so turn on **Show timer** in the Cooldown
+  Manager's options. Out of range, no mana and not usable are grey instead
+  of red, blue and dark; buff swipes are black; buff bars are light grey
+  on black.
+- **PadKeys_Totems**: the totem bar's buttons and slots get the black
+  border; Blizzard's frame art and the element-coloured frames go
+  (`element_colors = true` keeps the colours).
+- **PadKeys_Combo**: Blizzard's combo points around the target's portrait
+  are hidden, and a row of pips above the PadKeys bar fills white, one per
+  point. It shows in combat and while you have points. If the client keeps
+  the count secret, the number shows instead of the pips.
+
+Settings are in each addon's `Config.lua`.
 
 ## Combat banner (PadKeys_Combat)
 
