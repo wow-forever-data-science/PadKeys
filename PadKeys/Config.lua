@@ -98,6 +98,9 @@ ns.modules = {
   { addon = "PadKeys_Fade", does = "Blizzard's bars fade in on mouseover or drag" },
   { addon = "PadKeys_Look", does = "Theme font everywhere, black chat" },
   { addon = "PadKeys_Combat", does = "Combat banner, and missing buffs out of combat" },
+  { addon = "PadKeys_Cooldowns", does = "Blizzard's Cooldown Manager in the PadKeys look" },
+  { addon = "PadKeys_Totems", does = "Blizzard's totem bar in the PadKeys look" },
+  { addon = "PadKeys_Combo", does = "Combo points as black and white pips" },
   { addon = "PadKeys_Debug", does = "Saves errors to SavedVariables (/pkdebug)" },
 }
 
