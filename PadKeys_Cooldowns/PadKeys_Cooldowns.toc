@@ -1,0 +1,10 @@
+## Interface: 11507, 16001
+## Title: PadKeys - Cooldowns
+## Notes: Blizzard's Cooldown Manager in the PadKeys look: icons with a black border, black and white, the countdown without a swipe. Needs PadKeys.
+## Author: wow-forever-data-science
+## Version: 0.1.0
+## Dependencies: PadKeys
+## OptionalDeps: Blizzard_CooldownViewer, PadKeys_Debug
+
+Config.lua
+Cooldowns.lua
