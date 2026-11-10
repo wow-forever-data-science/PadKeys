@@ -1,0 +1,10 @@
+## Interface: 11507, 16001
+## Title: PadKeys - Combo
+## Notes: Combo points as a row of black and white pips, in place of Blizzard's. Rogues and druids in Cat Form. Needs PadKeys.
+## Author: wow-forever-data-science
+## Version: 0.1.0
+## Dependencies: PadKeys
+## OptionalDeps: PadKeys_Debug
+
+Config.lua
+Combo.lua
