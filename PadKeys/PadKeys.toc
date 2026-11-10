@@ -8,6 +8,7 @@
 
 Config.lua
 Theme.lua
+Skin.lua
 Core.lua
 Layout.lua
 KeyMap.lua

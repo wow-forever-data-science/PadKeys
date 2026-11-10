@@ -17,7 +17,7 @@ ns.config.bar = {
   scale = 1,
   -- Behind each button; 0 is see-through, 1 is solid black.
   background_alpha = 0.75,
-  -- Slightly rounded corners (Media/RoundedSquare.tga); false for square.
+  -- Slightly rounded corners (PadKeys/Media/RoundedSquare.tga); false for square.
   rounded = true,
   -- A see-through black box behind each key label, so it reads on bright
   -- icons. Alpha: 0 is see-through, 1 is solid black. The outline is a

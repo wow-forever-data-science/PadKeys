@@ -157,20 +157,11 @@ local function place()
   end
 end
 
--- Slightly rounded corners: a mask of our own (Media/RoundedSquare.tga,
--- made by tools/make_rounded_mask.py) that fills the whole button, so the
--- icon keeps its size.
-local ROUNDED = "Interface\\AddOns\\PadKeys_Bar\\Media\\RoundedSquare"
-
+-- Slightly rounded corners: the base addon's mask (PadKeys/Skin.lua).
 local function round(frame, texture, inset)
-  if not c.rounded then
-    return
+  if c.rounded then
+    ns.round(frame, texture, inset)
   end
-  local mask = frame:CreateMaskTexture()
-  mask:SetTexture(ROUNDED, "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
-  mask:SetPoint("TOPLEFT", inset, -inset)
-  mask:SetPoint("BOTTOMRIGHT", -inset, inset)
-  texture:AddMaskTexture(mask)
 end
 
 local buttons = {}
