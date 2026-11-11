@@ -27,7 +27,7 @@ local BAR_NAMES = {
   PetActionBar = "Pet bar", StanceBar = "Stance bar",
 }
 
--- PadKeys_Radial's G and Alt+G wheels show Action Bars 6 and 7 (slots 145
+-- PadKeys_Radial's G and Cmd+G wheels show Action Bars 6 and 7 (slots 145
 -- and 157).
 local WHEELS = {
   MultiBar5 = "CLICK PadKeysRing:actions",

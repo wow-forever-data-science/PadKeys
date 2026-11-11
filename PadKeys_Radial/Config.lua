@@ -7,8 +7,8 @@ local ns = PadKeys
 -- combat; the page is the key you press.
 local b = ns.config.bindings
 b.G = "CLICK PadKeysRing:actions"           -- Action Bar 6, slots 1-8
-b["ALT-G"] = "CLICK PadKeysRing:extra"      -- Action Bar 7, slots 1-8
-b[ns.config.mod .. "G"] = "CLICK PadKeysRing:pings"
+b[ns.config.mod .. "G"] = "CLICK PadKeysRing:extra" -- Action Bar 7, slots 1-8
+b["ALT-G"] = "CLICK PadKeysRing:pings"
 b["SHIFT-G"] = "CLICK PadKeysRing:markers"
 b["CTRL-G"] = "CLICK PadKeysRing:menu"      -- Blizzard's main menu entries
 
@@ -32,7 +32,7 @@ ns.config.radial = {
   ring = {
     -- Action Bar 6 (Blizzard's MultiBar5) starts at action slot 145.
     first_slot = 145,
-    -- The Alt+G page: Action Bar 7 (MultiBar6) starts at slot 157.
+    -- The Cmd+G page: Action Bar 7 (MultiBar6) starts at slot 157.
     extra_first_slot = 157,
     -- attack, warning, assist, onmyway; sent as ping_macro.
     pings = { "assist", false, "attack", false, "warning", false, "onmyway", false },
