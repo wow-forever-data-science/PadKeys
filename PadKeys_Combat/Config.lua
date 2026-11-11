@@ -39,7 +39,7 @@ ns.config.combat.buffs = {
   -- Names listed per buff before "+N".
   max_names = 3,
   -- Hide the list while resting (in an inn or a city).
-  hide_resting = false,
+  hide_resting = true,
   -- Buffs to leave out: fortitude, mark, intellect, spirit, blessing,
   -- mage_armor, demon_armor, inner_fire, omen, trueshot, poisons,
   -- lightning_shield, imbue.

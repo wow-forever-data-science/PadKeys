@@ -385,8 +385,8 @@ Blizzard's own filters; inspect them with PadKeys_Auras (C).
 Settings are under `ns.config.combat.buffs` in `PadKeys_Combat/Config.lua`:
 the 5-minute limit (`warn_at`), position (`anchor = "PlayerFrame"` puts it
 under the player frame instead), size, `ignore` to drop a buff,
-`hide_resting`, `consolidate_in_combat = false` to leave the buff frame
-alone, and `enabled = false` to turn the reminder off.
+`hide_resting = false` to keep it in inns and cities,
+`consolidate_in_combat = false` to leave the buff frame alone, and `enabled = false` to turn the reminder off.
 
 ## Targeting (works in combat)
 
