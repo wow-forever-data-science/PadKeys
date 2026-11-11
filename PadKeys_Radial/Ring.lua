@@ -2,8 +2,8 @@
 -- opens it (Config.lua):
 --
 -- * actions (G): Action Bar 6, slots 1-8 (drag spells, items, macros there);
--- * extra (Alt+G): Action Bar 7, slots 1-8, the same way;
--- * pings (Cmd+G): Blizzard's ping types, sent as /ping macros;
+-- * extra (Cmd+G): Action Bar 7, slots 1-8, the same way;
+-- * pings (Alt+G): Blizzard's ping types, sent as /ping macros;
 -- * markers (Shift+G): target markers, sent as /tm macros;
 -- * menu (Ctrl+G): Blizzard's main-menu entries (Menu.lua), several pages
 --   turned with the mouse wheel while it is open.

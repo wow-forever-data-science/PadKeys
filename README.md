@@ -36,7 +36,7 @@ error points at one part:
 | **PadKeys_Cursor** | UI cursor (windows, unit frames, buffs) and NPC dialogs (F = A, Esc = B) | PadKeys |
 | **PadKeys_Auras** | Aura highlight: your target's nameplate auras (C), your debuffs (Ctrl+C); hold Shift+C for the tooltip | PadKeys |
 | **PadKeys_Targeting** | Friendly/enemy toggle (\`) and party/raid cycling (Ctrl+Tab) | PadKeys |
-| **PadKeys_Radial** | Radials: actions (G, Alt+G), pings (Cmd+G), markers (Shift+G), main menu (Ctrl+G) | PadKeys |
+| **PadKeys_Radial** | Radials: actions (G, Cmd+G), pings (Alt+G), markers (Shift+G), main menu (Ctrl+G) | PadKeys |
 | **PadKeys_Bar** | One bar that shows the layer you hold (Cmd, Shift, Option, Ctrl) | PadKeys (SpellActivationOverlay optional, for its proc glows) |
 | **PadKeys_Fade** | Blizzard's action bars, micro menu and bags fade out until you mouse over them or drag a spell; each bar is labelled with its PadKeys key (Cmd, Shift, G wheel) | PadKeys |
 | **PadKeys_Look** | Every font in the game in the theme font (Roboto Condensed), and chat windows on a black background | PadKeys |
@@ -417,8 +417,8 @@ about a third of its size. The modifier you press with G picks the radial:
 | Key | Radial | In combat |
 |---|---|---|
 | G | Action Bar 6, slots 1-8: drag spells, items and macros there | yes |
-| Alt+G | Action Bar 7, slots 1-8, the same way | yes |
-| Cmd+G | Pings: attack (top), assist (right), warning (left), on my way (bottom) | yes |
+| Cmd+G | Action Bar 7, slots 1-8, the same way | yes |
+| Alt+G | Pings: attack (top), assist (right), warning (left), on my way (bottom) | yes |
 | Shift+G | Target markers on your target, skull at the top | yes |
 | Ctrl+G | Blizzard's main-menu entries, three pages | yes |
 
@@ -651,7 +651,7 @@ is loaded.
 11. **Buffs** (with PadKeys_Cursor on): hold Ctrl+G, left page, pick Buffs.
     The cursor should land on your buffs; cancel one with Shift+F.
 12. **Combat ring**: put a spell on Action Bar 6 slot 3, hold G, point up,
-    release: it should cast, also in combat. Then Cmd+G up (attack ping)
+    release: it should cast, also in combat. Then Alt+G up (attack ping)
     and Shift+G up (skull on your target). The highlight must match what
     fires; if not, send the debug file.
 
