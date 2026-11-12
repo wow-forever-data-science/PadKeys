@@ -1,6 +1,6 @@
 ## Interface: 11507, 16001
 ## Title: PadKeys - Targeting
-## Notes: Friendly/enemy targeting toggle and party/raid cycling, in combat too. Needs PadKeys.
+## Notes: Party/raid cycling and F that attacks or (in ally mode) targets allies, in combat too. Needs PadKeys.
 ## Author: wow-forever-data-science
 ## Version: 0.2.0
 ## Dependencies: PadKeys

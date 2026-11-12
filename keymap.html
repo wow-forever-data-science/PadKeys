@@ -191,7 +191,7 @@ footer p { margin: 0; max-width: 75ch; }
   </section>
 
   <footer>
-    <p>Gamepad equivalents: the eight action keys are the D-pad and face buttons; Command, Shift, Option and Control are the skill-panel triggers; ` is Target Friendly / Target Hostile; Z is the Menu button; Shift+` is Change Focus Frame.</p>
+    <p>Gamepad equivalents: the eight action keys are the D-pad and face buttons; Command, Shift, Option and Control are the skill-panel triggers; Z is the Menu button; Shift+` is Change Focus Frame.</p>
     <p>Before playing on a Mac, turn on Options → Mac → "Disable OS shortcuts", or Command+Q quits the game.</p>
   </footer>
 </div>
@@ -219,8 +219,8 @@ function bar(name, short, keys = FACE) {
 const MAP = {
   plain: {
     ...bar("Action Bar 1", "Bar1"),
-    "`": { a: "Friend / foe", c: "target", long: "Toggle friendly / enemy targeting", combat: true },
-    tab: { a: "Next target", c: "target", long: "Next enemy (friend in friendly mode)", combat: true },
+    "`": { a: "Ally mode", c: "target", long: "Ally mode: F targets the ally you face", combat: true },
+    tab: { a: "Next target", c: "target", long: "Next enemy", combat: true },
     W: { a: "Forward", c: "move", long: "Move forward" },
     S: { a: "Back", c: "move", long: "Move back" },
     A: { a: "Strafe", c: "move", long: "Strafe left" },
@@ -238,7 +238,7 @@ const MAP = {
   shift: {
     ...bar("Action Bar 3", "Bar3"),
     "`": { a: "Cursor", c: "menu", long: "Keyboard UI cursor" },
-    tab: { a: "Prev target", c: "target", long: "Previous enemy (friend in friendly mode)", combat: true },
+    tab: { a: "Prev target", c: "target", long: "Previous enemy", combat: true },
     F: { a: "Assist", c: "target", long: "Assist: your target's target" },
     G: { a: "Markers", c: "menu", long: "Target marker radial", hold: true, combat: true },
     C: { a: "Debuffs", c: "act", long: "Your next debuff tooltip", combat: true },
