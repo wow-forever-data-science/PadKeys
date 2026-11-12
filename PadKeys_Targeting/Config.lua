@@ -11,19 +11,18 @@ b["CTRL-TAB"] = "CLICK PadKeysGroupCycle:LeftButton"
 b["CTRL-SHIFT-TAB"] = "CLICK PadKeysGroupCycle:RightButton"
 
 -- The Interact key (F), picked by what is around you, first match wins:
---   1. in combat, with a living enemy targeted: start your attack (hunters:
+--   1. a living enemy targeted, in combat: start your attack (hunters:
 --      Auto Shot, in and out of combat, unless auto_shot is false)
---   2. a soft interact target that is a unit (corpse, NPC): Interact
---   3. hunters only, a living enemy soft targeted: Auto Shot, so F pulls
---      when nothing in 2 is in reach
---   4. in ally mode (`), a living ally soft targeted: make them your target
---   5. otherwise: Interact (mailboxes, herbs, chests and other game objects)
--- 4 is opt in because macro conditions can't see soft targeted game
--- objects, so F would pick a nearby ally over a mailbox. For the same
--- reason a mailbox or herb never blocks the pull in 3.
+--   2. hunters only, a living enemy soft targeted: Auto Shot, so F pulls;
+--      out of combat only when nothing F can interact with is in front of
+--      you (corpse, NPC, herb, chest)
+--   3. in ally mode (`), a living ally soft targeted: make them your target
+--   4. otherwise: Interact
+-- 3 is opt in because macro conditions can't see soft interact targets, so
+-- F would pick a nearby ally over a mailbox or NPC.
 ns.config.interact = { key = "F", auto_shot = true }
 
--- Ally soft targeting, used by 4 above and by helpful spells, needs these
+-- Ally soft targeting, used by 3 above and by helpful spells, needs these
 -- CVars. They belong to wow-settings (see CLAUDE.md), not this addon:
 --   SoftTargetFriend      3   on for keyboard and gamepad
 --   SoftTargetFriendArc   1   a cone in front of you, like enemies
