@@ -431,7 +431,10 @@ about a third of its size. The modifier you press with G picks the radial:
 | Ctrl+G | Blizzard's main-menu entries, three pages | yes |
 
 - **Action Bar 6** is Blizzard's bar 6; it can stay hidden in Edit Mode.
-  The radial shows icons and names only, not cooldowns or usability yet.
+  The action radials show the cooldown countdown over each icon, as the
+  PadKeys bar does: a spell on cooldown is dimmed with the seconds on
+  top, a charge recharging shows its time but stays solid, and the global
+  cooldown alone shows nothing. Usability (range, mana) isn't shown yet.
 - All four are one **secure button**: on release, a secure snippet
   turns the mouse direction into a segment and fires its action, so
   spells, macros and windows work in combat and nothing is tainted. The

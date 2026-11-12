@@ -99,6 +99,27 @@ function ns.create_wheel(name)
     w.segments[i] = { icon = art:CreateTexture(nil, "OVERLAY"), disabled = disabled }
   end
 
+  -- Countdowns over the action icons: only the numbers, no swipe, edge or
+  -- flash, as on the PadKeys bar. On the unscaled frame, so the numbers
+  -- keep their size whatever the wheel's scale; each sits on its icon.
+  local countdown_size = ns.config.radial.countdown_size or 14
+  for _, segment in ipairs(w.segments) do
+    local cooldown = CreateFrame("Cooldown", nil, frame, "CooldownFrameTemplate")
+    cooldown:SetFrameLevel(art:GetFrameLevel() + 2)
+    cooldown:SetSize(40, 40)
+    cooldown:SetPoint("CENTER", segment.icon, "CENTER")
+    cooldown:SetDrawSwipe(false)
+    cooldown:SetDrawEdge(false)
+    cooldown:SetDrawBling(false)
+    cooldown:SetHideCountdownNumbers(false)
+    local countdown = cooldown.GetCountdownFontString and
+      cooldown:GetCountdownFontString()
+    if countdown then
+      ns.style(countdown, countdown_size)
+    end
+    segment.cooldown = cooldown
+  end
+
   w.label = ns.text(frame, 13, "white", "OVERLAY", "GameFontHighlight")
   -- Under the wheel: the centre is too small for text at small scales.
   w.label:SetPoint("TOP", art, "BOTTOM", 0, -6)
@@ -153,21 +174,38 @@ local function draw_icon(tex, index, icon)
   tex:SetPoint("CENTER", polar(index, distance))
 end
 
+-- A duration object (C_ActionBar.GetActionCooldownDuration) or nil. The
+-- numbers inside are secret in combat; the widget takes the object as is.
+local function set_cooldown(segment, duration)
+  if duration then
+    segment.cooldown:SetCooldownFromDurationObject(duration)
+  else
+    segment.cooldown:Clear()
+  end
+end
+
 -- entries[i] is nil (an empty segment) or
--- { icon = atlas or texture, label = text, enabled = bool, desaturate = bool }.
+-- { icon = atlas or texture, label = text, enabled = bool, desaturate = bool,
+--   cooldown = duration object or nil, cooling = bool }.
+-- cooling dims the icon (the spell can't be cast); a cooldown without it
+-- (a charge recharging) only shows the countdown.
 function Wheel:set_entries(entries)
   self.entries = entries
+  local dim = ns.config.radial.cooldown_alpha or 0.35
   for i, segment in ipairs(self.segments) do
     local entry = entries[i]
     if entry then
       draw_icon(segment.icon, i, entry.icon)
       segment.icon:SetDesaturated(entry.desaturate or
                                   ns.config.theme.grey_icons or false)
+      segment.icon:SetAlpha(entry.cooling and dim or 1)
       segment.icon:Show()
       segment.disabled:SetShown(not entry.enabled)
+      set_cooldown(segment, entry.cooldown)
     else
       segment.icon:Hide()
       segment.disabled:Hide()
+      set_cooldown(segment, nil)
     end
   end
   if self.current then
