@@ -35,7 +35,7 @@ error points at one part:
 | **PadKeys** | Key layout (action bars, movement, F interact, X sit, G pings, targeting keys), soft targeting, F1 key map, `/padkeys` | — |
 | **PadKeys_Cursor** | UI cursor (windows, unit frames, buffs) and NPC dialogs (F = A, Esc = B) | PadKeys |
 | **PadKeys_Auras** | Aura highlight: your target's nameplate auras (C), your debuffs (Ctrl+C); hold Shift+C for the tooltip | PadKeys |
-| **PadKeys_Targeting** | Friendly/enemy toggle (\`) and party/raid cycling (Ctrl+Tab) | PadKeys |
+| **PadKeys_Targeting** | Friendly/enemy toggle (\`), party/raid cycling (Ctrl+Tab), and F that attacks or targets the ally you face | PadKeys |
 | **PadKeys_Radial** | Radials: actions (G, Cmd+G), pings (Alt+G), markers (Shift+G), main menu (Ctrl+G) | PadKeys |
 | **PadKeys_Bar** | One bar that shows the layer you hold (Cmd, Shift, Option, Ctrl) | PadKeys (SpellActivationOverlay optional, for its proc glows) |
 | **PadKeys_Fade** | Blizzard's action bars, micro menu and bags fade out until you mouse over them or drag a spell; each bar is labelled with its PadKeys key (Cmd, Shift, G wheel) | PadKeys |
@@ -191,6 +191,13 @@ a cone in front of you, and an icon shows over the NPC, herb, ore or chest
 it will use), key-down casting and auto loot. Without `wow-settings`, tick
 Options → Controls → **Enable Interact Key** and Options → Combat →
 **Action Targeting**.
+
+Allies get soft targeted like enemies, in a cone in front of you, once
+`wow-settings` has `SoftTargetFriend` 3, `SoftTargetFriendArc` 1,
+`SoftTargetFriendRange` 40, `SoftTargetIconFriend` 1 and `autoSelfCast` 1.
+A helpful spell then goes to your target if it is an ally, else the ally
+you face, else you. With PadKeys_Targeting, F on an ally you face (and no
+NPC, herb or corpse to use) makes them your target.
 
 What you lose from WoW's defaults:
 - Q/E strafe (now A/D) and R reply to whisper (type `/r`);
@@ -642,7 +649,11 @@ is loaded.
 
 9. **Targeting** (in a group, also in combat): Ctrl+Tab through the party,
    \` then Tab for friends, \` again for enemies. With PadKeys_Cursor on,
-   press Shift+\` and move over the raid frames.
+   press Shift+\` and move over the raid frames. Face an ally with nothing
+   to interact with nearby: F should target them (needs the ally soft
+   targeting settings in `wow-settings`; `/dump UnitName("softfriend")`
+   shows whether the client sees one). With an enemy targeted, face an
+   ally and cast a heal: it should land on the ally.
 
 **Stage 5: + PadKeys_Radial**
 

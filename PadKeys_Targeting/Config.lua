@@ -15,6 +15,17 @@ b["CTRL-SHIFT-TAB"] = "CLICK PadKeysGroupCycle:RightButton"
 -- The next/previous target keys.
 ns.config.target_mode = { next = "TAB", previous = "SHIFT-TAB" }
 
--- In combat, with a living enemy targeted, this key starts your attack
--- instead of interacting with a soft target (a corpse or herb nearby).
-ns.config.combat_attack = { key = "F" }
+-- The Interact key (F), picked by what is around you, first match wins:
+--   1. in combat, with a living enemy targeted: start your attack
+--   2. a soft interact target (corpse, herb, NPC, mailbox): Interact
+--   3. a living ally soft targeted: make them your target
+--   4. otherwise: Interact
+ns.config.interact = { key = "F" }
+
+-- Ally soft targeting, used by 3 above and by helpful spells, needs these
+-- CVars. They belong to wow-settings (see CLAUDE.md), not this addon:
+--   SoftTargetFriend      3   on for keyboard and gamepad
+--   SoftTargetFriendArc   1   a cone in front of you, like enemies
+--   SoftTargetFriendRange 40  about your healing range
+--   SoftTargetIconFriend  1   an icon over the ally a heal will land on
+--   autoSelfCast          1   a helpful spell with no ally lands on you
