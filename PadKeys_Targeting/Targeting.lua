@@ -123,9 +123,10 @@ interact_header:SetAttribute("_onstate-interact", [[
 -- Hunters pull with F, so their attack state skips the combat check and
 -- also takes a soft targeted enemy (Auto Shot then targets it). Out of
 -- combat a soft enemy is "pull", which gives way to anything in front of
--- you that F can interact with (see near below).
+-- you that F can interact with (see near below). @target is explicit, as a
+-- bare [harm] falls back to the soft enemy when nothing is targeted.
 RegisterStateDriver(interact_header, "interact",
-  (auto_shot() and "[harm,nodead] attack; [combat,@softenemy,harm,nodead] attack; "
+  (auto_shot() and "[@target,harm,nodead] attack; [combat,@softenemy,harm,nodead] attack; "
     .. "[@softenemy,harm,nodead] pull; "
     or "[combat,harm,nodead] attack; ")
   .. "[@softfriend,help,nodead] friend; interact")
