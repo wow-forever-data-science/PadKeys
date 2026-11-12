@@ -22,6 +22,12 @@ ns.config.radial = {
   at_cursor = true,
   x = 0,
   y = 0,
+  -- Action pages: the cooldown countdown over an icon, in this font size,
+  -- and the icon's opacity while it can't be cast (0 is invisible). The
+  -- global cooldown alone shows nothing; a charge recharging shows the
+  -- countdown but keeps the icon solid.
+  countdown_size = 14,
+  cooldown_alpha = 0.35,
   -- Mouse distance before a direction picks a segment.
   dead_zone = 8,
 

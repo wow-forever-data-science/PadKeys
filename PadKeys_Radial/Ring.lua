@@ -182,16 +182,48 @@ local function action_name(slot)
   return ab.GetActionText(slot)
 end
 
--- No usable or cooldown state yet: icon and name only.
+-- Which ring slots are only on the global cooldown, so a cast doesn't dim
+-- the whole page. Blizzard's isOnGCD flag is only right while handling
+-- SPELL_UPDATE_COOLDOWN (as PadKeys_Bar found), so it is read then.
+local on_gcd = {}
+local function read_gcd()
+  local config = ring_config()
+  for _, first in ipairs({ config.first_slot, config.extra_first_slot }) do
+    for slot = first, first + ns.wheel_segments - 1 do
+      local cd = ab.HasAction(slot) and ab.GetActionCooldown(slot)
+      on_gcd[slot] = cd and cd.isOnGCD or nil
+    end
+  end
+end
+
+-- The countdown, as on the PadKeys bar: the global cooldown alone shows
+-- nothing; a spell out of charges is on cooldown (dimmed); one recharging
+-- with charges left shows the recharge time but stays solid. Only plain
+-- flags (isActive) are tested; the numbers stay in duration objects.
+local function slot_cooldown(slot)
+  local cd = ab.GetActionCooldown(slot)
+  if cd and cd.isActive and not on_gcd[slot] then
+    return ab.GetActionCooldownDuration(slot, true), true
+  end
+  local charges = ab.GetActionCharges and ab.GetActionCharges(slot)
+  if charges and charges.isActive then
+    return ab.GetActionChargeDuration(slot), false
+  end
+  return nil, false
+end
+
 local function slot_entries(first)
   local entries = {}
   for i = 1, ns.wheel_segments do
     local slot = first + i - 1
     if ab.HasAction(slot) then
+      local cooldown, cooling = slot_cooldown(slot)
       entries[i] = {
         icon = ab.GetActionTexture(slot),
         label = action_name(slot),
         enabled = true,
+        cooldown = cooldown,
+        cooling = cooling,
       }
     end
   end
@@ -280,12 +312,17 @@ pager:HookScript("OnClick", function(_, _, down)
   end
 end)
 
+-- The page the open wheel shows ("actions"), or nil.
+local shown_page
+
 -- Runs after the secure snippet, with the original button name.
 button:HookScript("OnClick", function(_, page, down)
   if not down then
+    shown_page = nil
     wheel:close()
     return
   end
+  shown_page = page
   if page == "menu" then
     wheel:open(TITLES.menu)
     show_menu_page()
@@ -304,6 +341,21 @@ button:HookScript("OnClick", function(_, page, down)
     elseif page == "extra" then
       wheel.label:SetText("Put spells, items or macros on Action Bar 7")
     end
+  end
+end)
+
+-- Cooldowns that start or end while an action page is open (a cast, the
+-- end of the global cooldown) show at once.
+local watcher = CreateFrame("Frame")
+watcher:RegisterEvent("SPELL_UPDATE_COOLDOWN")
+watcher:RegisterEvent("SPELL_UPDATE_CHARGES")
+watcher:RegisterEvent("ACTIONBAR_SLOT_CHANGED")
+watcher:SetScript("OnEvent", function(_, event)
+  if event == "SPELL_UPDATE_COOLDOWN" then
+    read_gcd()
+  end
+  if wheel:is_open() and (shown_page == "actions" or shown_page == "extra") then
+    wheel:set_entries(ENTRIES[shown_page]())
   end
 end)
 
