@@ -11,13 +11,14 @@ b["CTRL-TAB"] = "CLICK PadKeysGroupCycle:LeftButton"
 b["CTRL-SHIFT-TAB"] = "CLICK PadKeysGroupCycle:RightButton"
 
 -- The Interact key (F), picked by what is around you, first match wins:
---   1. in combat, with a living enemy targeted: start your attack
+--   1. in combat, with a living enemy targeted: start your attack (hunters:
+--      Auto Shot, unless auto_shot is false)
 --   2. a soft interact target that is a unit (corpse, NPC): Interact
 --   3. in ally mode (`), a living ally soft targeted: make them your target
 --   4. otherwise: Interact (mailboxes, herbs, chests and other game objects)
 -- 3 is opt in because macro conditions can't see soft targeted game
 -- objects, so F would pick a nearby ally over a mailbox.
-ns.config.interact = { key = "F" }
+ns.config.interact = { key = "F", auto_shot = true }
 
 -- Ally soft targeting, used by 3 above and by helpful spells, needs these
 -- CVars. They belong to wow-settings (see CLAUDE.md), not this addon:

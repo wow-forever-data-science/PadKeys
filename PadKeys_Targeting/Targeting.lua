@@ -6,8 +6,9 @@
 -- picks the next unit that exists, so it works in combat.
 --
 -- Interact (F) does what fits what is around you: in combat, with a living
--- enemy targeted, it starts your attack (Interact would prefer a corpse or
--- herb nearby over the enemy you fight); otherwise it interacts. Ally mode
+-- enemy targeted, it starts your attack, Auto Shot for hunters (Interact
+-- would prefer a corpse or herb nearby over the enemy you fight); otherwise
+-- it interacts. Ally mode
 -- (one key toggles it) makes F target the ally you face instead, as F picks
 -- an enemy by attacking it. Ally mode is opt in because macro conditions
 -- can't see soft targeted game objects: [@softinteract,exists] is false at
@@ -62,12 +63,29 @@ ns.group_cycle = button
 
 -- Interact key: the header binds the key to one of these buttons for the
 -- "attack" and "friend" states, and clears it (back to Interact) otherwise.
+-- Hunters attack with Auto Shot (spell 75, by its localized name); the !
+-- keeps a second press from turning it off. In melee range Auto Shot
+-- fails, and a melee ability such as Raptor Strike starts the melee swing.
+local AUTO_SHOT = 75
+
+local function attack_macro()
+  local _, class = UnitClass("player")
+  if class == "HUNTER" and ns.config.interact.auto_shot then
+    local name = C_Spell and C_Spell.GetSpellName and C_Spell.GetSpellName(AUTO_SHOT)
+      or GetSpellInfo and (GetSpellInfo(AUTO_SHOT))
+    if name then
+      return "/cast !" .. name
+    end
+  end
+  return "/startattack"
+end
+
 local attack = CreateFrame("Button", "PadKeysAttack", UIParent,
                            "SecureActionButtonTemplate")
 attack:RegisterForClicks("AnyDown")
 attack:SetAttribute("useOnKeyDown", true)
 attack:SetAttribute("type", "macro")
-attack:SetAttribute("macrotext", "/startattack")
+attack:SetAttribute("macrotext", attack_macro())
 
 local friend = CreateFrame("Button", "PadKeysTargetSoftFriend", UIParent,
                            "SecureActionButtonTemplate")
