@@ -12,10 +12,12 @@
 -- member, in raid frame order. It is a secure button whose wrapped OnClick
 -- picks the next unit that exists, so it works in combat.
 --
--- Attack in combat: Interact (F) prefers a soft target, a corpse to loot or
--- an herb, over the enemy you are fighting. In combat, with a living enemy
--- targeted, F starts your attack instead. A state driver swaps the binding,
--- so it works in combat.
+-- Interact (F) does what fits what is around you: in combat, with a living
+-- enemy targeted, it starts your attack (Interact would prefer a corpse or
+-- herb nearby over the enemy you fight); with a soft interact target it
+-- interacts; with only an ally soft targeted it makes them your target, as
+-- F picks an enemy by attacking it. A state driver swaps the binding, so it
+-- works in combat.
 
 local ns = PadKeys
 
@@ -101,8 +103,8 @@ function ns.is_friendly_mode()
   return mode_header:GetAttribute("friendly") and true or false
 end
 
--- Attack in combat: the header binds the key to the attack button while the
--- state is "on", and clears it (back to Interact) otherwise.
+-- Interact key: the header binds the key to one of these buttons for the
+-- "attack" and "friend" states, and clears it (back to Interact) otherwise.
 local attack = CreateFrame("Button", "PadKeysAttack", UIParent,
                            "SecureActionButtonTemplate")
 attack:RegisterForClicks("AnyDown")
@@ -110,14 +112,26 @@ attack:SetAttribute("useOnKeyDown", true)
 attack:SetAttribute("type", "macro")
 attack:SetAttribute("macrotext", "/startattack")
 
-local attack_header = CreateFrame("Frame", "PadKeysAttackHeader", UIParent,
-                                  "SecureHandlerStateTemplate")
-attack_header:SetAttribute("key", ns.config.combat_attack.key)
-attack_header:SetAttribute("_onstate-attack", [[
-  if newstate == "on" then
-    self:SetBindingClick(true, self:GetAttribute("key"), "PadKeysAttack")
+local friend = CreateFrame("Button", "PadKeysTargetSoftFriend", UIParent,
+                           "SecureActionButtonTemplate")
+friend:RegisterForClicks("AnyDown")
+friend:SetAttribute("useOnKeyDown", true)
+friend:SetAttribute("type", "target")
+friend:SetAttribute("unit", "softfriend")
+
+local interact_header = CreateFrame("Frame", "PadKeysInteractHeader",
+                                    UIParent, "SecureHandlerStateTemplate")
+interact_header:SetAttribute("key", ns.config.interact.key)
+interact_header:SetAttribute("_onstate-interact", [[
+  local key = self:GetAttribute("key")
+  if newstate == "attack" then
+    self:SetBindingClick(true, key, "PadKeysAttack")
+  elseif newstate == "friend" then
+    self:SetBindingClick(true, key, "PadKeysTargetSoftFriend")
   else
     self:ClearBindings()
   end
 ]])
-RegisterStateDriver(attack_header, "attack", "[combat,harm,nodead] on; off")
+RegisterStateDriver(interact_header, "interact",
+  "[combat,harm,nodead] attack; [@softinteract,exists] interact; "
+  .. "[@softfriend,help,nodead] friend; interact")
