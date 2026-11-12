@@ -51,8 +51,8 @@ end
 -- for PadKeys_* addons only appear when that addon is loaded.
 local function sections()
   local c = ns.config
-  local targeting = ns.is_friendly_mode ~= nil
-  local friendly = targeting and ns.is_friendly_mode()
+  local targeting = ns.is_ally_mode ~= nil
+  local ally = targeting and ns.is_ally_mode()
   local list = {
     { "Action bars", {
       { "Action Bar 1", bar_keys("ACTIONBUTTON") },
@@ -73,10 +73,10 @@ local function sections()
   local target_rows = {}
   if targeting then
     target_rows[#target_rows + 1] = action_row(
-      "CLICK PadKeysTargetMode:LeftButton", "Toggle friendly / enemy targeting")
+      "CLICK PadKeysAllyMode:LeftButton", "Ally mode: F targets the ally you face")
   end
   target_rows[#target_rows + 1] = {
-    friendly and "Next / previous friend" or "Next / previous enemy",
+    "Next / previous enemy",
     keys_for("TARGETNEARESTENEMY") .. " / " .. keys_for("TARGETPREVIOUSENEMY") }
   if targeting then
     target_rows[#target_rows + 1] = action_row(
@@ -88,7 +88,7 @@ local function sections()
   target_rows[#target_rows + 1] = action_row("TARGETLASTTARGET")
   target_rows[#target_rows + 1] = action_row("TARGETLASTHOSTILE")
   list[#list + 1] = {
-    "Targeting" .. (friendly and " (friendly mode on)" or ""), target_rows }
+    "Targeting" .. (ally and " (ally mode on)" or ""), target_rows }
 
   local menu_rows = {}
   if c.radial then

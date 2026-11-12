@@ -6,8 +6,8 @@ without a gamepad, and adds its own code only where Blizzard's doesn't:
 
 - a **key layout** with eight action keys and modifier layers, like a
   gamepad's buttons and shoulders;
-- **targeting** like the gamepad: a friendly/enemy mode toggle, enemy and
-  group cycling, assist and last target, all usable in combat;
+- **targeting**: enemy and group cycling, assist and last target, and an
+  ally mode for F, all usable in combat;
 - **radials** in the style of Blizzard's gamepad radial: actions, pings and
   target markers in combat, and Blizzard's main-menu entries;
 - a **keyboard UI cursor** that moves through open windows, unit frames and
@@ -35,7 +35,7 @@ error points at one part:
 | **PadKeys** | Key layout (action bars, movement, F interact, X sit, G pings, targeting keys), soft targeting, F1 key map, `/padkeys` | — |
 | **PadKeys_Cursor** | UI cursor (windows, unit frames, buffs) and NPC dialogs (F = A, Esc = B) | PadKeys |
 | **PadKeys_Auras** | Aura highlight: your target's nameplate auras (C), your debuffs (Ctrl+C); hold Shift+C for the tooltip | PadKeys |
-| **PadKeys_Targeting** | Friendly/enemy toggle (\`), party/raid cycling (Ctrl+Tab), and F that attacks or targets the ally you face | PadKeys |
+| **PadKeys_Targeting** | Party/raid cycling (Ctrl+Tab), F that attacks in combat, and ally mode (\`) where F targets the ally you face | PadKeys |
 | **PadKeys_Radial** | Radials: actions (G, Cmd+G), pings (Alt+G), markers (Shift+G), main menu (Ctrl+G) | PadKeys |
 | **PadKeys_Bar** | One bar that shows the layer you hold (Cmd, Shift, Option, Ctrl) | PadKeys (SpellActivationOverlay optional, for its proc glows) |
 | **PadKeys_Fade** | Blizzard's action bars, micro menu and bags fade out until you mouse over them or drag a spell; each bar is labelled with its PadKeys key (Cmd, Shift, G wheel) | PadKeys |
@@ -71,8 +71,8 @@ keyboard with each layer's keys. It's also published at
 | Option + those | Action Bar 5 (Mac only) | F | Interact / choose in NPC dialogs |
 | Ctrl + 1 2 3 4 | Pet bar, slots 1–4 | Shift+F | Assist |
 | Ctrl + Q E R T | Action Bar 4, slots 1–4 | | |
-| \` | Friendly ↔ enemy targeting | | |
-| Tab / Shift+Tab | Next / previous target (in mode) | Ctrl+F | Last target |
+| \` | Ally mode (F targets allies) | | |
+| Tab / Shift+Tab | Next / previous enemy | Ctrl+F | Last target |
 | Ctrl+Tab / Ctrl+Shift+Tab | Next / previous group member | Cmd+F | Last hostile target |
 | G (hold) | Action radial (Bar 6); with Cmd: pings, Shift: markers, Ctrl: main menu | C | Target's next debuff tooltip |
 | Z | Sheathe / draw weapon | Cmd / Shift / Ctrl+C | Target buff / your debuff / your buff |
@@ -137,7 +137,7 @@ Everything PadKeys draws is black, white and grey, in one font: Roboto
 Condensed ExtraBold, shipped in `PadKeys/Fonts/` with its SIL Open Font
 License. That covers the bar, the fade labels, the radial wheels (Blizzard's
 art in grey), the UI cursor's arrow and glow, the key map window, the
-friendly-targeting label, the combat banner and PadKeys' messages. Grey
+ally mode label, the combat banner and PadKeys' messages. Grey
 means dimmed: out of range, not usable, a bar's name next to its key.
 
 Set the font once in the `theme` block at the end of `PadKeys/Config.lua`
@@ -196,15 +196,15 @@ Allies get soft targeted like enemies, in a cone in front of you, once
 `wow-settings` has `SoftTargetFriend` 3, `SoftTargetFriendArc` 1,
 `SoftTargetFriendRange` 40, `SoftTargetIconFriend` 1 and `autoSelfCast` 1.
 A helpful spell then goes to your target if it is an ally, else the ally
-you face, else you. With PadKeys_Targeting, F on an ally you face (and no
-NPC, herb or corpse to use) makes them your target.
+you face, else you. With PadKeys_Targeting in ally mode (\`), F on an ally
+you face (and no NPC or corpse to use) makes them your target.
 
 What you lose from WoW's defaults:
 - Q/E strafe (now A/D) and R reply to whisper (type `/r`);
 - T attack (soft targeting starts attacks), Z sheathe, and C character
   window (it's on the Ctrl+G menu radial; PadKeys_Auras takes Shift+C);
-- G target last hostile (now Cmd+F) and Ctrl+Tab nearest friend (now
-  friendly mode);
+- G target last hostile (now Cmd+F) and Ctrl+Tab nearest friend (F in
+  ally mode targets the ally you face);
 - F1–F5 targeting yourself and party members (F1 is now the key map);
 - Shift+1–4 jumping to bar pages 1–4 (Shift+5/6, Shift+mouse wheel and
   the page arrows still page the main bar).
@@ -398,13 +398,11 @@ under the player frame instead), size, `ignore` to drop a buff,
 
 ## Targeting (works in combat)
 
-The gamepad has "Target Friendly" and "Target Hostile" buttons. PadKeys
-turns them into a mode:
-
 | Key | Does |
 |---|---|
-| \` | Toggle enemy mode (default) / friendly mode. Friendly mode shows "Friendly targeting" near the top of the screen. |
-| Tab / Shift+Tab | Next / previous nearest enemy, or friendly player or NPC in friendly mode |
+| \` | Toggle ally mode (off by default). On, F targets the ally you face, and "F targets allies" shows near the top of the screen. Off, F interacts. |
+| Tab / Shift+Tab | Next / previous nearest enemy |
+| F | In combat with a living enemy targeted: start your attack. Else a corpse or NPC you face: interact. Else, in ally mode, the ally you face: target them. Else: interact (mailbox, herb, chest) |
 | Ctrl+Tab / Ctrl+Shift+Tab | Next / previous party or raid member, in raid frame order |
 | Shift+F | Assist: target your target's target |
 | Ctrl+F | Last target |
@@ -591,7 +589,7 @@ message, with its stack, in
 | Pings | the ping system (`TOGGLEPINGLISTENER`, `Blizzard_PingUI`) and its wheel | none, only the key |
 | NPC dialogs | `QuestFrame_GeneralProgressAction` (accept/continue/complete) and the gamepad's rules: cursor on the first entry, A clicks it, B closes | our cursor in place of SmartNavigation |
 | Key layout | Blizzard's binding actions | apply/restore of the bindings |
-| Targeting modes | Blizzard's friendly/enemy targeting bindings | a secure toggle that swaps them on Tab |
+| Interact key | Blizzard's Interact and soft targets (`softinteract`, `softfriend`) | a state driver and the ally mode toggle that rebind F |
 | Target auras | Blizzard's aura tooltip (`GameTooltip:SetUnitAura`) and aura filters | the highlight label and which aura is next |
 | Buff cancelling | the aura icons' right-click (as `BuffFrameMixin:CancelSelectedBuff`) | reaching the icons with the cursor |
 | Key map | `ButtonFrameTemplate` window, `GetBindingText` key names, `BINDING_NAME_*` action names | the list of sections |
@@ -650,10 +648,10 @@ is loaded.
 
 **Stage 4: + PadKeys_Targeting**
 
-9. **Targeting** (in a group, also in combat): Ctrl+Tab through the party,
-   \` then Tab for friends, \` again for enemies. With PadKeys_Cursor on,
-   press Shift+\` and move over the raid frames. Face an ally with nothing
-   to interact with nearby: F should target them (needs the ally soft
+9. **Targeting** (in a group, also in combat): Ctrl+Tab through the party.
+   With PadKeys_Cursor on, press Shift+\` and move over the raid frames.
+   At a mailbox with an ally nearby: F should open the mailbox. Press \`,
+   face an ally: F should target them; \` again and F interacts (needs the ally soft
    targeting settings in `wow-settings`; `/dump UnitName("softfriend")`
    shows whether the client sees one). With an enemy targeted, face an
    ally and cast a heal: it should land on the ally.
@@ -722,9 +720,6 @@ Known risks:
 - Tooltips while the cursor moves come from calling Blizzard's own OnEnter
   handlers. If that causes "action blocked" errors, set `tooltips = false`
   under `cursor` in `PadKeys_Cursor/Config.lua`.
-- Tab is used by targeting and the cursor. If both take Tab at the same
-  moment (e.g. toggling friendly mode while the cursor is on), the one that
-  took it last wins.
 - The cursor finds windows from `UIPanelWindows`, `UISpecialFrames` and a
   short list of names. A window it misses can be added to `EXTRA_ROOTS` in
   `PadKeys_Cursor/Cursor.lua`.

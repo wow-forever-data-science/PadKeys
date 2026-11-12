@@ -3,23 +3,20 @@
 local ns = PadKeys
 
 local b = ns.config.bindings
--- ` toggles friendly/enemy mode, which points the next/previous target keys
--- (Tab / Shift+Tab, set in PadKeys/Config.lua) at friends or enemies, in
--- and out of combat.
-b["`"] = "CLICK PadKeysTargetMode:LeftButton"
+-- ` toggles ally mode, in which F targets the ally you face (3 below).
+b["`"] = "CLICK PadKeysAllyMode:LeftButton"
 -- Ctrl+Tab / Ctrl+Shift+Tab: next / previous party or raid member, in raid
 -- frame order. All of these work in combat.
 b["CTRL-TAB"] = "CLICK PadKeysGroupCycle:LeftButton"
 b["CTRL-SHIFT-TAB"] = "CLICK PadKeysGroupCycle:RightButton"
 
--- The next/previous target keys.
-ns.config.target_mode = { next = "TAB", previous = "SHIFT-TAB" }
-
 -- The Interact key (F), picked by what is around you, first match wins:
 --   1. in combat, with a living enemy targeted: start your attack
---   2. a soft interact target (corpse, herb, NPC, mailbox): Interact
---   3. a living ally soft targeted: make them your target
---   4. otherwise: Interact
+--   2. a soft interact target that is a unit (corpse, NPC): Interact
+--   3. in ally mode (`), a living ally soft targeted: make them your target
+--   4. otherwise: Interact (mailboxes, herbs, chests and other game objects)
+-- 3 is opt in because macro conditions can't see soft targeted game
+-- objects, so F would pick a nearby ally over a mailbox.
 ns.config.interact = { key = "F" }
 
 -- Ally soft targeting, used by 3 above and by helpful spells, needs these

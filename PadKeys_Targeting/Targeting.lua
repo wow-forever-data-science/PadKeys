@@ -1,12 +1,5 @@
 -- Targeting, the keyboard version of the gamepad's targeting buttons.
 --
--- Friendly/enemy mode (gamepad LB "Target Friendly" / RB "Target Hostile"):
--- one key toggles the mode, and the next/previous target keys (Tab and
--- Shift+Tab) cycle enemies or friends, in and out of combat. The toggle is
--- a secure button whose snippet rebinds those keys, so it works in combat.
--- (Blizzard has no command that cycles enemies and friends together: its
--- TARGETNEAREST only found friends.)
---
 -- Group cycling, the keyboard version of the gamepad's party/raid targeting:
 -- each press targets the next (left button) or previous (right button) group
 -- member, in raid frame order. It is a secure button whose wrapped OnClick
@@ -14,15 +7,18 @@
 --
 -- Interact (F) does what fits what is around you: in combat, with a living
 -- enemy targeted, it starts your attack (Interact would prefer a corpse or
--- herb nearby over the enemy you fight); with a soft interact target it
--- interacts; with only an ally soft targeted it makes them your target, as
--- F picks an enemy by attacking it. A state driver swaps the binding, so it
--- works in combat.
+-- herb nearby over the enemy you fight); otherwise it interacts. Ally mode
+-- (one key toggles it) makes F target the ally you face instead, as F picks
+-- an enemy by attacking it. Ally mode is opt in because macro conditions
+-- can't see soft targeted game objects: [@softinteract,exists] is false at
+-- a mailbox, herb or chest, so F would target a nearby ally over them. A
+-- state driver swaps the binding and the toggle is a secure button, so both
+-- work in combat.
 
 local ns = PadKeys
 
 BINDING_HEADER_PADKEYS_TARGETING = "PadKeys: targeting"
-_G["BINDING_NAME_CLICK PadKeysTargetMode:LeftButton"] = "Toggle friendly / enemy targeting"
+_G["BINDING_NAME_CLICK PadKeysAllyMode:LeftButton"] = "Toggle ally mode (F targets the ally you face)"
 _G["BINDING_NAME_CLICK PadKeysGroupCycle:LeftButton"] = "Next party/raid member"
 _G["BINDING_NAME_CLICK PadKeysGroupCycle:RightButton"] = "Previous party/raid member"
 
@@ -64,45 +60,6 @@ SecureHandlerWrapScript(button, "OnClick", header, ON_CLICK)
 
 ns.group_cycle = button
 
--- Friendly/enemy toggle. In friendly mode the header owns override bindings
--- that point the target keys at Blizzard's friendly targeting; enemy mode
--- clears them, so the layout's normal enemy bindings apply again.
-local TOGGLE_MODE = [[
-  local friendly = not owner:GetAttribute("friendly")
-  owner:SetAttribute("friendly", friendly)
-  if friendly then
-    owner:SetBinding(true, owner:GetAttribute("nextkey"), "TARGETNEARESTFRIEND")
-    owner:SetBinding(true, owner:GetAttribute("prevkey"), "TARGETPREVIOUSFRIEND")
-  else
-    owner:ClearBindings()
-  end
-]]
-
-local mode_header = CreateFrame("Frame", "PadKeysTargetModeHeader", UIParent,
-                                "SecureHandlerBaseTemplate")
-mode_header:SetAttribute("nextkey", ns.config.target_mode.next)
-mode_header:SetAttribute("prevkey", ns.config.target_mode.previous)
-
-local mode = CreateFrame("Button", "PadKeysTargetMode", UIParent,
-                         "SecureActionButtonTemplate")
-mode:RegisterForClicks("AnyDown")
-SecureHandlerWrapScript(mode, "OnClick", mode_header, TOGGLE_MODE)
-
--- A small label while friendly mode is on, so you know which mode you're in.
-local label = ns.text(UIParent, 16, "white", "OVERLAY", "GameFontNormalLarge")
-label:SetPoint("TOP", UIParent, "TOP", 0, -120)
-label:SetText("Friendly targeting")
-label:Hide()
-mode:HookScript("OnClick", function()
-  local friendly = mode_header:GetAttribute("friendly")
-  label:SetShown(friendly)
-  ns.flash(friendly and "Targeting: friendly" or "Targeting: enemy")
-end)
-
-function ns.is_friendly_mode()
-  return mode_header:GetAttribute("friendly") and true or false
-end
-
 -- Interact key: the header binds the key to one of these buttons for the
 -- "attack" and "friend" states, and clears it (back to Interact) otherwise.
 local attack = CreateFrame("Button", "PadKeysAttack", UIParent,
@@ -119,19 +76,52 @@ friend:SetAttribute("useOnKeyDown", true)
 friend:SetAttribute("type", "target")
 friend:SetAttribute("unit", "softfriend")
 
+-- The header binds F from two inputs: the state driver's state and the
+-- ally mode attribute that the toggle flips. Both run "apply".
 local interact_header = CreateFrame("Frame", "PadKeysInteractHeader",
                                     UIParent, "SecureHandlerStateTemplate")
 interact_header:SetAttribute("key", ns.config.interact.key)
-interact_header:SetAttribute("_onstate-interact", [[
+interact_header:SetAttribute("apply", [[
   local key = self:GetAttribute("key")
-  if newstate == "attack" then
+  local state = self:GetAttribute("state-interact")
+  if state == "attack" then
     self:SetBindingClick(true, key, "PadKeysAttack")
-  elseif newstate == "friend" then
+  elseif state == "friend" and self:GetAttribute("ally") then
     self:SetBindingClick(true, key, "PadKeysTargetSoftFriend")
   else
     self:ClearBindings()
   end
 ]])
+interact_header:SetAttribute("_onstate-interact", [[
+  self:RunAttribute("apply")
+]])
 RegisterStateDriver(interact_header, "interact",
   "[combat,harm,nodead] attack; [@softinteract,exists] interact; "
   .. "[@softfriend,help,nodead] friend; interact")
+
+-- Ally mode toggle. Runs in the restricted environment, with owner = the
+-- interact header.
+local TOGGLE_ALLY = [[
+  owner:SetAttribute("ally", not owner:GetAttribute("ally"))
+  owner:RunAttribute("apply")
+]]
+
+local mode = CreateFrame("Button", "PadKeysAllyMode", UIParent,
+                         "SecureActionButtonTemplate")
+mode:RegisterForClicks("AnyDown")
+SecureHandlerWrapScript(mode, "OnClick", interact_header, TOGGLE_ALLY)
+
+-- A small label while ally mode is on, so you know which mode you're in.
+local label = ns.text(UIParent, 16, "white", "OVERLAY", "GameFontNormalLarge")
+label:SetPoint("TOP", UIParent, "TOP", 0, -120)
+label:SetText("F targets allies")
+label:Hide()
+mode:HookScript("OnClick", function()
+  local ally = ns.is_ally_mode()
+  label:SetShown(ally)
+  ns.flash(ally and "F: target allies" or "F: interact")
+end)
+
+function ns.is_ally_mode()
+  return interact_header:GetAttribute("ally") and true or false
+end
