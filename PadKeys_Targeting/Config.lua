@@ -12,7 +12,7 @@ b["CTRL-SHIFT-TAB"] = "CLICK PadKeysGroupCycle:RightButton"
 
 -- The Interact key (F), picked by what is around you, first match wins:
 --   1. in combat, with a living enemy targeted: start your attack (hunters:
---      Auto Shot, unless auto_shot is false)
+--      Auto Shot, in and out of combat so F pulls, unless auto_shot is false)
 --   2. a soft interact target that is a unit (corpse, NPC): Interact
 --   3. in ally mode (`), a living ally soft targeted: make them your target
 --   4. otherwise: Interact (mailboxes, herbs, chests and other game objects)

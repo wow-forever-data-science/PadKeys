@@ -68,9 +68,13 @@ ns.group_cycle = button
 -- fails, and a melee ability such as Raptor Strike starts the melee swing.
 local AUTO_SHOT = 75
 
-local function attack_macro()
+local function auto_shot()
   local _, class = UnitClass("player")
-  if class == "HUNTER" and ns.config.interact.auto_shot then
+  return class == "HUNTER" and ns.config.interact.auto_shot
+end
+
+local function attack_macro()
+  if auto_shot() then
     local name = C_Spell and C_Spell.GetSpellName and C_Spell.GetSpellName(AUTO_SHOT)
       or GetSpellInfo and (GetSpellInfo(AUTO_SHOT))
     if name then
@@ -113,8 +117,13 @@ interact_header:SetAttribute("apply", [[
 interact_header:SetAttribute("_onstate-interact", [[
   self:RunAttribute("apply")
 ]])
+-- Hunters pull with F, so their attack state skips the combat check and
+-- also takes a soft targeted enemy (Auto Shot then targets it): a living
+-- enemy wins over a corpse or herb out of combat too.
 RegisterStateDriver(interact_header, "interact",
-  "[combat,harm,nodead] attack; [@softinteract,exists] interact; "
+  (auto_shot() and "[harm,nodead][@softenemy,harm,nodead] attack; "
+    or "[combat,harm,nodead] attack; ")
+  .. "[@softinteract,exists] interact; "
   .. "[@softfriend,help,nodead] friend; interact")
 
 -- Ally mode toggle. Runs in the restricted environment, with owner = the
