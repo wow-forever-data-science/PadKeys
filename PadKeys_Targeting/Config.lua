@@ -3,7 +3,7 @@
 local ns = PadKeys
 
 local b = ns.config.bindings
--- ` toggles ally mode, in which F targets the ally you face (3 below).
+-- ` toggles ally mode, in which F targets the ally you face (2 below).
 b["`"] = "CLICK PadKeysAllyMode:LeftButton"
 -- Ctrl+Tab / Ctrl+Shift+Tab: next / previous party or raid member, in raid
 -- frame order. All of these work in combat.
@@ -12,17 +12,14 @@ b["CTRL-SHIFT-TAB"] = "CLICK PadKeysGroupCycle:RightButton"
 
 -- The Interact key (F), picked by what is around you, first match wins:
 --   1. a living enemy targeted, in combat: start your attack (hunters:
---      Auto Shot, in and out of combat, unless auto_shot is false)
---   2. hunters only, a living enemy soft targeted: Auto Shot, so F pulls;
---      out of combat only when nothing F can interact with is in front of
---      you (corpse, NPC, herb, chest)
---   3. in ally mode (`), a living ally soft targeted: make them your target
---   4. otherwise: Interact
--- 3 is opt in because macro conditions can't see soft interact targets, so
+--      Auto Shot, unless auto_shot is false)
+--   2. in ally mode (`), a living ally soft targeted: make them your target
+--   3. otherwise: Interact
+-- 2 is opt in because macro conditions can't see soft interact targets, so
 -- F would pick a nearby ally over a mailbox or NPC.
 ns.config.interact = { key = "F", auto_shot = true }
 
--- Ally soft targeting, used by 3 above and by helpful spells, needs these
+-- Ally soft targeting, used by 2 above and by helpful spells, needs these
 -- CVars. They belong to wow-settings (see CLAUDE.md), not this addon:
 --   SoftTargetFriend      3   on for keyboard and gamepad
 --   SoftTargetFriendArc   1   a cone in front of you, like enemies

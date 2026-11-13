@@ -8,11 +8,10 @@
 -- Interact (F) does what fits what is around you: in combat, with a living
 -- enemy targeted, it starts your attack, Auto Shot for hunters (Interact
 -- would prefer a corpse or herb nearby over the enemy you fight); otherwise
--- it interacts. Hunters also Auto Shot a living hard target out of combat,
--- and pull a soft targeted enemy when nothing F can interact with (corpse,
--- NPC, herb, chest) is in front of them. Ally mode
--- (one key toggles it) makes F target the ally you face instead, as F picks
--- an enemy by attacking it. Ally mode is opt in because macro conditions
+-- it interacts. Out of combat F is left to the client's Interact, which
+-- alone sees what is in front of you; pull with an ability, as the
+-- gamepad does. Ally mode (one key toggles it) makes F target the ally you
+-- face instead, as F picks an enemy by attacking it. Ally mode is opt in because macro conditions
 -- can't see soft interact targets: [@softinteract,exists] is false at a
 -- corpse, NPC, mailbox or herb, so F would target a nearby ally over them. A
 -- state driver swaps the binding and the toggle is a secure button, so both
@@ -100,16 +99,15 @@ friend:SetAttribute("useOnKeyDown", true)
 friend:SetAttribute("type", "target")
 friend:SetAttribute("unit", "softfriend")
 
--- The header binds F from three inputs: the state driver's state, the
--- ally mode attribute that the toggle flips, and the near attribute that
--- the watcher below sets. All run "apply".
+-- The header binds F from two inputs: the state driver's state and the
+-- ally mode attribute that the toggle flips. Both run "apply".
 local interact_header = CreateFrame("Frame", "PadKeysInteractHeader",
                                     UIParent, "SecureHandlerStateTemplate")
 interact_header:SetAttribute("key", ns.config.interact.key)
 interact_header:SetAttribute("apply", [[
   local key = self:GetAttribute("key")
   local state = self:GetAttribute("state-interact")
-  if state == "attack" or (state == "pull" and not self:GetAttribute("near")) then
+  if state == "attack" then
     self:SetBindingClick(true, key, "PadKeysAttack")
   elseif state == "friend" and self:GetAttribute("ally") then
     self:SetBindingClick(true, key, "PadKeysTargetSoftFriend")
@@ -120,34 +118,8 @@ interact_header:SetAttribute("apply", [[
 interact_header:SetAttribute("_onstate-interact", [[
   self:RunAttribute("apply")
 ]])
--- Hunters pull with F, so their attack state skips the combat check and
--- also takes a soft targeted enemy (Auto Shot then targets it). Out of
--- combat a soft enemy is "pull", which gives way to anything in front of
--- you that F can interact with (see near below). @target is explicit, as a
--- bare [harm] falls back to the soft enemy when nothing is targeted.
 RegisterStateDriver(interact_header, "interact",
-  (auto_shot() and "[@target,harm,nodead] attack; [combat,@softenemy,harm,nodead] attack; "
-    .. "[@softenemy,harm,nodead] pull; "
-    or "[combat,harm,nodead] attack; ")
-  .. "[@softfriend,help,nodead] friend; interact")
-
--- near: something F can interact with is in front of you (corpse, NPC,
--- herb, chest). Macro conditions can't see it ([@softinteract,exists] is
--- false even at a lootable corpse), but UnitGUID("softinteract") returns
--- units and game objects alike. Addon code may only set the attribute out
--- of combat, so it is refreshed when combat ends.
-local function update_near()
-  if InCombatLockdown() then
-    return
-  end
-  interact_header:SetAttribute("near", UnitGUID("softinteract") ~= nil)
-  interact_header:Execute([[ self:RunAttribute("apply") ]])
-end
-
-local watcher = CreateFrame("Frame")
-watcher:RegisterEvent("PLAYER_SOFT_INTERACT_CHANGED")
-watcher:RegisterEvent("PLAYER_REGEN_ENABLED")
-watcher:SetScript("OnEvent", update_near)
+  "[combat,harm,nodead] attack; [@softfriend,help,nodead] friend; interact")
 
 -- Ally mode toggle. Runs in the restricted environment, with owner = the
 -- interact header.
