@@ -402,7 +402,7 @@ under the player frame instead), size, `ignore` to drop a buff,
 |---|---|
 | \` | Toggle ally mode (off by default). On, F targets the ally you face, and "F targets allies" shows near the top of the screen. Off, F interacts. |
 | Tab / Shift+Tab | Next / previous nearest enemy |
-| F | In combat with a living enemy targeted: start your attack (hunters: Auto Shot, also out of combat to pull; `auto_shot = false` in `PadKeys_Targeting/Config.lua` turns it off). Else a corpse or NPC you face: interact. Else, in ally mode, the ally you face: target them. Else: interact (mailbox, herb, chest) |
+| F | In combat with a living enemy targeted: start your attack (hunters: Auto Shot; `auto_shot = false` in `PadKeys_Targeting/Config.lua` turns it off). Else a corpse or NPC you face: interact. Else, in ally mode, the ally you face: target them. Else: interact (mailbox, herb, chest) |
 | Ctrl+Tab / Ctrl+Shift+Tab | Next / previous party or raid member, in raid frame order |
 | Shift+F | Assist: target your target's target |
 | Ctrl+F | Last target |

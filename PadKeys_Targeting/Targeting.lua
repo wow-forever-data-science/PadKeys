@@ -8,12 +8,12 @@
 -- Interact (F) does what fits what is around you: in combat, with a living
 -- enemy targeted, it starts your attack, Auto Shot for hunters (Interact
 -- would prefer a corpse or herb nearby over the enemy you fight); otherwise
--- it interacts. Hunters also Auto Shot a living hard target out of combat,
--- and pull a soft targeted enemy when no corpse or NPC is in reach. Ally mode
--- (one key toggles it) makes F target the ally you face instead, as F picks
--- an enemy by attacking it. Ally mode is opt in because macro conditions
--- can't see soft targeted game objects: [@softinteract,exists] is false at
--- a mailbox, herb or chest, so F would target a nearby ally over them. A
+-- it interacts. Out of combat F is left to the client's Interact, which
+-- alone sees what is in front of you; pull with an ability, as the
+-- gamepad does. Ally mode (one key toggles it) makes F target the ally you
+-- face instead, as F picks an enemy by attacking it. Ally mode is opt in because macro conditions
+-- can't see soft interact targets: [@softinteract,exists] is false at a
+-- corpse, NPC, mailbox or herb, so F would target a nearby ally over them. A
 -- state driver swaps the binding and the toggle is a secure button, so both
 -- work in combat.
 
@@ -118,16 +118,8 @@ interact_header:SetAttribute("apply", [[
 interact_header:SetAttribute("_onstate-interact", [[
   self:RunAttribute("apply")
 ]])
--- Hunters pull with F, so their attack state skips the combat check and
--- also takes a soft targeted enemy (Auto Shot then targets it). The soft
--- enemy comes after a soft interact unit, so a corpse or NPC in reach is
--- looted or talked to before F pulls the next mob.
 RegisterStateDriver(interact_header, "interact",
-  (auto_shot() and "[harm,nodead] attack; "
-    or "[combat,harm,nodead] attack; ")
-  .. "[@softinteract,exists] interact; "
-  .. (auto_shot() and "[@softenemy,harm,nodead] attack; " or "")
-  .. "[@softfriend,help,nodead] friend; interact")
+  "[combat,harm,nodead] attack; [@softfriend,help,nodead] friend; interact")
 
 -- Ally mode toggle. Runs in the restricted environment, with owner = the
 -- interact header.
