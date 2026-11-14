@@ -10,6 +10,10 @@
 -- Blizzard's own action API for the icon, cooldown, count, usable tint and
 -- range. Out of range greys the icon; a cooldown makes it see-through
 -- with the seconds left on top (no swipe). Nothing here is secure, so it updates freely in combat.
+--
+-- The slots take Blizzard's pings: hold the ping key and click one to
+-- ping that spell's state (ready, or on cooldown with the time left), as
+-- on Blizzard's own buttons.
 
 local ns = PadKeys
 local c = ns.config.bar
@@ -270,6 +274,52 @@ for i, key in ipairs(FACE_KEYS) do
   buttons[i] = b
 end
 
+-- Pings. Blizzard's ping system takes any frame with the "ping-receiver"
+-- attribute and PingableTypeMixin's methods (Blizzard_SharedXML/
+-- PingableType.lua) and sends the ping itself, so a slot only has to say
+-- what it shows. Each slot answers for the Blizzard button its key presses
+-- (b.source, set in update), which is a pingable action button already.
+-- Pet slots and empty ones block the ping rather than pass it through.
+local function source_button(b)
+  local button = b.source and not b.source.pet and b.source.button
+  return button and button.GetIsPingable and button or nil
+end
+
+local PINGABLE = {
+  GetIsPingable = function(b)
+    local button = source_button(b)
+    return button and button.HasAction and button:HasAction() and
+           button:GetIsPingable() or false
+  end,
+  -- Spell pings only, as on Blizzard's buttons.
+  GetAllowRadialWheel = function()
+    return false
+  end,
+  GetTargetInfo = function(b)
+    local button = source_button(b)
+    return button and button:GetTargetInfo() or {}
+  end,
+}
+
+-- The slots take the mouse only while the ping key is held, so the bar
+-- never blocks clicks otherwise.
+local function set_pingable(on)
+  for _, b in ipairs(buttons) do
+    b:EnableMouse(on)
+  end
+end
+
+for _, b in ipairs(buttons) do
+  for name, method in pairs(PINGABLE) do
+    b[name] = method
+  end
+  b:SetAttribute("ping-receiver", true)
+end
+if c.pings and PingListenerFrame then
+  PingListenerFrame:HookScript("OnShow", function() set_pingable(true) end)
+  PingListenerFrame:HookScript("OnHide", function() set_pingable(false) end)
+end
+
 -- Proc glow. SpellActivationOverlay (and other addons) light up Blizzard's
 -- buttons with LibButtonGlow (button.__LBGoverlay), and Blizzard's own proc
 -- alerts go through ActionButtonSpellAlertManager. Both work on buttons of
@@ -422,6 +472,7 @@ local function update()
 
   for _, b in ipairs(buttons) do
     local src = source_for(mods, b.key)
+    b.source = src
     local active, far, cooling
     if not src then
       clear(b)

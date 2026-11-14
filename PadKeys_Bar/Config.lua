@@ -45,4 +45,7 @@ ns.config.bar = {
   -- Light up a button when the Blizzard button behind it glows: procs from
   -- SpellActivationOverlay or other glow addons, and Blizzard's own.
   glow = true,
+  -- Hold Blizzard's ping key and click a slot to ping that spell: ready,
+  -- or on cooldown with the time left.
+  pings = true,
 }
