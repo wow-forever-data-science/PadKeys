@@ -94,6 +94,7 @@ local function sections()
   if c.radial then
     menu_rows[#menu_rows + 1] = action_row("CLICK PadKeysRing:actions")
     menu_rows[#menu_rows + 1] = action_row("CLICK PadKeysRing:extra")
+    menu_rows[#menu_rows + 1] = action_row("CLICK PadKeysRing:third")
     menu_rows[#menu_rows + 1] = action_row("CLICK PadKeysRing:markers")
     menu_rows[#menu_rows + 1] = action_row("CLICK PadKeysRing:menu")
   end

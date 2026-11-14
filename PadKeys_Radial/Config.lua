@@ -8,6 +8,10 @@ local ns = PadKeys
 local b = ns.config.bindings
 b.G = "CLICK PadKeysRing:actions"           -- Action Bar 6, slots 1-8
 b[ns.config.mod .. "G"] = "CLICK PadKeysRing:extra" -- Action Bar 7, slots 1-8
+-- Option+G, only on a Mac: on Windows Alt is the Cmd+G key above.
+if ns.config.mod ~= "ALT-" then
+  b["ALT-G"] = "CLICK PadKeysRing:third"    -- Action Bar 8, slots 1-8
+end
 b["SHIFT-G"] = "CLICK PadKeysRing:markers"
 b["CTRL-G"] = "CLICK PadKeysRing:menu"      -- Blizzard's main menu entries
 
@@ -39,6 +43,8 @@ ns.config.radial = {
     first_slot = 145,
     -- The Cmd+G page: Action Bar 7 (MultiBar6) starts at slot 157.
     extra_first_slot = 157,
+    -- The Option+G page: Action Bar 8 (MultiBar7) starts at slot 169.
+    third_first_slot = 169,
     -- Target markers 1-8: star, circle, diamond, triangle, moon, square,
     -- cross, skull; sent as marker_macro. Skull at the top.
     markers = { 6, 7, 8, 1, 2, 3, 4, 5 },

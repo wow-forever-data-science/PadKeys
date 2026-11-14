@@ -27,11 +27,12 @@ local BAR_NAMES = {
   PetActionBar = "Pet bar", StanceBar = "Stance bar",
 }
 
--- PadKeys_Radial's G and Cmd+G wheels show Action Bars 6 and 7 (slots 145
--- and 157).
+-- PadKeys_Radial's G, Cmd+G and Option+G wheels show Action Bars 6, 7
+-- and 8 (slots 145, 157 and 169).
 local WHEELS = {
   MultiBar5 = "CLICK PadKeysRing:actions",
   MultiBar6 = "CLICK PadKeysRing:extra",
+  MultiBar7 = "CLICK PadKeysRing:third",
 }
 
 -- What can be dropped on an action button.

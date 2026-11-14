@@ -1,8 +1,9 @@
--- The ring: one secure button with four pages, picked by the key that
+-- The ring: one secure button with five pages, picked by the key that
 -- opens it (Config.lua):
 --
 -- * actions (G): Action Bar 6, slots 1-8 (drag spells, items, macros there);
 -- * extra (Cmd+G): Action Bar 7, slots 1-8, the same way;
+-- * third (Option+G, Mac only): Action Bar 8, slots 1-8, the same way;
 -- * markers (Shift+G): target markers, sent as /tm macros;
 -- * menu (Ctrl+G): Blizzard's main-menu entries (Menu.lua), several pages
 --   turned with the mouse wheel while it is open.
@@ -20,12 +21,14 @@ local ns = PadKeys
 BINDING_HEADER_PADKEYS_RADIAL = "PadKeys: radials"
 _G["BINDING_NAME_CLICK PadKeysRing:actions"] = "Action radial, Action Bar 6 (hold)"
 _G["BINDING_NAME_CLICK PadKeysRing:extra"] = "Second action radial, Action Bar 7 (hold)"
+_G["BINDING_NAME_CLICK PadKeysRing:third"] = "Third action radial, Action Bar 8 (hold)"
 _G["BINDING_NAME_CLICK PadKeysRing:markers"] = "Target marker radial (hold)"
 _G["BINDING_NAME_CLICK PadKeysRing:menu"] = "Main menu radial (hold)"
 
 local TITLES = {
   actions = "Actions",
   extra = "More actions",
+  third = "Even more actions",
   markers = "Target markers",
   menu = FRAME_LABEL_MAIN_MENU or MAINMENU_BUTTON,
 }
@@ -143,6 +146,8 @@ local function setup()
     button:SetAttribute("*action-actions" .. i, config.first_slot + i - 1)
     button:SetAttribute("*type-extra" .. i, "action")
     button:SetAttribute("*action-extra" .. i, config.extra_first_slot + i - 1)
+    button:SetAttribute("*type-third" .. i, "action")
+    button:SetAttribute("*action-third" .. i, config.third_first_slot + i - 1)
     local marker = config.markers[i]
     set_macro("markers" .. i, marker and format(config.marker_macro, marker))
     for page, names in ipairs(menu.pages) do
@@ -175,7 +180,8 @@ end
 local on_gcd = {}
 local function read_gcd()
   local config = ring_config()
-  for _, first in ipairs({ config.first_slot, config.extra_first_slot }) do
+  for _, first in ipairs({ config.first_slot, config.extra_first_slot,
+                            config.third_first_slot }) do
     for slot = first, first + ns.wheel_segments - 1 do
       local cd = ab.HasAction(slot) and ab.GetActionCooldown(slot)
       on_gcd[slot] = cd and cd.isOnGCD or nil
@@ -225,6 +231,10 @@ local function extra_entries()
   return slot_entries(ring_config().extra_first_slot)
 end
 
+local function third_entries()
+  return slot_entries(ring_config().third_first_slot)
+end
+
 local function marker_entries()
   local entries = {}
   for i, marker in pairs(ring_config().markers) do
@@ -262,6 +272,7 @@ end
 local ENTRIES = {
   actions = action_entries,
   extra = extra_entries,
+  third = third_entries,
   markers = marker_entries,
 }
 
@@ -303,9 +314,13 @@ button:HookScript("OnClick", function(_, page, down)
       wheel.label:SetText("Put spells, items or macros on Action Bar 6")
     elseif page == "extra" then
       wheel.label:SetText("Put spells, items or macros on Action Bar 7")
+    elseif page == "third" then
+      wheel.label:SetText("Put spells, items or macros on Action Bar 8")
     end
   end
 end)
+
+local SLOT_PAGES = { actions = true, extra = true, third = true }
 
 -- Cooldowns that start or end while an action page is open (a cast, the
 -- end of the global cooldown) show at once.
@@ -317,7 +332,7 @@ watcher:SetScript("OnEvent", function(_, event)
   if event == "SPELL_UPDATE_COOLDOWN" then
     read_gcd()
   end
-  if wheel:is_open() and (shown_page == "actions" or shown_page == "extra") then
+  if wheel:is_open() and SLOT_PAGES[shown_page] then
     wheel:set_entries(ENTRIES[shown_page]())
   end
 end)
