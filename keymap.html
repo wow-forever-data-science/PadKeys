@@ -163,6 +163,7 @@ footer p { margin: 0; max-width: 75ch; }
           <dl>
             <dt>G</dt><dd>Action Bar 6, slots 1-8 (in combat too)</dd>
             <dt>Cmd+G</dt><dd>Action Bar 7, slots 1-8 (in combat too)</dd>
+            <dt>Option+G</dt><dd>Action Bar 8, slots 1-8 (in combat too)</dd>
             <dt>Shift+G</dt><dd>Target markers (in combat too)</dd>
             <dt>Ctrl+G</dt><dd>Main menu; the mouse wheel pages it</dd>
           </dl>
@@ -254,6 +255,7 @@ const MAP = {
   },
   opt: {
     ...bar("Action Bar 5", "Bar5"),
+    G: { a: "Bar 8", c: "menu", long: "Action radial, Action Bar 8", hold: true, combat: true },
   },
   cmd: {
     ...bar("Action Bar 2", "Bar2"),

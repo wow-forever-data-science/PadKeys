@@ -36,7 +36,7 @@ error points at one part:
 | **PadKeys_Cursor** | UI cursor (windows, unit frames, buffs) and NPC dialogs (F = A, Esc = B) | PadKeys |
 | **PadKeys_Auras** | Aura highlight: your target's nameplate auras (C), your debuffs (Ctrl+C); hold Shift+C for the tooltip | PadKeys |
 | **PadKeys_Targeting** | Party/raid cycling (Ctrl+Tab), F that attacks in combat, and ally mode (\`) where F targets the ally you face | PadKeys |
-| **PadKeys_Radial** | Radials: actions (G, Cmd+G), markers (Shift+G), main menu (Ctrl+G) | PadKeys |
+| **PadKeys_Radial** | Radials: actions (G, Cmd+G, Option+G), markers (Shift+G), main menu (Ctrl+G) | PadKeys |
 | **PadKeys_Bar** | One bar that shows the layer you hold (Cmd, Shift, Option, Ctrl) | PadKeys (SpellActivationOverlay optional, for its proc glows) |
 | **PadKeys_Fade** | Blizzard's action bars, micro menu and bags fade out until you mouse over them or drag a spell; each bar is labelled with its PadKeys key (Cmd, Shift, G wheel) | PadKeys |
 | **PadKeys_Look** | Every font in the game in the theme font (Roboto Condensed), and chat windows on a black background | PadKeys |
@@ -74,7 +74,7 @@ keyboard with each layer's keys. It's also published at
 | \` | Ally mode (F targets allies) | | |
 | Tab / Shift+Tab | Next / previous enemy | Ctrl+F | Last target |
 | Ctrl+Tab / Ctrl+Shift+Tab | Next / previous group member | Cmd+F | Last hostile target |
-| G (hold) | Action radial (Bar 6); with Cmd: Bar 7, Shift: markers, Ctrl: main menu | C | Target's next debuff tooltip |
+| G (hold) | Action radial (Bar 6); with Cmd: Bar 7, Option: Bar 8, Shift: markers, Ctrl: main menu | C | Target's next debuff tooltip |
 | Z | Sheathe / draw weapon | Cmd / Shift / Ctrl+C | Target buff / your debuff / your buff |
 | Shift+\` | UI cursor | X | Sit / stand |
 | F1 | Key map | B | Bags, with the UI cursor inside |
@@ -425,6 +425,7 @@ about a third of its size. The modifier you press with G picks the radial:
 |---|---|---|
 | G | Action Bar 6, slots 1-8: drag spells, items and macros there | yes |
 | Cmd+G | Action Bar 7, slots 1-8, the same way | yes |
+| Option+G | Action Bar 8, slots 1-8, the same way (Mac only) | yes |
 | Shift+G | Target markers on your target, skull at the top | yes |
 | Ctrl+G | Blizzard's main-menu entries, three pages | yes |
 
