@@ -32,7 +32,7 @@ ns.config.auras = {
   label_gap = 4,
   -- Seconds the highlight stays after the last press, and the tooltip
   -- after Shift+C is let go, before they fade; then seconds to fade.
-  show_for = 4,
+  show_for = 6,
   linger = 2,
   fade_time = 1,
 }
