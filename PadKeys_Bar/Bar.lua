@@ -315,9 +315,12 @@ for _, b in ipairs(buttons) do
   end
   b:SetAttribute("ping-receiver", true)
 end
-if c.pings and PingListenerFrame then
-  PingListenerFrame:HookScript("OnShow", function() set_pingable(true) end)
-  PingListenerFrame:HookScript("OnHide", function() set_pingable(false) end)
+-- PingListenerFrame is forbidden to addons, so follow the ping key through
+-- the call its binding makes on press and release.
+if c.pings and C_Ping and C_Ping.TogglePingListener then
+  hooksecurefunc(C_Ping, "TogglePingListener", function(down)
+    set_pingable(down and true or false)
+  end)
 end
 
 -- Proc glow. SpellActivationOverlay (and other addons) light up Blizzard's
