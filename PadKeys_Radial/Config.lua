@@ -8,9 +8,6 @@ local ns = PadKeys
 local b = ns.config.bindings
 b.G = "CLICK PadKeysRing:actions"           -- Action Bar 6, slots 1-8
 b[ns.config.mod .. "G"] = "CLICK PadKeysRing:extra" -- Action Bar 7, slots 1-8
--- Alt+G is Blizzard's ping key: hold it and click a unit, a spot or a
--- PadKeys bar slot to ping it, or drag for Blizzard's ping wheel.
-b["ALT-G"] = "TOGGLEPINGLISTENER"
 b["SHIFT-G"] = "CLICK PadKeysRing:markers"
 b["CTRL-G"] = "CLICK PadKeysRing:menu"      -- Blizzard's main menu entries
 
