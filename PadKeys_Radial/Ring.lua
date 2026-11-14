@@ -1,9 +1,8 @@
--- The ring: one secure button with five pages, picked by the key that
+-- The ring: one secure button with four pages, picked by the key that
 -- opens it (Config.lua):
 --
 -- * actions (G): Action Bar 6, slots 1-8 (drag spells, items, macros there);
 -- * extra (Cmd+G): Action Bar 7, slots 1-8, the same way;
--- * pings (Alt+G): Blizzard's ping types, sent as /ping macros;
 -- * markers (Shift+G): target markers, sent as /tm macros;
 -- * menu (Ctrl+G): Blizzard's main-menu entries (Menu.lua), several pages
 --   turned with the mouse wheel while it is open.
@@ -21,24 +20,14 @@ local ns = PadKeys
 BINDING_HEADER_PADKEYS_RADIAL = "PadKeys: radials"
 _G["BINDING_NAME_CLICK PadKeysRing:actions"] = "Action radial, Action Bar 6 (hold)"
 _G["BINDING_NAME_CLICK PadKeysRing:extra"] = "Second action radial, Action Bar 7 (hold)"
-_G["BINDING_NAME_CLICK PadKeysRing:pings"] = "Ping radial (hold)"
 _G["BINDING_NAME_CLICK PadKeysRing:markers"] = "Target marker radial (hold)"
 _G["BINDING_NAME_CLICK PadKeysRing:menu"] = "Main menu radial (hold)"
 
 local TITLES = {
   actions = "Actions",
   extra = "More actions",
-  pings = "Pings",
   markers = "Target markers",
   menu = FRAME_LABEL_MAIN_MENU or MAINMENU_BUTTON,
-}
-
--- Ping names in Config.lua -> Enum.PingSubjectType key and label global.
-local PINGS = {
-  attack = { "Attack", "PING_TYPE_ATTACK" },
-  warning = { "Warning", "PING_TYPE_WARNING" },
-  assist = { "Assist", "PING_TYPE_ASSIST" },
-  onmyway = { "OnMyWay", "PING_TYPE_ON_MY_WAY" },
 }
 
 -- Runs in the restricted environment: self = the ring button, owner = the
@@ -122,7 +111,7 @@ local function ring_config()
   return ns.config.radial.ring
 end
 
--- What each segment does, as attributes of its button name ("pings1").
+-- What each segment does, as attributes of its button name ("markers1").
 -- The "*" matches any modifier, so Cmd or Shift still held on release
 -- doesn't matter. A nil kind empties the segment.
 local function set_macro(segment, macro)
@@ -154,8 +143,6 @@ local function setup()
     button:SetAttribute("*action-actions" .. i, config.first_slot + i - 1)
     button:SetAttribute("*type-extra" .. i, "action")
     button:SetAttribute("*action-extra" .. i, config.extra_first_slot + i - 1)
-    local ping = config.pings[i]
-    set_macro("pings" .. i, ping and format(config.ping_macro, ping))
     local marker = config.markers[i]
     set_macro("markers" .. i, marker and format(config.marker_macro, marker))
     for page, names in ipairs(menu.pages) do
@@ -238,29 +225,6 @@ local function extra_entries()
   return slot_entries(ring_config().extra_first_slot)
 end
 
-local function ping_icon(enum_key)
-  local kind = Enum.PingSubjectType and Enum.PingSubjectType[enum_key]
-  if not (kind and C_Ping and C_Ping.GetDefaultPingOptions) then
-    return nil
-  end
-  for _, option in ipairs(C_Ping.GetDefaultPingOptions()) do
-    if option.type == kind then
-      return "Ping_Wheel_Icon_" .. tostring(option.uiTextureKitID or "")
-    end
-  end
-end
-
-local function ping_entries()
-  local entries = {}
-  for i, name in pairs(ring_config().pings) do
-    local ping = name and PINGS[name]
-    if ping then
-      entries[i] = { icon = ping_icon(ping[1]), label = _G[ping[2]] or name, enabled = true }
-    end
-  end
-  return entries
-end
-
 local function marker_entries()
   local entries = {}
   for i, marker in pairs(ring_config().markers) do
@@ -298,7 +262,6 @@ end
 local ENTRIES = {
   actions = action_entries,
   extra = extra_entries,
-  pings = ping_entries,
   markers = marker_entries,
 }
 

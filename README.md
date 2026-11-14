@@ -8,7 +8,7 @@ without a gamepad, and adds its own code only where Blizzard's doesn't:
   gamepad's buttons and shoulders;
 - **targeting**: enemy and group cycling, assist and last target, and an
   ally mode for F, all usable in combat;
-- **radials** in the style of Blizzard's gamepad radial: actions, pings and
+- **radials** in the style of Blizzard's gamepad radial: actions and
   target markers in combat, and Blizzard's main-menu entries;
 - a **keyboard UI cursor** that moves through open windows, unit frames and
   your buffs;
@@ -36,7 +36,7 @@ error points at one part:
 | **PadKeys_Cursor** | UI cursor (windows, unit frames, buffs) and NPC dialogs (F = A, Esc = B) | PadKeys |
 | **PadKeys_Auras** | Aura highlight: your target's nameplate auras (C), your debuffs (Ctrl+C); hold Shift+C for the tooltip | PadKeys |
 | **PadKeys_Targeting** | Party/raid cycling (Ctrl+Tab), F that attacks in combat, and ally mode (\`) where F targets the ally you face | PadKeys |
-| **PadKeys_Radial** | Radials: actions (G, Cmd+G), pings (Alt+G), markers (Shift+G), main menu (Ctrl+G) | PadKeys |
+| **PadKeys_Radial** | Radials: actions (G, Cmd+G), markers (Shift+G), main menu (Ctrl+G); moves Blizzard's ping key to Alt+G | PadKeys |
 | **PadKeys_Bar** | One bar that shows the layer you hold (Cmd, Shift, Option, Ctrl) | PadKeys (SpellActivationOverlay optional, for its proc glows) |
 | **PadKeys_Fade** | Blizzard's action bars, micro menu and bags fade out until you mouse over them or drag a spell; each bar is labelled with its PadKeys key (Cmd, Shift, G wheel) | PadKeys |
 | **PadKeys_Look** | Every font in the game in the theme font (Roboto Condensed), and chat windows on a black background | PadKeys |
@@ -74,7 +74,7 @@ keyboard with each layer's keys. It's also published at
 | \` | Ally mode (F targets allies) | | |
 | Tab / Shift+Tab | Next / previous enemy | Ctrl+F | Last target |
 | Ctrl+Tab / Ctrl+Shift+Tab | Next / previous group member | Cmd+F | Last hostile target |
-| G (hold) | Action radial (Bar 6); with Cmd: pings, Shift: markers, Ctrl: main menu | C | Target's next debuff tooltip |
+| G (hold) | Action radial (Bar 6); with Cmd: Bar 7, Shift: markers, Ctrl: main menu, Alt: Blizzard's ping key | C | Target's next debuff tooltip |
 | Z | Sheathe / draw weapon | Cmd / Shift / Ctrl+C | Target buff / your debuff / your buff |
 | Shift+\` | UI cursor | X | Sit / stand |
 | F1 | Key map | B | Bags, with the UI cursor inside |
@@ -424,7 +424,7 @@ about a third of its size. The modifier you press with G picks the radial:
 |---|---|---|
 | G | Action Bar 6, slots 1-8: drag spells, items and macros there | yes |
 | Cmd+G | Action Bar 7, slots 1-8, the same way | yes |
-| Alt+G | Pings: attack (top), assist (right), warning (left), on my way (bottom) | yes |
+| Alt+G | Not a radial: Blizzard's ping key (see Pings below) | yes |
 | Shift+G | Target markers on your target, skull at the top | yes |
 | Ctrl+G | Blizzard's main-menu entries, three pages | yes |
 
@@ -437,8 +437,8 @@ about a third of its size. The modifier you press with G picks the radial:
   turns the mouse direction into a segment and fires its action, so
   spells, macros and windows work in combat and nothing is tainted. The
   modifier only matters on press.
-- Hold-G for Blizzard's ping system is gone; without PadKeys_Radial, G
-  is Blizzard's ping system again. **Z** is sheathe / draw again.
+- Blizzard's ping key moves from G to Alt+G; without PadKeys_Radial, G
+  is Blizzard's ping key again. **Z** is sheathe / draw again.
 
 ### Main menu (Ctrl+G)
 
@@ -458,15 +458,21 @@ own button (`CharacterMicroButton` and so on), not by calling those
 handlers: from addon code their windows open tainted, and tainted Blizzard
 code errors on the client's secret values. Social, Chat and Tracking have
 no button to click, so they are left out. Size, position, dead zone, the
-pages, the pings and the marker order are in `PadKeys_Radial/Config.lua`.
+pages and the marker order are in `PadKeys_Radial/Config.lua`.
 
 **Buffs** opens the UI cursor on your buffs (or debuffs, if you have no
 buffs) when PadKeys_Cursor is on.
 
 ## Pings (Blizzard's)
 
-Hold **G**: Blizzard's ping system. Click a unit or a spot to send a
-contextual ping, or drag for Blizzard's ping wheel.
+Hold **Alt+G** (plain **G** without PadKeys_Radial): Blizzard's ping key.
+While you hold it:
+
+- click a unit or a spot to send Blizzard's contextual ping;
+- click a slot of the PadKeys bar to ping that spell: ready, or on
+  cooldown with the time left (as on Blizzard's own buttons);
+- press and drag for Blizzard's ping wheel: attack, assist, warning, on my
+  way.
 
 ## UI cursor (out of combat)
 
@@ -585,8 +591,8 @@ message, with its stack, in
 
 | Feature | Blizzard code used | Our code |
 |---|---|---|
-| Radials | `GamepadRadial` (`Blizzard_Gamepad/UI/Radials`): art (atlases), menu labels and icons; the micro buttons (clicked); the secure action button; `/ping`, `/tm` | the wheel, pages, mouse direction and paging (secure snippet), release |
-| Pings | the ping system (`TOGGLEPINGLISTENER`, `Blizzard_PingUI`) and its wheel | none, only the key |
+| Radials | `GamepadRadial` (`Blizzard_Gamepad/UI/Radials`): art (atlases), menu labels and icons; the micro buttons (clicked); the secure action button; `/tm` | the wheel, pages, mouse direction and paging (secure snippet), release |
+| Pings | the ping system (`TOGGLEPINGLISTENER`, `Blizzard_PingUI`) and its wheel; `PingableTypeMixin` for the bar slots | the key; each bar slot answers for the Blizzard button its key presses |
 | NPC dialogs | `QuestFrame_GeneralProgressAction` (accept/continue/complete) and the gamepad's rules: cursor on the first entry, A clicks it, B closes | our cursor in place of SmartNavigation |
 | Key layout | Blizzard's binding actions | apply/restore of the bindings |
 | Interact key | Blizzard's Interact and soft targets (`softinteract`, `softfriend`) | a state driver and the ally mode toggle that rebind F |
@@ -626,7 +632,8 @@ is loaded.
    should print 3. Tab / Shift+Tab cycle enemies,
    Shift+F assists, Ctrl+F and Cmd+F go back to earlier targets.
 4. **Key map**: press F1 and check it matches what the keys do.
-5. **Pings** (in a group): hold G and click a mob, then drag for the wheel.
+5. **Pings** (in a group): hold G (Alt+G with PadKeys_Radial) and click a
+   mob, then drag for the wheel. With PadKeys_Bar, click a bar slot too.
 
 **Stage 2: + PadKeys_Cursor**
 
@@ -664,8 +671,8 @@ is loaded.
 11. **Buffs** (with PadKeys_Cursor on): hold Ctrl+G, left page, pick Buffs.
     The cursor should land on your buffs; cancel one with Shift+F.
 12. **Combat ring**: put a spell on Action Bar 6 slot 3, hold G, point up,
-    release: it should cast, also in combat. Then Alt+G up (attack ping)
-    and Shift+G up (skull on your target). The highlight must match what
+    release: it should cast, also in combat. Then Shift+G up (skull on
+    your target). The highlight must match what
     fires; if not, send the debug file.
 
 **Stage 6: + PadKeys_Bar**
@@ -729,8 +736,7 @@ Known risks:
 
 `feat/padkeys-custom-rings` adds our own secure rings on top of this
 (to become a sixth addon, PadKeys_Rings):
-a Utility ring (Hearthstone, macros, your own spells and items) and a Ping
-ring that pings your target in combat without clicking. Blizzard has no ring
+a Utility ring (Hearthstone, macros, your own spells and items). Blizzard has no ring
 for your own spells and items, so those need our code.
 
 ## Terms of service
