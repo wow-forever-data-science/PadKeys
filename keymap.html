@@ -162,7 +162,8 @@ footer p { margin: 0; max-width: 75ch; }
           <p>Hold G, point with the mouse, release G. The modifier picks the radial.</p>
           <dl>
             <dt>G</dt><dd>Action Bar 6, slots 1-8 (in combat too)</dd>
-            <dt>Alt+G</dt><dd>Pings (in combat too)</dd>
+            <dt>Cmd+G</dt><dd>Action Bar 7, slots 1-8 (in combat too)</dd>
+            <dt>Option+G</dt><dd>Blizzard's ping key: hold and click a unit, a spot or a bar slot, or drag for the ping wheel</dd>
             <dt>Shift+G</dt><dd>Target markers (in combat too)</dd>
             <dt>Ctrl+G</dt><dd>Main menu; the mouse wheel pages it</dd>
           </dl>
@@ -253,11 +254,12 @@ const MAP = {
   },
   opt: {
     ...bar("Action Bar 5", "Bar5"),
+    G: { a: "Ping", c: "menu", long: "Blizzard's ping key: click a unit, a spot or a bar slot; drag for the wheel", hold: true, combat: true },
   },
   cmd: {
     ...bar("Action Bar 2", "Bar2"),
     F: { a: "Last hostile", c: "target", long: "Last hostile target" },
-    G: { a: "Pings", c: "menu", long: "Ping radial", hold: true, combat: true },
+    G: { a: "Bar 7", c: "menu", long: "Action radial, Action Bar 7", hold: true, combat: true },
     C: { a: "Tgt buffs", c: "act", long: "Target's next buff tooltip", combat: true },
   },
 };

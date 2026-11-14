@@ -52,7 +52,8 @@ local bindings = {
   TAB = "TARGETNEARESTENEMY",
   ["SHIFT-TAB"] = "TARGETPREVIOUSENEMY",
   -- Hold for Blizzard's ping system: click a spot or unit to ping it, or
-  -- drag for Blizzard's ping wheel. PadKeys_Radial puts its ring here.
+  -- drag for Blizzard's ping wheel. PadKeys_Radial puts its ring here
+  -- and the ping key on Alt+G.
   G = "TOGGLEPINGLISTENER",
   -- Sheathe / draw your weapon, as in WoW's defaults.
   Z = "TOGGLESHEATH",

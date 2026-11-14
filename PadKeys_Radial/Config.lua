@@ -8,7 +8,9 @@ local ns = PadKeys
 local b = ns.config.bindings
 b.G = "CLICK PadKeysRing:actions"           -- Action Bar 6, slots 1-8
 b[ns.config.mod .. "G"] = "CLICK PadKeysRing:extra" -- Action Bar 7, slots 1-8
-b["ALT-G"] = "CLICK PadKeysRing:pings"
+-- Alt+G is Blizzard's ping key: hold it and click a unit, a spot or a
+-- PadKeys bar slot to ping it, or drag for Blizzard's ping wheel.
+b["ALT-G"] = "TOGGLEPINGLISTENER"
 b["SHIFT-G"] = "CLICK PadKeysRing:markers"
 b["CTRL-G"] = "CLICK PadKeysRing:menu"      -- Blizzard's main menu entries
 
@@ -40,9 +42,6 @@ ns.config.radial = {
     first_slot = 145,
     -- The Cmd+G page: Action Bar 7 (MultiBar6) starts at slot 157.
     extra_first_slot = 157,
-    -- attack, warning, assist, onmyway; sent as ping_macro.
-    pings = { "assist", false, "attack", false, "warning", false, "onmyway", false },
-    ping_macro = "/ping %s",
     -- Target markers 1-8: star, circle, diamond, triangle, moon, square,
     -- cross, skull; sent as marker_macro. Skull at the top.
     markers = { 6, 7, 8, 1, 2, 3, 4, 5 },
