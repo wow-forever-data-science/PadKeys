@@ -31,7 +31,7 @@ ns.config.cursor = {
     pickup = { "CTRL-F" },                 -- drag a spell or item
     -- The most at once: a vendor item buys a full stack (or what you can
     -- afford), a recipe or the Create button creates all, the mailbox
-    -- opens all mail or sends the letter. Cmd+F on a Mac
+    -- opens all mail or sends the letter, the talents apply. Cmd+F on a Mac
     -- (the base MOD); takes over last hostile target while the cursor is on.
     all = { ns.config.mod .. "F" },
     -- gamepad B: close the window the cursor is in, or leave the cursor

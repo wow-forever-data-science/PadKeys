@@ -82,7 +82,7 @@ keyboard with each layer's keys. It's also published at
 
 | Context | Keys |
 |---|---|
-| UI cursor | WASD / arrows move · F / Space click (uses a bag item) · Shift+F right-click · Ctrl+F pick up · Cmd+F buy a stack / create all / open all mail · Tab / Shift+Tab next / previous window · Esc leave |
+| UI cursor | WASD / arrows move · F / Space click (uses a bag item) · Shift+F right-click · Ctrl+F pick up · Cmd+F buy a stack / create all / open all mail / apply talents · Tab / Shift+Tab next / previous window · Esc leave |
 | Radials | point with the mouse · release G: run · Ctrl+G only: mouse wheel pages |
 | NPC dialog | W / S move to an option or reward · F choose, accept, continue, complete · Esc close |
 | Auras | C: target's first aura, then the next · Ctrl+C: your debuffs · hold Shift+C: tooltip |
@@ -492,7 +492,7 @@ in Blizzard's box); F on Create / Create All runs them. **Cmd+F** does
 the most at once: on a selected recipe it creates all (on another recipe
 the first press selects it), on a vendor
 item it buys a full stack (or as many as you can afford), at a mailbox it
-opens all mail. **B** opens your bags with the
+opens all mail, in the talents it applies your picks. **B** opens your bags with the
 cursor on sort bags (in combat it only opens them; press B again to
 close). It clicks Blizzard's backpack button through a secure button, so
 the bags aren't tainted.
@@ -503,7 +503,7 @@ the bags aren't tainted.
 | F / Space | Click: cast from the spellbook, pick a gossip line, use a bag item (eat, drink, equip, sell to an open vendor); on a text field (search box), type in it, and Escape or Enter goes back to moving |
 | Shift+F | Right-click: use or sell an item, cancel a buff (takes over Assist while the cursor is on) |
 | Ctrl+F | Pick up a spell or item; move to an action bar slot or bag slot and click to place it (takes over Last target while the cursor is on) |
-| Cmd+F | Most at once: open all mail, create all of a recipe, buy a full stack of a vendor item (or what you can afford), buy back on the Buyback tab |
+| Cmd+F | Most at once: open all mail, apply talents, create all of a recipe, buy a full stack of a vendor item (or what you can afford), buy back on the Buyback tab |
 | Tab / Shift+Tab | Jump to the next / previous open window (the gamepad's "Next Frame") |
 | Esc / Backspace | Close the window the cursor is in (the gamepad's B). Where there's nothing to close (unit frames, auras, popups), leave the cursor. |
 

@@ -11,6 +11,7 @@
 --   don't stack). On the Buyback tab it buys back.
 -- * Mailbox: the all key (Cmd+F) opens all mail, and on the Send Mail tab
 --   sends the letter.
+-- * Talents: the all key (Cmd+F) applies the talents you picked.
 -- * Vendor: the mouse wheel steps through the items, turning the page at
 --   the end of one.
 -- * Vendor: gear is repaired from your own money, and junk (grey items)
@@ -138,6 +139,18 @@ ns.cursor_on_all(function()
       button:OnClick()
       return true
     end
+  end
+  return false
+end)
+
+-- The talents: the all key applies the picked talents, as Blizzard's Apply
+-- Changes button does. The button is greyed out until a talent is picked.
+ns.cursor_on_all(function()
+  local talents = PlayerSpellsFrame and PlayerSpellsFrame.TalentsFrame
+  local button = talents and talents.ApplyButton
+  if button and button:IsVisible() and button:IsEnabled() then
+    button:Click()
+    return true
   end
   return false
 end)
