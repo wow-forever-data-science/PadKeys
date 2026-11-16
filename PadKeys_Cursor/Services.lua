@@ -10,7 +10,7 @@
 --   can afford, as Shift-click's stack split would (or one, for items that
 --   don't stack). On the Buyback tab it buys back.
 -- * Mailbox: the all key (Cmd+F) opens all mail, and on the Send Mail tab
---   sends the letter.
+--   sends the letter, with the cursor on or off.
 -- * Talents: the all key (Cmd+F) applies the talents you picked.
 -- * Vendor: the mouse wheel steps through the items, turning the page at
 --   the end of one.
@@ -133,7 +133,7 @@ end)
 -- The mailbox: the all key opens all mail, as Blizzard's Open All button
 -- (and the gamepad's X) does; on the Send Mail tab it sends, as the Send
 -- button does.
-ns.cursor_on_all(function()
+local function mail_all()
   for _, button in ipairs({ OpenAllMail, SendMailMailButton }) do
     if button and button:IsVisible() and button:IsEnabled() then
       button:OnClick()
@@ -141,6 +141,30 @@ ns.cursor_on_all(function()
     end
   end
   return false
+end
+ns.cursor_on_all(mail_all)
+
+-- The all key reaches the mailbox with the cursor off too (items dragged in
+-- with the mouse, then Cmd+F sends): bound while the mailbox is open,
+-- without priority, so the cursor's own binding wins while it is on.
+local mail_key = CreateFrame("Button", "PadKeysMailAll", UIParent)
+mail_key:RegisterForClicks("AnyDown")
+mail_key:SetScript("OnClick", mail_all)
+mail_key:RegisterEvent("MAIL_SHOW")
+mail_key:RegisterEvent("MAIL_CLOSED")
+mail_key:RegisterEvent("PLAYER_REGEN_ENABLED")
+mail_key:SetScript("OnEvent", function(self, event)
+  if InCombatLockdown() then
+    return
+  end
+  ClearOverrideBindings(self)
+  -- Combat ends with the mailbox still open: bind again.
+  if event == "MAIL_SHOW" or (event == "PLAYER_REGEN_ENABLED"
+                              and MailFrame and MailFrame:IsShown()) then
+    for _, key in ipairs(ns.config.cursor.keys.all) do
+      SetOverrideBindingClick(self, false, key, "PadKeysMailAll")
+    end
+  end
 end)
 
 -- The talents: the all key applies the picked talents, as Blizzard's Apply
