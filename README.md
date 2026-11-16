@@ -44,6 +44,7 @@ error points at one part:
 | **PadKeys_Cooldowns** | Blizzard's Cooldown Manager (cooldowns, buff icons, buff bars) in the PadKeys look: black borders, grey tints, the countdown without a swipe | PadKeys |
 | **PadKeys_Totems** | Blizzard's totem bar in the PadKeys look: black borders, no gold or element frames | PadKeys |
 | **PadKeys_Combo** | Combo points as a row of black and white pips above the bar, in place of Blizzard's (rogues, druids in Cat Form) | PadKeys |
+| **PadKeys_Portrait** | Your stance, form, aspect or aura in place of your portrait (else your class icon), and what you are tracking as a badge on it | PadKeys |
 | **PadKeys_Debug** | Saves Lua errors and blocked actions to a file, to send or read outside the game (`/pkdebug`) | — |
 
 It started in the wowforevR R package repository and moved here as a
@@ -346,6 +347,12 @@ the frames still work, and Edit Mode still moves them.
   are hidden, and a row of pips above the PadKeys bar fills white, one per
   point. It shows in combat and while you have points. If the client keeps
   the count secret, the number shows instead of the pips.
+- **PadKeys_Portrait**: your portrait shows the stance or form you are in
+  (warrior stances, druid forms, stealth), else your hunter aspect or
+  paladin aura, else your class icon (`fallback = "face"` keeps
+  Blizzard's portrait). Aspects and auras are buffs, read out of combat
+  only, so a change in combat shows as combat ends. A badge on the lower
+  right shows what you are tracking; hover it for the name.
 
 Settings are in each addon's `Config.lua`.
 
@@ -710,6 +717,13 @@ is loaded.
     its first recipe. Cmd+F on a recipe selects it, a second press
     creates all; Cmd+F on a
     vendor's reagent buys a stack.
+
+**Stage 9: + PadKeys_Portrait**
+
+21. **Portrait**: your class icon shows in place of your face. Change
+    stance or form (or, out of combat, aspect or aura); the icon follows.
+22. **Tracking**: turn on Find Herbs or Track Beasts; a badge shows on the
+    portrait's lower right, and hovering it shows the name.
 
 Known risks:
 - The buff reminder reads auras by name out of combat. If a list stays
