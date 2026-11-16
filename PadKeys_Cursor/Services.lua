@@ -167,6 +167,35 @@ mail_key:SetScript("OnEvent", function(self, event)
   end
 end)
 
+-- A text box with the keyboard focus takes every key before the bindings,
+-- and Blizzard focuses the Send Mail ones (the recipient after each send),
+-- so they take the all key themselves.
+local function held_chord(key)
+  local mods = {}
+  if IsAltKeyDown() then mods[#mods + 1] = "ALT" end
+  if IsControlKeyDown() then mods[#mods + 1] = "CTRL" end
+  if IsShiftKeyDown() then mods[#mods + 1] = "SHIFT" end
+  if IsMetaKeyDown and IsMetaKeyDown() then mods[#mods + 1] = "META" end
+  mods[#mods + 1] = key
+  return table.concat(mods, "-")
+end
+
+local hooked_mail_boxes
+mail_key:HookScript("OnEvent", function(_, event)
+  if event ~= "MAIL_SHOW" or hooked_mail_boxes then
+    return
+  end
+  hooked_mail_boxes = true
+  for _, box in ipairs({ SendMailNameEditBox, SendMailSubjectEditBox,
+                         SendMailBodyEditBox }) do
+    box:HookScript("OnKeyDown", function(_, key)
+      if tContains(ns.config.cursor.keys.all, held_chord(key)) then
+        mail_all()
+      end
+    end)
+  end
+end)
+
 -- The talents: the all key applies the picked talents, as Blizzard's Apply
 -- Changes button does. The button is greyed out until a talent is picked.
 ns.cursor_on_all(function()
