@@ -492,7 +492,8 @@ in Blizzard's box); F on Create / Create All runs them. **Cmd+F** does
 the most at once: on a selected recipe it creates all (on another recipe
 the first press selects it), on a vendor
 item it buys a full stack (or as many as you can afford), at a mailbox it
-opens all mail, in the talents it applies your picks. **B** opens your bags with the
+opens all mail or sends the letter (with the cursor off too, after
+dragging items in with the mouse), in the talents it applies your picks. **B** opens your bags with the
 cursor on sort bags (in combat it only opens them; press B again to
 close). It clicks Blizzard's backpack button through a secure button, so
 the bags aren't tainted.
