@@ -73,7 +73,7 @@ local function sections()
   local target_rows = {}
   if targeting then
     target_rows[#target_rows + 1] = action_row(
-      "CLICK PadKeysAllyMode:LeftButton", "Ally mode: F targets the ally you face")
+      "CLICK PadKeysAllyMode:LeftButton", "Ally mode: F targets the ally you face, then the next")
   end
   target_rows[#target_rows + 1] = {
     "Next / previous enemy",
