@@ -19,7 +19,13 @@ b["CTRL-SHIFT-TAB"] = "CLICK PadKeysGroupCycle:RightButton"
 --   4. otherwise: Interact
 -- 2 and 3 are opt in because macro conditions can't see soft interact
 -- targets, so F would pick a nearby ally over a mailbox or NPC.
-ns.config.interact = { key = "F", auto_shot = true }
+-- inspect: in ally mode with a living ally targeted, this key (Cmd+F on a
+-- Mac, the base MOD) inspects them instead of targeting the last enemy.
+ns.config.interact = {
+  key = "F",
+  inspect = ns.config.mod .. "F",
+  auto_shot = true,
+}
 
 -- Ally soft targeting, used by 3 above and by helpful spells, needs these
 -- CVars. They belong to wow-settings (see CLAUDE.md), not this addon:

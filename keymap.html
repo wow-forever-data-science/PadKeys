@@ -220,7 +220,7 @@ function bar(name, short, keys = FACE) {
 const MAP = {
   plain: {
     ...bar("Action Bar 1", "Bar1"),
-    "`": { a: "Ally mode", c: "target", long: "Ally mode: F targets the ally you face, then the next", combat: true },
+    "`": { a: "Ally mode", c: "target", long: "Ally mode: F targets the ally you face, then the next; Cmd+F inspects them", combat: true },
     tab: { a: "Next target", c: "target", long: "Next enemy", combat: true },
     W: { a: "Forward", c: "move", long: "Move forward" },
     S: { a: "Back", c: "move", long: "Move back" },
@@ -259,7 +259,7 @@ const MAP = {
   },
   cmd: {
     ...bar("Action Bar 2", "Bar2"),
-    F: { a: "Last hostile", c: "target", long: "Last hostile target" },
+    F: { a: "Last hostile", c: "target", long: "Last hostile target; in ally mode, inspect your ally target" },
     G: { a: "Bar 7", c: "menu", long: "Action radial, Action Bar 7", hold: true, combat: true },
     C: { a: "Tgt buffs", c: "act", long: "Target's next buff tooltip", combat: true },
   },

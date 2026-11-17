@@ -72,7 +72,7 @@ keyboard with each layer's keys. It's also published at
 | Option + those | Action Bar 5 (Mac only) | F | Interact / choose in NPC dialogs |
 | Ctrl + 1 2 3 4 | Pet bar, slots 1–4 | Shift+F | Assist |
 | Ctrl + Q E R T | Action Bar 4, slots 1–4 | | |
-| \` | Ally mode (F targets allies) | | |
+| \` | Ally mode (F targets allies, Cmd+F inspects) | | |
 | Tab / Shift+Tab | Next / previous enemy | Ctrl+F | Last target |
 | Ctrl+Tab / Ctrl+Shift+Tab | Next / previous group member | Cmd+F | Last hostile target |
 | G (hold) | Action radial (Bar 6); with Cmd: Bar 7, Option: Bar 8, Shift: markers, Ctrl: main menu | C | Target's next debuff tooltip |
@@ -410,13 +410,13 @@ under the player frame instead), size, `ignore` to drop a buff,
 
 | Key | Does |
 |---|---|
-| \` | Toggle ally mode (off by default). On, F targets the ally you face, then the next ally on each press, and "F targets allies" shows near the top of the screen. Off, F interacts. |
+| \` | Toggle ally mode (off by default). On, F targets the ally you face, then the next ally on each press, Cmd+F inspects the ally you target, and "F targets allies" shows near the top of the screen. Off, F interacts. |
 | Tab / Shift+Tab | Next / previous nearest enemy |
 | F | In combat with a living enemy targeted: start your attack (hunters: Auto Shot; `auto_shot = false` in `PadKeys_Targeting/Config.lua` turns it off). Else a corpse or NPC you face: interact. Else, in ally mode, with an ally targeted: target the next ally in front of you. Else, in ally mode, the ally you face: target them. Else: interact (mailbox, herb, chest) |
 | Ctrl+Tab / Ctrl+Shift+Tab | Next / previous party or raid member, in raid frame order |
 | Shift+F | Assist: target your target's target |
 | Ctrl+F | Last target |
-| Cmd+F | Last hostile target |
+| Cmd+F | Last hostile target. In ally mode with a living ally targeted: inspect them |
 
 The mode toggle and group cycling are secure buttons, so they work in
 combat: the toggle rebinds Tab and Shift+Tab, and group cycling picks the
