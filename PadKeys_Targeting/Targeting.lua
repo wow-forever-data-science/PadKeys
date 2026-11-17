@@ -19,11 +19,16 @@
 -- targets: [@softinteract,exists] is false at a corpse, NPC, mailbox or
 -- herb, so F would target a nearby ally over them. A state driver swaps
 -- the binding and the toggle is a secure button, so both work in combat.
+--
+-- In ally mode with an ally targeted, Cmd+F inspects them. It runs
+-- Blizzard's /inspect from a secure button, as InspectUnit called from
+-- addon code would taint the inspect window. Outside ally mode Cmd+F stays
+-- last hostile target, which you want back after healing an ally.
 
 local ns = PadKeys
 
 BINDING_HEADER_PADKEYS_TARGETING = "PadKeys: targeting"
-_G["BINDING_NAME_CLICK PadKeysAllyMode:LeftButton"] = "Toggle ally mode (F targets the ally you face)"
+_G["BINDING_NAME_CLICK PadKeysAllyMode:LeftButton"] = "Toggle ally mode (F targets the ally you face, Cmd+F inspects)"
 _G["BINDING_NAME_CLICK PadKeysGroupCycle:LeftButton"] = "Next party/raid member"
 _G["BINDING_NAME_CLICK PadKeysGroupCycle:RightButton"] = "Previous party/raid member"
 
@@ -112,22 +117,32 @@ next_friend:SetAttribute("useOnKeyDown", true)
 next_friend:SetAttribute("type", "macro")
 next_friend:SetAttribute("macrotext", "/targetfriend")
 
--- The header binds F from two inputs: the state driver's state and the
--- ally mode attribute that the toggle flips. Both run "apply".
+local inspect = CreateFrame("Button", "PadKeysInspect", UIParent,
+                            "SecureActionButtonTemplate")
+inspect:RegisterForClicks("AnyDown")
+inspect:SetAttribute("useOnKeyDown", true)
+inspect:SetAttribute("type", "macro")
+inspect:SetAttribute("macrotext", "/inspect")
+
+-- The header binds F (and the inspect key) from two inputs: the state
+-- driver's state and the ally mode attribute that the toggle flips. Both
+-- run "apply". The inspect key binds without priority, so PadKeys_Cursor's
+-- all key wins while the cursor is on.
 local interact_header = CreateFrame("Frame", "PadKeysInteractHeader",
                                     UIParent, "SecureHandlerStateTemplate")
 interact_header:SetAttribute("key", ns.config.interact.key)
+interact_header:SetAttribute("inspect", ns.config.interact.inspect)
 interact_header:SetAttribute("apply", [[
   local key = self:GetAttribute("key")
   local state = self:GetAttribute("state-interact")
+  self:ClearBindings()
   if state == "attack" then
     self:SetBindingClick(true, key, "PadKeysAttack")
   elseif state == "friend" and self:GetAttribute("ally") then
     self:SetBindingClick(true, key, "PadKeysTargetSoftFriend")
   elseif state == "next" and self:GetAttribute("ally") then
     self:SetBindingClick(true, key, "PadKeysTargetNextFriend")
-  else
-    self:ClearBindings()
+    self:SetBindingClick(false, self:GetAttribute("inspect"), "PadKeysInspect")
   end
 ]])
 interact_header:SetAttribute("_onstate-interact", [[
