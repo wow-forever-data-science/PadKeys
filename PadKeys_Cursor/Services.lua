@@ -10,7 +10,8 @@
 --   can afford, as Shift-click's stack split would (or one, for items that
 --   don't stack). On the Buyback tab it buys back.
 -- * Mailbox: the all key (Cmd+F) opens all mail, and on the Send Mail tab
---   sends the letter, with the cursor on or off.
+--   sends the letter, with the cursor on or off. With an empty inbox it
+--   switches to the Send Mail tab.
 -- * Talents: the all key (Cmd+F) applies the talents you picked.
 -- * Vendor: the mouse wheel steps through the items, turning the page at
 --   the end of one.
@@ -132,8 +133,13 @@ end)
 
 -- The mailbox: the all key opens all mail, as Blizzard's Open All button
 -- (and the gamepad's X) does; on the Send Mail tab it sends, as the Send
--- button does.
+-- button does. An empty inbox has nothing to open, so it clicks the Send
+-- Mail tab instead.
 local function mail_all()
+  if InboxFrame and InboxFrame:IsVisible() and GetInboxNumItems() == 0 then
+    MailFrameTab2:Click()
+    return true
+  end
   for _, button in ipairs({ OpenAllMail, SendMailMailButton }) do
     if button and button:IsVisible() and button:IsEnabled() then
       button:OnClick()
