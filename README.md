@@ -199,7 +199,9 @@ Allies get soft targeted like enemies, in a cone in front of you, once
 `SoftTargetFriendRange` 40, `SoftTargetIconFriend` 1 and `autoSelfCast` 1.
 A helpful spell then goes to your target if it is an ally, else the ally
 you face, else you. With PadKeys_Targeting in ally mode (\`), F on an ally
-you face (and no NPC or corpse to use) makes them your target.
+you face (and no NPC or corpse to use) makes them your target. With an
+ally targeted, each F moves on to the next ally in front of you, while an
+enemy target stays until you change it.
 
 What you lose from WoW's defaults:
 - Q/E strafe (now A/D) and R reply to whisper (type `/r`);
@@ -408,9 +410,9 @@ under the player frame instead), size, `ignore` to drop a buff,
 
 | Key | Does |
 |---|---|
-| \` | Toggle ally mode (off by default). On, F targets the ally you face, and "F targets allies" shows near the top of the screen. Off, F interacts. |
+| \` | Toggle ally mode (off by default). On, F targets the ally you face, then the next ally on each press, and "F targets allies" shows near the top of the screen. Off, F interacts. |
 | Tab / Shift+Tab | Next / previous nearest enemy |
-| F | In combat with a living enemy targeted: start your attack (hunters: Auto Shot; `auto_shot = false` in `PadKeys_Targeting/Config.lua` turns it off). Else a corpse or NPC you face: interact. Else, in ally mode, the ally you face: target them. Else: interact (mailbox, herb, chest) |
+| F | In combat with a living enemy targeted: start your attack (hunters: Auto Shot; `auto_shot = false` in `PadKeys_Targeting/Config.lua` turns it off). Else a corpse or NPC you face: interact. Else, in ally mode, with an ally targeted: target the next ally in front of you. Else, in ally mode, the ally you face: target them. Else: interact (mailbox, herb, chest) |
 | Ctrl+Tab / Ctrl+Shift+Tab | Next / previous party or raid member, in raid frame order |
 | Shift+F | Assist: target your target's target |
 | Ctrl+F | Last target |
@@ -667,7 +669,8 @@ is loaded.
 9. **Targeting** (in a group, also in combat): Ctrl+Tab through the party.
    With PadKeys_Cursor on, press Shift+\` and move over the raid frames.
    At a mailbox with an ally nearby: F should open the mailbox. Press \`,
-   face an ally: F should target them; \` again and F interacts (needs the ally soft
+   face an ally: F should target them, and F again the next ally in
+   front of you; \` again and F interacts (needs the ally soft
    targeting settings in `wow-settings`; `/dump UnitName("softfriend")`
    shows whether the client sees one). With an enemy targeted, face an
    ally and cast a heal: it should land on the ally.

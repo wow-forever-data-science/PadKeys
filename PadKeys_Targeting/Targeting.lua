@@ -11,11 +11,14 @@
 -- it interacts. Out of combat F is left to the client's Interact, which
 -- alone sees what is in front of you; pull with an ability, as the
 -- gamepad does. Ally mode (one key toggles it) makes F target the ally you
--- face instead, as F picks an enemy by attacking it. Ally mode is opt in because macro conditions
--- can't see soft interact targets: [@softinteract,exists] is false at a
--- corpse, NPC, mailbox or herb, so F would target a nearby ally over them. A
--- state driver swaps the binding and the toggle is a secure button, so both
--- work in combat.
+-- face instead, as F picks an enemy by attacking it. With an ally already
+-- targeted F moves on to the next ally: the client stops picking soft
+-- targets while you have a target (SoftTargetWithLocked 0, kept so enemy
+-- targets stay put), so F on softfriend would retarget the same ally.
+-- Ally mode is opt in because macro conditions can't see soft interact
+-- targets: [@softinteract,exists] is false at a corpse, NPC, mailbox or
+-- herb, so F would target a nearby ally over them. A state driver swaps
+-- the binding and the toggle is a secure button, so both work in combat.
 
 local ns = PadKeys
 
@@ -63,7 +66,8 @@ SecureHandlerWrapScript(button, "OnClick", header, ON_CLICK)
 ns.group_cycle = button
 
 -- Interact key: the header binds the key to one of these buttons for the
--- "attack" and "friend" states, and clears it (back to Interact) otherwise.
+-- "attack", "friend" and "next" states, and clears it (back to Interact)
+-- otherwise.
 -- Hunters attack with Auto Shot (spell 75, by its localized name); the !
 -- keeps a second press from turning it off. In melee range Auto Shot
 -- fails, and a melee ability such as Raptor Strike starts the melee swing.
@@ -99,6 +103,15 @@ friend:SetAttribute("useOnKeyDown", true)
 friend:SetAttribute("type", "target")
 friend:SetAttribute("unit", "softfriend")
 
+-- With an ally targeted: the next ally in front of you, as Tab does for
+-- enemies.
+local next_friend = CreateFrame("Button", "PadKeysTargetNextFriend", UIParent,
+                                "SecureActionButtonTemplate")
+next_friend:RegisterForClicks("AnyDown")
+next_friend:SetAttribute("useOnKeyDown", true)
+next_friend:SetAttribute("type", "macro")
+next_friend:SetAttribute("macrotext", "/targetfriend")
+
 -- The header binds F from two inputs: the state driver's state and the
 -- ally mode attribute that the toggle flips. Both run "apply".
 local interact_header = CreateFrame("Frame", "PadKeysInteractHeader",
@@ -111,6 +124,8 @@ interact_header:SetAttribute("apply", [[
     self:SetBindingClick(true, key, "PadKeysAttack")
   elseif state == "friend" and self:GetAttribute("ally") then
     self:SetBindingClick(true, key, "PadKeysTargetSoftFriend")
+  elseif state == "next" and self:GetAttribute("ally") then
+    self:SetBindingClick(true, key, "PadKeysTargetNextFriend")
   else
     self:ClearBindings()
   end
@@ -119,7 +134,8 @@ interact_header:SetAttribute("_onstate-interact", [[
   self:RunAttribute("apply")
 ]])
 RegisterStateDriver(interact_header, "interact",
-  "[combat,harm,nodead] attack; [@softfriend,help,nodead] friend; interact")
+  "[combat,harm,nodead] attack; [help,nodead] next; "
+  .. "[@softfriend,help,nodead] friend; interact")
 
 -- Ally mode toggle. Runs in the restricted environment, with owner = the
 -- interact header.
