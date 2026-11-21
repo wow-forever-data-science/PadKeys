@@ -51,11 +51,10 @@ local bindings = {
   -- your group.
   TAB = "TARGETNEARESTENEMY",
   ["SHIFT-TAB"] = "TARGETPREVIOUSENEMY",
-  -- Hold for Blizzard's ping system: click a spot, a unit or a PadKeys bar
-  -- slot to ping it, or drag for Blizzard's ping wheel. A plain key, as a
-  -- modifier would swap the bar's layer. Hold a modifier too to ping that
-  -- layer's slots.
-  ["5"] = "TOGGLEPINGLISTENER",
+  -- 5 is free: Blizzard's ping key moved to the side mouse button
+  -- (BUTTON5), which wow-settings binds. false keeps 5 off the client's
+  -- default (Action Bar 1, slot 5, already on Q).
+  ["5"] = false,
   -- G is PadKeys_Radial's ring; without it, G stays free.
   G = false,
   -- Sheathe / draw your weapon, as in WoW's defaults.

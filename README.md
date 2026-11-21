@@ -32,11 +32,11 @@ error points at one part:
 
 | Addon | What it adds | Needs |
 |---|---|---|
-| **PadKeys** | Key layout (action bars, movement, F interact, X sit, 5 pings, targeting keys), soft targeting, F1 key map, `/padkeys` | — |
+| **PadKeys** | Key layout (action bars, movement, F interact, X sit, targeting keys), soft targeting, F1 key map, `/padkeys` | — |
 | **PadKeys_Cursor** | UI cursor (windows, unit frames, buffs) and NPC dialogs (F = A, Esc = B) | PadKeys |
 | **PadKeys_Auras** | Aura highlight: your target's nameplate auras (C), your debuffs (Ctrl+C); hold Shift+C for the tooltip | PadKeys |
 | **PadKeys_Targeting** | Party/raid cycling (Ctrl+Tab), F that attacks in combat, and ally mode (\`) where F targets the ally you face | PadKeys |
-| **PadKeys_Radial** | Radials: actions (G, Cmd+G, Option+G), markers (Shift+G), main menu (Ctrl+G) | PadKeys |
+| **PadKeys_Radial** | Radials: actions (G, Cmd+G, Option+G), markers (Shift + side mouse button), main menu (Ctrl+G) | PadKeys |
 | **PadKeys_Bar** | One bar that shows the layer you hold (Cmd, Shift, Option, Ctrl) | PadKeys (SpellActivationOverlay optional, for its proc glows) |
 | **PadKeys_Fade** | Blizzard's action bars, micro menu and bags fade out until you mouse over them or drag a spell; each bar is labelled with its PadKeys key (Cmd, Shift, G wheel) | PadKeys |
 | **PadKeys_Look** | Every font in the game in the theme font (Roboto Condensed), and chat windows on a black background | PadKeys |
@@ -75,11 +75,11 @@ keyboard with each layer's keys. It's also published at
 | \` | Ally mode (F targets allies, Cmd+F inspects) | | |
 | Tab / Shift+Tab | Next / previous enemy | Ctrl+F | Last target |
 | Ctrl+Tab / Ctrl+Shift+Tab | Next / previous group member | Cmd+F | Last hostile target |
-| G (hold) | Action radial (Bar 6); with Cmd: Bar 7, Option: Bar 8, Shift: markers, Ctrl: main menu | C | Target's next debuff tooltip |
+| G (hold) | Action radial (Bar 6); with Cmd: Bar 7, Option: Bar 8, Ctrl: main menu | C | Target's next debuff tooltip |
 | Z | Sheathe / draw weapon | Cmd / Shift / Ctrl+C | Target buff / your debuff / your buff |
 | Shift+\` | UI cursor | X | Sit / stand |
 | F1 | Key map | B | Bags, with the UI cursor inside |
-| 5 (hold) | Blizzard's ping key: click a unit, a spot or a bar slot | | |
+| Side mouse button (hold) | Blizzard's ping key: click a unit, a spot or a bar slot | Shift + side mouse button (hold) | Target marker radial |
 
 | Context | Keys |
 |---|---|
@@ -435,7 +435,7 @@ about a third of its size. The modifier you press with G picks the radial:
 | G | Action Bar 6, slots 1-8: drag spells, items and macros there | yes |
 | Cmd+G | Action Bar 7, slots 1-8, the same way | yes |
 | Option+G | Action Bar 8, slots 1-8, the same way (Mac only) | yes |
-| Shift+G | Target markers on your target, skull at the top | yes |
+| Shift + side mouse button | Target markers on your target, skull at the top (bound by wow-settings) | yes |
 | Ctrl+G | Blizzard's main-menu entries, three pages | yes |
 
 - **Action Bar 6** is Blizzard's bar 6; it can stay hidden in Edit Mode.
@@ -474,13 +474,15 @@ buffs) when PadKeys_Cursor is on.
 
 ## Pings (Blizzard's)
 
-Hold **5**: Blizzard's ping key. It is a plain key, as a modifier would
-swap the PadKeys bar's layer. While you hold it:
+Hold the **side mouse button** (`BUTTON5`): Blizzard's ping key. The
+binding lives in `wow-settings` (with Shift + the same button for the
+marker radial), not in PadKeys; 5 is left unbound. While you hold it:
 
 - click a unit or a spot to send Blizzard's contextual ping;
 - click a slot of the PadKeys bar to ping that spell: ready, or on
-  cooldown with the time left (as on Blizzard's own buttons); hold a
-  modifier too to ping that layer's slots;
+  cooldown with the time left (as on Blizzard's own buttons); press a
+  modifier after the side button to ping that layer's slots (a modifier
+  held first picks Shift + side button, the marker radial);
 - press and drag for Blizzard's ping wheel: attack, assist, warning, on my
   way.
 
@@ -643,8 +645,10 @@ is loaded.
    should print 3. Tab / Shift+Tab cycle enemies,
    Shift+F assists, Ctrl+F and Cmd+F go back to earlier targets.
 4. **Key map**: press F1 and check it matches what the keys do.
-5. **Pings** (in a group): hold 5 and click a mob, then drag for the
-   wheel. With PadKeys_Bar, click a bar slot too, also with Shift held.
+5. **Pings** (in a group): hold the side mouse button and click a mob,
+   then drag for the wheel. With PadKeys_Bar, click a bar slot too, also
+   with Shift pressed after the side button (Shift first opens the marker
+   radial instead).
 
 **Stage 2: + PadKeys_Cursor**
 
@@ -683,8 +687,8 @@ is loaded.
 11. **Buffs** (with PadKeys_Cursor on): hold Ctrl+G, left page, pick Buffs.
     The cursor should land on your buffs; cancel one with Shift+F.
 12. **Combat ring**: put a spell on Action Bar 6 slot 3, hold G, point up,
-    release: it should cast, also in combat. Then Shift+G up (skull on
-    your target). The highlight must match what
+    release: it should cast, also in combat. Then Shift + side mouse button,
+    point up (skull on your target). The highlight must match what
     fires; if not, send the debug file.
 
 **Stage 6: + PadKeys_Bar**

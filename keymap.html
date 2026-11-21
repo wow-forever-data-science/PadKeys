@@ -164,8 +164,12 @@ footer p { margin: 0; max-width: 75ch; }
             <dt>G</dt><dd>Action Bar 6, slots 1-8 (in combat too)</dd>
             <dt>Cmd+G</dt><dd>Action Bar 7, slots 1-8 (in combat too)</dd>
             <dt>Option+G</dt><dd>Action Bar 8, slots 1-8 (in combat too)</dd>
-            <dt>Shift+G</dt><dd>Target markers (in combat too)</dd>
             <dt>Ctrl+G</dt><dd>Main menu; the mouse wheel pages it</dd>
+          </dl>
+          <p>Side mouse button (bound in wow-settings):</p>
+          <dl>
+            <dt>Side button</dt><dd>Ping: hold, click a unit, spot or bar slot; drag for the wheel</dd>
+            <dt>Shift+Side</dt><dd>Target markers (in combat too)</dd>
           </dl>
         </div>
         <div class="card">
@@ -232,7 +236,6 @@ const MAP = {
     B: { a: "Bags", c: "menu", long: "Bags, with the UI cursor inside" },
     C: { a: "Tgt debuffs", c: "act", long: "Target's next debuff tooltip", combat: true },
     Z: { a: "Sheathe", c: "move", long: "Sheathe / draw your weapon" },
-    "5": { a: "Ping", c: "menu", long: "Blizzard's ping key: click a unit, a spot or a bar slot (hold a modifier for that layer); drag for the wheel", hold: true, combat: true },
     G: { a: "Actions", c: "menu", long: "Action radial: Action Bar 6, slots 1-8", hold: true, combat: true },
     F1: { a: "Key map", c: "menu", long: "This key map, in game" },
     esc: { a: "Back", c: "menu", long: "Game menu; closes the cursor or aura view first" },
@@ -242,7 +245,6 @@ const MAP = {
     "`": { a: "Cursor", c: "menu", long: "Keyboard UI cursor" },
     tab: { a: "Prev target", c: "target", long: "Previous enemy", combat: true },
     F: { a: "Assist", c: "target", long: "Assist: your target's target" },
-    G: { a: "Markers", c: "menu", long: "Target marker radial", hold: true, combat: true },
     C: { a: "Debuffs", c: "act", long: "Your next debuff tooltip", combat: true },
   },
   ctrl: {
