@@ -154,25 +154,27 @@ ns.cursor_on_all(mail_all)
 -- The all key reaches the mailbox with the cursor off too (items dragged in
 -- with the mouse, then Cmd+F sends): bound while the mailbox is open,
 -- without priority, so the cursor's own binding wins while it is on.
+-- Bound from MailFrame's OnShow and OnHide: this client opens it as a
+-- player interaction (RegisterPlayerInteraction), and MAIL_SHOW never fires.
 local mail_key = CreateFrame("Button", "PadKeysMailAll", UIParent)
 mail_key:RegisterForClicks("AnyDown")
 mail_key:SetScript("OnClick", mail_all)
-mail_key:RegisterEvent("MAIL_SHOW")
-mail_key:RegisterEvent("MAIL_CLOSED")
-mail_key:RegisterEvent("PLAYER_REGEN_ENABLED")
-mail_key:SetScript("OnEvent", function(self, event)
+
+local function bind_mail_key()
   if InCombatLockdown() then
     return
   end
-  ClearOverrideBindings(self)
-  -- Combat ends with the mailbox still open: bind again.
-  if event == "MAIL_SHOW" or (event == "PLAYER_REGEN_ENABLED"
-                              and MailFrame and MailFrame:IsShown()) then
+  ClearOverrideBindings(mail_key)
+  if MailFrame and MailFrame:IsShown() then
     for _, key in ipairs(ns.config.cursor.keys.all) do
-      SetOverrideBindingClick(self, false, key, "PadKeysMailAll")
+      SetOverrideBindingClick(mail_key, false, key, "PadKeysMailAll")
     end
   end
-end)
+end
+
+-- Combat ends with the mailbox still open: bind again.
+mail_key:RegisterEvent("PLAYER_REGEN_ENABLED")
+mail_key:SetScript("OnEvent", bind_mail_key)
 
 -- A text box with the keyboard focus takes every key before the bindings,
 -- and Blizzard focuses the Send Mail ones (the recipient after each send),
@@ -187,12 +189,16 @@ local function held_chord(key)
   return table.concat(mods, "-")
 end
 
-local hooked_mail_boxes
-mail_key:HookScript("OnEvent", function(_, event)
-  if event ~= "MAIL_SHOW" or hooked_mail_boxes then
+-- Blizzard_MailFrame loads before PadKeys, but in case it doesn't, hook it
+-- as it loads.
+local hooked_mail
+local function hook_mail()
+  if hooked_mail or not MailFrame then
     return
   end
-  hooked_mail_boxes = true
+  hooked_mail = true
+  MailFrame:HookScript("OnShow", bind_mail_key)
+  MailFrame:HookScript("OnHide", bind_mail_key)
   for _, box in ipairs({ SendMailNameEditBox, SendMailSubjectEditBox,
                          SendMailBodyEditBox }) do
     box:HookScript("OnKeyDown", function(_, key)
@@ -201,7 +207,18 @@ mail_key:HookScript("OnEvent", function(_, event)
       end
     end)
   end
-end)
+end
+hook_mail()
+if not hooked_mail then
+  local loader = CreateFrame("Frame")
+  loader:RegisterEvent("ADDON_LOADED")
+  loader:SetScript("OnEvent", function(self, _, addon)
+    if addon == "Blizzard_MailFrame" then
+      self:UnregisterEvent("ADDON_LOADED")
+      hook_mail()
+    end
+  end)
+end
 
 -- The talents and the Legacy tree: the all key applies what you picked,
 -- as Blizzard's Apply Changes button does (and its gamepad binding, in
