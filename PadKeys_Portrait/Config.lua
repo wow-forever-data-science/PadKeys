@@ -12,11 +12,4 @@ ns.config.portrait = {
   -- and one cancelled in combat shows as combat ends.
   -- false shows stances and forms only.
   buffs = true,
-  -- What you are tracking (Find Herbs, Track Beasts, ...) as a badge on
-  -- the portrait's lower right; hover it for the name. false for none.
-  -- In combat only your own tracking casts change it.
-  tracking = true,
-  tracking_size = 22,
-  -- How much of the level circle's edge shows around the icon, in pixels.
-  tracking_ring_width = 2,
 }

@@ -1,6 +1,6 @@
 ## Interface: 11507, 16001
 ## Title: PadKeys - Portrait
-## Notes: Your stance, form, aspect or aura in place of your portrait, and what you are tracking as a badge on it. Needs PadKeys.
+## Notes: Your stance, form, aspect or aura in place of your portrait. Needs PadKeys.
 ## Author: wow-forever-data-science
 ## Version: 0.1.0
 ## Dependencies: PadKeys

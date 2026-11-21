@@ -1,15 +1,13 @@
 -- Your player portrait shows what you are in, so a hidden buff frame still
 -- tells you: the active stance or form (warrior stances, druid forms,
 -- rogue stealth), else the active hunter aspect or paladin aura, else your
--- class icon (Config.lua). What you are tracking sits on it as a badge.
+-- class icon (Config.lua).
 --
 -- Stances and forms come from the stance bar's own flags
 -- (GetShapeshiftFormInfo), plain in combat too. Aspects and auras are
 -- buffs: auras are secret in combat, so they are read out of combat only.
 -- In combat your own cast of an aspect or aura switches the icon instead
 -- (UNIT_SPELLCAST_SUCCEEDED); one cancelled in combat shows as combat ends.
--- Tracking is read the same way: out of combat from the minimap's list,
--- in combat from your own cast of a tracking spell.
 --
 -- The icon is a texture of ours on top of Blizzard's portrait, in the same
 -- frame and layer; Blizzard's portrait is only made see-through, so its
@@ -148,106 +146,6 @@ local function update()
   end
 end
 
--- The tracking badge: a round icon on the portrait's lower right, in the
--- same circle as the level on the lower left (else a rounded box). Hovering
--- shows the name; clicks pass through to the player frame.
-local badge
-
-local LEVEL_RING = "UI-HUD-UnitFrame-SmallCircle"
-
--- Names of the tracking spells seen out of combat, so a cast in combat can
--- be told apart.
-local tracking_names = {}
-
-local function tracking()
-  if not (C_Minimap and C_Minimap.GetNumTrackingTypes) then
-    return
-  end
-  local active
-  for i = 1, C_Minimap.GetNumTrackingTypes() do
-    local info = C_Minimap.GetTrackingInfo(i)
-    if info and info.type == "spell" then
-      tracking_names[info.name] = true
-      if info.active then
-        active = active or info
-      end
-    end
-  end
-  return active
-end
-
-local function show_tracking(name, texture)
-  badge.name = name
-  if texture then
-    badge.icon:SetTexture(texture)
-    ns.icon(badge.icon)
-    badge:Show()
-  else
-    badge:Hide()
-  end
-end
-
--- The minimap's list, read out of combat only (secret in combat).
-local function update_tracking()
-  if InCombatLockdown() then
-    return
-  end
-  local ok, info = pcall(tracking)
-  if ok then
-    show_tracking(info and info.name, info and info.texture)
-  end
-end
-
--- A cast of a tracking spell makes it the one shown.
-local function read_tracking_cast(spell_id)
-  if not spell_id or is_secret(spell_id) then
-    return
-  end
-  local name = spell_name(spell_id)
-  if name and not is_secret(name) and tracking_names[name] then
-    show_tracking(name, spell_texture(spell_id))
-  end
-end
-
-if c.tracking then
-  badge = CreateFrame("Frame", "PadKeysPortraitTracking", parent)
-  badge:SetSize(c.tracking_size, c.tracking_size)
-  badge:SetPoint("CENTER", portrait, "BOTTOMRIGHT", -6, 6)
-  badge:SetFrameLevel(parent:GetFrameLevel() + 5)
-  badge.icon = badge:CreateTexture(nil, "ARTWORK")
-  if C_Texture and C_Texture.GetAtlasInfo and C_Texture.GetAtlasInfo(LEVEL_RING) then
-    -- The ring's dark middle sits under the icon, so only its edge shows.
-    local ring = badge:CreateTexture(nil, "BORDER")
-    ring:SetAtlas(LEVEL_RING)
-    ring:SetAllPoints(badge)
-    local inset = c.tracking_ring_width
-    badge.icon:SetPoint("TOPLEFT", inset, -inset)
-    badge.icon:SetPoint("BOTTOMRIGHT", -inset, inset)
-    local t = ns.ICON_TRIM
-    badge.icon:SetTexCoord(t, 1 - t, t, 1 - t)
-    local round = badge:CreateMaskTexture()
-    round:SetTexture("Interface\\CharacterFrame\\TempPortraitAlphaMask",
-                     "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
-    round:SetAllPoints(badge.icon)
-    badge.icon:AddMaskTexture(round)
-  else
-    ns.box(badge, 1, true)
-    ns.fit_icon(badge, badge.icon)
-    ns.round(badge, badge.icon, 1)
-  end
-  badge:SetMouseMotionEnabled(true)
-  badge:SetMouseClickEnabled(false)
-  badge:SetScript("OnEnter", function(self)
-    if self.name then
-      GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-      GameTooltip:SetText(self.name, 1, 1, 1)
-      GameTooltip:Show()
-    end
-  end)
-  badge:SetScript("OnLeave", GameTooltip_Hide)
-  badge:Hide()
-end
-
 local events = CreateFrame("Frame")
 events:RegisterEvent("PLAYER_ENTERING_WORLD")
 events:RegisterEvent("UPDATE_SHAPESHIFT_FORM")
@@ -255,25 +153,11 @@ events:RegisterEvent("UPDATE_SHAPESHIFT_FORMS")
 events:RegisterEvent("PLAYER_REGEN_ENABLED")
 events:RegisterUnitEvent("UNIT_AURA", "player")
 events:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player")
-if badge then
-  events:RegisterEvent("MINIMAP_UPDATE_TRACKING")
-end
 events:SetScript("OnEvent", function(_, event, _, _, spell_id)
-  if event == "MINIMAP_UPDATE_TRACKING" then
-    update_tracking()
-    return
-  end
   if event == "UNIT_SPELLCAST_SUCCEEDED" then
     read_cast(spell_id)
-    if badge then
-      read_tracking_cast(spell_id)
-    end
   elseif event ~= "UPDATE_SHAPESHIFT_FORM" and event ~= "UPDATE_SHAPESHIFT_FORMS" then
     read_buffs()
   end
   update()
-  if (event == "PLAYER_ENTERING_WORLD" or event == "PLAYER_REGEN_ENABLED")
-     and badge then
-    update_tracking()
-  end
 end)
