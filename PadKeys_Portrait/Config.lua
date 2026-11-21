@@ -14,6 +14,7 @@ ns.config.portrait = {
   buffs = true,
   -- What you are tracking (Find Herbs, Track Beasts, ...) as a badge on
   -- the portrait's lower right; hover it for the name. false for none.
+  -- In combat only your own tracking casts change it.
   tracking = true,
   tracking_size = 22,
 }
