@@ -356,9 +356,9 @@ the frames still work, and Edit Mode still moves them.
   Blizzard's portrait). Aspects and auras are buffs, read out of combat
   only; in combat your own cast of one switches the icon, and one
   cancelled in combat shows as combat ends.
-- **PadKeys_Tracking**: a round badge on the minimap's rim shows what you
-  are tracking, in the ring Blizzard puts behind your level; hover it for
-  the name. In combat only your own tracking casts change it.
+- **PadKeys_Tracking**: a round badge on the minimap's rim, at 2 o'clock
+  next to the day and night dial, shows what you are tracking, in the ring
+  Blizzard puts behind your level; hover it for the name. In combat only your own tracking casts change it.
 
 Settings are in each addon's `Config.lua`.
 
