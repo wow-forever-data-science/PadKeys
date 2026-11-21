@@ -120,6 +120,16 @@ function ns.create_wheel(name)
     segment.cooldown = cooldown
   end
 
+  -- Stack counts (items, reagents) on each icon's lower right, above the
+  -- countdowns; unscaled like them.
+  local counts = CreateFrame("Frame", nil, frame)
+  counts:SetAllPoints(frame)
+  counts:SetFrameLevel(art:GetFrameLevel() + 3)
+  local count_size = ns.config.radial.count_size or 14
+  for _, segment in ipairs(w.segments) do
+    segment.count = ns.text(counts, count_size, "white", "OVERLAY", "NumberFontNormal")
+  end
+
   w.label = ns.text(frame, 13, "white", "OVERLAY", "GameFontHighlight")
   -- Under the wheel: the centre is too small for text at small scales.
   w.label:SetPoint("TOP", art, "BOTTOM", 0, -6)
@@ -189,10 +199,12 @@ end
 
 -- entries[i] is nil (an empty segment) or
 -- { icon = atlas or texture, label = text, enabled = bool, desaturate = bool,
---   cooldown = duration object or nil, cooling = bool, tint = number }.
+--   cooldown = duration object or nil, cooling = bool, tint = number,
+--   count = text or nil }.
 -- cooling dims the icon (the spell can't be cast); a cooldown without it
 -- (a charge recharging) only shows the countdown. tint darkens the icon
--- (1 is none), as the bar does when an action can't be used.
+-- (1 is none), as the bar does when an action can't be used. count may be
+-- a secret value; SetText takes it.
 function Wheel:set_entries(entries)
   self.entries = entries
   local dim = ns.config.radial.cooldown_alpha or 0.35
@@ -203,6 +215,11 @@ function Wheel:set_entries(entries)
       local x, y = draw_icon(segment.icon, i, entry.icon)
       segment.cooldown:ClearAllPoints()
       segment.cooldown:SetPoint("CENTER", self.frame, "CENTER", x * scale, y * scale)
+      local half = segment.icon:GetWidth() / 2
+      segment.count:ClearAllPoints()
+      segment.count:SetPoint("BOTTOMRIGHT", self.frame, "CENTER",
+                             (x + half) * scale, (y - half) * scale)
+      segment.count:SetText(entry.count or "")
       segment.icon:SetDesaturated(entry.desaturate or
                                   ns.config.theme.grey_icons or false)
       local v = entry.tint or 1
@@ -214,6 +231,7 @@ function Wheel:set_entries(entries)
     else
       segment.icon:Hide()
       segment.disabled:Hide()
+      segment.count:SetText("")
       set_cooldown(segment, nil)
     end
   end

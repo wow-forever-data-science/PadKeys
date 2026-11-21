@@ -33,6 +33,8 @@ ns.config.radial = {
   -- global cooldown alone shows nothing; a charge recharging shows the
   -- countdown but keeps the icon solid.
   countdown_size = 14,
+  -- Stack counts of items and reagents on an icon's lower right.
+  count_size = 14,
   cooldown_alpha = 0.35,
   -- Mouse distance before a direction picks a segment.
   dead_zone = 8,

@@ -232,6 +232,7 @@ local function slot_entries(first)
         cooldown = cooldown,
         cooling = cooling,
         tint = slot_tint(slot),
+        count = ab.GetActionDisplayCount(slot),
       }
     end
   end
