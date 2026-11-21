@@ -12,10 +12,9 @@ b[ns.config.mod .. "G"] = "CLICK PadKeysRing:extra" -- Action Bar 7, slots 1-8
 if ns.config.mod ~= "ALT-" then
   b["ALT-G"] = "CLICK PadKeysRing:third"    -- Action Bar 8, slots 1-8
 end
--- Shift+G is free for now. The marker radial (CLICK PadKeysRing:markers)
--- is on Shift + the side mouse button, which wow-settings binds, next to
--- Blizzard's ping key on the plain side button.
-b["SHIFT-G"] = false
+-- Not Shift + the side mouse button: Blizzard's ping key there takes a
+-- held modifier too (to ping a bar layer's slots), so both would open.
+b["SHIFT-G"] = "CLICK PadKeysRing:markers"
 b["CTRL-G"] = "CLICK PadKeysRing:menu"      -- Blizzard's main menu entries
 
 ns.config.radial = {

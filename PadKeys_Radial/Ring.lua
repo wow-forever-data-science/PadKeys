@@ -4,8 +4,7 @@
 -- * actions (G): Action Bar 6, slots 1-8 (drag spells, items, macros there);
 -- * extra (Cmd+G): Action Bar 7, slots 1-8, the same way;
 -- * third (Option+G, Mac only): Action Bar 8, slots 1-8, the same way;
--- * markers (Shift + side mouse button, bound by wow-settings): target
---   markers, sent as /tm macros;
+-- * markers (Shift+G): target markers, sent as /tm macros;
 -- * menu (Ctrl+G): Blizzard's main-menu entries (Menu.lua), several pages
 --   turned with the mouse wheel while it is open.
 --
