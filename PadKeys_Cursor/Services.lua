@@ -12,7 +12,8 @@
 -- * Mailbox: the all key (Cmd+F) opens all mail, and on the Send Mail tab
 --   sends the letter, with the cursor on or off. With an empty inbox it
 --   switches to the Send Mail tab.
--- * Talents: the all key (Cmd+F) applies the talents you picked.
+-- * Talents and the Legacy tree: the all key (Cmd+F) applies what you
+--   picked.
 -- * Vendor: the mouse wheel steps through the items, turning the page at
 --   the end of one.
 -- * Vendor: gear is repaired from your own money, and junk (grey items)
@@ -202,14 +203,23 @@ mail_key:HookScript("OnEvent", function(_, event)
   end
 end)
 
--- The talents: the all key applies the picked talents, as Blizzard's Apply
--- Changes button does. The button is greyed out until a talent is picked.
-ns.cursor_on_all(function()
+-- The talents and the Legacy tree: the all key applies what you picked,
+-- as Blizzard's Apply Changes button does (and its gamepad binding, in
+-- Blizzard_LegacySystem.lua). The button is greyed out until something is
+-- picked.
+local function apply_buttons()
   local talents = PlayerSpellsFrame and PlayerSpellsFrame.TalentsFrame
-  local button = talents and talents.ApplyButton
-  if button and button:IsVisible() and button:IsEnabled() then
-    button:Click()
-    return true
+  local legacy = LegacySystemFrame and LegacySystemFrame.TreePage and
+    LegacySystemFrame.TreePage.LegacyTreeTraitPanel
+  return { talents and talents.ApplyButton, legacy and legacy.ApplyButton }
+end
+
+ns.cursor_on_all(function()
+  for _, button in pairs(apply_buttons()) do
+    if button:IsVisible() and button:IsEnabled() then
+      button:Click()
+      return true
+    end
   end
   return false
 end)
