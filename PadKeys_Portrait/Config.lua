@@ -17,4 +17,6 @@ ns.config.portrait = {
   -- In combat only your own tracking casts change it.
   tracking = true,
   tracking_size = 22,
+  -- How much of the level circle's edge shows around the icon, in pixels.
+  tracking_ring_width = 2,
 }
