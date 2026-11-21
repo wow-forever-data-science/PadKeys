@@ -121,7 +121,7 @@ local function sections()
       { "Click", config_keys(k.click) },
       { "Right-click (use, sell, cancel buff)", config_keys(k.rightclick) },
       { "Pick up", config_keys(k.pickup) },
-      { "Most at once (buy a stack, create all, apply talents or Legacy tree)", config_keys(k.all) },
+      { "Most at once (buy a stack, create all, apply talents or Legacy tree, create auction)", config_keys(k.all) },
       { "Next / previous window", config_keys(k.next_window) .. " / " ..
           config_keys(k.previous_window) },
       { "Close window / leave", config_keys(k.back) },

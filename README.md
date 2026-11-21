@@ -84,7 +84,7 @@ keyboard with each layer's keys. It's also published at
 
 | Context | Keys |
 |---|---|
-| UI cursor | WASD / arrows move · F / Space click (uses a bag item) · Shift+F right-click · Ctrl+F pick up · Cmd+F buy a stack / create all / open all mail / apply talents or Legacy tree · Tab / Shift+Tab next / previous window · Esc leave |
+| UI cursor | WASD / arrows move · F / Space click (uses a bag item) · Shift+F right-click · Ctrl+F pick up · Cmd+F buy a stack / create all / open all mail / apply talents or Legacy tree / create auction · Tab / Shift+Tab next / previous window · Esc leave |
 | Radials | point with the mouse · release G: run · Ctrl+G only: mouse wheel pages |
 | NPC dialog | W / S move to an option or reward · F choose, accept, continue, complete · Esc close |
 | Auras | C: target's first aura, then the next · Ctrl+C: your debuffs · hold Shift+C: tooltip |

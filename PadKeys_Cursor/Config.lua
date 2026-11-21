@@ -32,9 +32,9 @@ ns.config.cursor = {
     -- The most at once: a vendor item buys a full stack (or what you can
     -- afford), a recipe or the Create button creates all, the mailbox
     -- opens all mail (or the Send Mail tab when empty) or sends the letter
-    -- (cursor on or off), the talents or Legacy tree apply. Cmd+F on a Mac (the base
-    -- MOD); takes over last hostile target
-    -- while the cursor is on or the mailbox is open.
+    -- (cursor on or off), the talents or Legacy tree apply, the auction
+    -- house creates the auction. Cmd+F on a Mac (the base MOD); takes over
+    -- last hostile target while the cursor is on or the mailbox is open.
     all = { ns.config.mod .. "F" },
     -- gamepad B: close the window the cursor is in, or leave the cursor
     -- where there is nothing to close. Only taken over while the cursor is
