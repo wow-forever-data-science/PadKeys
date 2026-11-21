@@ -1,0 +1,10 @@
+## Interface: 11507, 16001
+## Title: PadKeys - Tracking
+## Notes: What you are tracking as a round badge on the minimap. Needs PadKeys.
+## Author: wow-forever-data-science
+## Version: 0.1.0
+## Dependencies: PadKeys
+## OptionalDeps: PadKeys_Debug
+
+Config.lua
+Tracking.lua

@@ -104,7 +104,8 @@ ns.modules = {
   { addon = "PadKeys_Cooldowns", does = "Blizzard's Cooldown Manager in the PadKeys look" },
   { addon = "PadKeys_Totems", does = "Blizzard's totem bar in the PadKeys look" },
   { addon = "PadKeys_Combo", does = "Combo points as black and white pips" },
-  { addon = "PadKeys_Portrait", does = "Stance, form or aspect as your portrait, tracking badge" },
+  { addon = "PadKeys_Portrait", does = "Stance, form or aspect as your portrait" },
+  { addon = "PadKeys_Tracking", does = "What you are tracking as a badge on the minimap" },
   { addon = "PadKeys_Debug", does = "Saves errors to SavedVariables (/pkdebug)" },
 }
 
