@@ -148,10 +148,12 @@ local function update()
   end
 end
 
--- The tracking badge: a rounded box on the portrait's lower right, above
--- the frame's ring. Hovering shows the name; clicks pass through to the
--- player frame.
+-- The tracking badge: a round icon on the portrait's lower right, in the
+-- same circle as the level on the lower left (else a rounded box). Hovering
+-- shows the name; clicks pass through to the player frame.
 local badge
+
+local LEVEL_RING = "UI-HUD-UnitFrame-SmallCircle"
 
 -- Names of the tracking spells seen out of combat, so a cast in combat can
 -- be told apart.
@@ -212,10 +214,27 @@ if c.tracking then
   badge:SetSize(c.tracking_size, c.tracking_size)
   badge:SetPoint("CENTER", portrait, "BOTTOMRIGHT", -6, 6)
   badge:SetFrameLevel(parent:GetFrameLevel() + 5)
-  ns.box(badge, 1, true)
   badge.icon = badge:CreateTexture(nil, "ARTWORK")
-  ns.fit_icon(badge, badge.icon)
-  ns.round(badge, badge.icon, 1)
+  if C_Texture and C_Texture.GetAtlasInfo and C_Texture.GetAtlasInfo(LEVEL_RING) then
+    -- The ring's dark middle sits under the icon, so only its edge shows.
+    local ring = badge:CreateTexture(nil, "BORDER")
+    ring:SetAtlas(LEVEL_RING)
+    ring:SetAllPoints(badge)
+    local inset = c.tracking_ring_width
+    badge.icon:SetPoint("TOPLEFT", inset, -inset)
+    badge.icon:SetPoint("BOTTOMRIGHT", -inset, inset)
+    local t = ns.ICON_TRIM
+    badge.icon:SetTexCoord(t, 1 - t, t, 1 - t)
+    local round = badge:CreateMaskTexture()
+    round:SetTexture("Interface\\CharacterFrame\\TempPortraitAlphaMask",
+                     "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
+    round:SetAllPoints(badge.icon)
+    badge.icon:AddMaskTexture(round)
+  else
+    ns.box(badge, 1, true)
+    ns.fit_icon(badge, badge.icon)
+    ns.round(badge, badge.icon, 1)
+  end
   badge:SetMouseMotionEnabled(true)
   badge:SetMouseClickEnabled(false)
   badge:SetScript("OnEnter", function(self)
