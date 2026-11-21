@@ -101,13 +101,13 @@ function ns.create_wheel(name)
 
   -- Countdowns over the action icons: only the numbers, no swipe, edge or
   -- flash, as on the PadKeys bar. On the unscaled frame, so the numbers
-  -- keep their size whatever the wheel's scale; each sits on its icon.
+  -- keep their size whatever the wheel's scale; set_entries places each
+  -- on its icon.
   local countdown_size = ns.config.radial.countdown_size or 14
   for _, segment in ipairs(w.segments) do
     local cooldown = CreateFrame("Cooldown", nil, frame, "CooldownFrameTemplate")
     cooldown:SetFrameLevel(art:GetFrameLevel() + 2)
     cooldown:SetSize(40, 40)
-    cooldown:SetPoint("CENTER", segment.icon, "CENTER")
     cooldown:SetDrawSwipe(false)
     cooldown:SetDrawEdge(false)
     cooldown:SetDrawBling(false)
@@ -151,7 +151,8 @@ end
 
 -- An atlas name or a texture (file ID or path), sized and placed as
 -- Blizzard places each kind.
--- Blizzard's sizes, times icon_scale.
+-- Blizzard's sizes, times icon_scale. Returns the icon's offset from the
+-- wheel's centre, in the art's (scaled) units.
 local function draw_icon(tex, index, icon)
   local grow = ns.config.radial.icon_scale or 1
   local distance = TEXTURE_ICON_DISTANCE
@@ -170,8 +171,10 @@ local function draw_icon(tex, index, icon)
     tex:SetTexture(icon or 134400)
     tex:SetSize(TEXTURE_ICON_SIZE * grow, TEXTURE_ICON_SIZE * grow)
   end
+  local x, y = polar(index, distance)
   tex:ClearAllPoints()
-  tex:SetPoint("CENTER", polar(index, distance))
+  tex:SetPoint("CENTER", x, y)
+  return x, y
 end
 
 -- A duration object (C_ActionBar.GetActionCooldownDuration) or nil. The
@@ -186,18 +189,24 @@ end
 
 -- entries[i] is nil (an empty segment) or
 -- { icon = atlas or texture, label = text, enabled = bool, desaturate = bool,
---   cooldown = duration object or nil, cooling = bool }.
+--   cooldown = duration object or nil, cooling = bool, tint = number }.
 -- cooling dims the icon (the spell can't be cast); a cooldown without it
--- (a charge recharging) only shows the countdown.
+-- (a charge recharging) only shows the countdown. tint darkens the icon
+-- (1 is none), as the bar does when an action can't be used.
 function Wheel:set_entries(entries)
   self.entries = entries
   local dim = ns.config.radial.cooldown_alpha or 0.35
+  local scale = self.art:GetScale()
   for i, segment in ipairs(self.segments) do
     local entry = entries[i]
     if entry then
-      draw_icon(segment.icon, i, entry.icon)
+      local x, y = draw_icon(segment.icon, i, entry.icon)
+      segment.cooldown:ClearAllPoints()
+      segment.cooldown:SetPoint("CENTER", self.frame, "CENTER", x * scale, y * scale)
       segment.icon:SetDesaturated(entry.desaturate or
                                   ns.config.theme.grey_icons or false)
+      local v = entry.tint or 1
+      segment.icon:SetVertexColor(v, v, v)
       segment.icon:SetAlpha(entry.cooling and dim or 1)
       segment.icon:Show()
       segment.disabled:SetShown(not entry.enabled)

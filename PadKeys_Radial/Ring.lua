@@ -206,6 +206,19 @@ local function slot_cooldown(slot)
   return nil, false
 end
 
+-- Blizzard's usable tint, as on the PadKeys bar: dark when the action
+-- can't be used (an item you have none of, a missing reagent), lighter
+-- when only the mana is short.
+local function slot_tint(slot)
+  local usable, no_mana = ab.IsUsableAction(slot)
+  if usable then
+    return 1
+  elseif no_mana then
+    return 0.6
+  end
+  return 0.35
+end
+
 local function slot_entries(first)
   local entries = {}
   for i = 1, ns.wheel_segments do
@@ -218,6 +231,7 @@ local function slot_entries(first)
         enabled = true,
         cooldown = cooldown,
         cooling = cooling,
+        tint = slot_tint(slot),
       }
     end
   end
@@ -324,11 +338,14 @@ end)
 local SLOT_PAGES = { actions = true, extra = true, third = true }
 
 -- Cooldowns that start or end while an action page is open (a cast, the
--- end of the global cooldown) show at once.
+-- end of the global cooldown), and changes to what can be used (mana, an
+-- item used up), show at once.
 local watcher = CreateFrame("Frame")
 watcher:RegisterEvent("SPELL_UPDATE_COOLDOWN")
 watcher:RegisterEvent("SPELL_UPDATE_CHARGES")
 watcher:RegisterEvent("ACTIONBAR_SLOT_CHANGED")
+watcher:RegisterEvent("ACTIONBAR_UPDATE_USABLE")
+watcher:RegisterEvent("BAG_UPDATE_DELAYED")
 watcher:SetScript("OnEvent", function(_, event)
   if event == "SPELL_UPDATE_COOLDOWN" then
     read_gcd()

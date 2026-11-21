@@ -446,7 +446,9 @@ about a third of its size. The modifier you press with G picks the radial:
   The action radials show the cooldown countdown over each icon, as the
   PadKeys bar does: a spell on cooldown is dimmed with the seconds on
   top, a charge recharging shows its time but stays solid, and the global
-  cooldown alone shows nothing. Usability (range, mana) isn't shown yet.
+  cooldown alone shows nothing. An action you can't use (an item you have
+  none of, a missing reagent) is dark grey, one short of mana lighter
+  grey, as on the bar. Range isn't shown.
 - All four are one **secure button**: on release, a secure snippet
   turns the mouse direction into a segment and fires its action, so
   spells, macros and windows work in combat and nothing is tainted. The
