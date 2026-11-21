@@ -8,7 +8,7 @@ ns.config.tracking = {
   -- Blizzard's day and night dial sits at about 1 o'clock, radius 102.
   clock = 2,
   radius = 102,
-  size = 52,
+  size = 36,
   -- How much of the ring's edge shows around the icon, in pixels.
   ring_width = 2,
 }
