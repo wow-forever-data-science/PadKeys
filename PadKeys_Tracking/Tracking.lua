@@ -1,6 +1,6 @@
 -- What you are tracking (Find Herbs, Track Beasts, ...) as a round badge
--- on the minimap's rim; hover it for the name. Blizzard's own tracking
--- button shows a magnifier only.
+-- on the minimap's rim, next to the day and night dial; hover it for the
+-- name. Blizzard's own tracking button shows a magnifier only.
 --
 -- The minimap's tracking list is secret in combat, so it is read out of
 -- combat only. In combat your own cast of a tracking spell switches the
@@ -39,7 +39,9 @@ end
 
 local badge = CreateFrame("Frame", "PadKeysTracking", Minimap)
 badge:SetSize(c.size, c.size)
-badge:SetPoint("CENTER", Minimap, c.point, c.x, c.y)
+local angle = math.rad(c.clock * 30)
+badge:SetPoint("CENTER", Minimap, "CENTER",
+               c.radius * math.sin(angle), c.radius * math.cos(angle))
 badge:SetFrameLevel(Minimap:GetFrameLevel() + 5)
 badge.icon = badge:CreateTexture(nil, "ARTWORK")
 if C_Texture and C_Texture.GetAtlasInfo and C_Texture.GetAtlasInfo(RING) then
