@@ -8,6 +8,8 @@
 -- buffs: auras are secret in combat, so they are read out of combat only.
 -- In combat your own cast of an aspect or aura switches the icon instead
 -- (UNIT_SPELLCAST_SUCCEEDED); one cancelled in combat shows as combat ends.
+-- Tracking is read the same way: out of combat from the minimap's list,
+-- in combat from your own cast of a tracking spell.
 --
 -- The icon is a texture of ours on top of Blizzard's portrait, in the same
 -- frame and layer; Blizzard's portrait is only made see-through, so its
@@ -150,27 +152,58 @@ end
 -- the frame's ring. Hovering shows the name; clicks pass through to the
 -- player frame.
 local badge
+
+-- Names of the tracking spells seen out of combat, so a cast in combat can
+-- be told apart.
+local tracking_names = {}
+
 local function tracking()
   if not (C_Minimap and C_Minimap.GetNumTrackingTypes) then
     return
   end
+  local active
   for i = 1, C_Minimap.GetNumTrackingTypes() do
     local info = C_Minimap.GetTrackingInfo(i)
-    if info and info.active and info.type == "spell" then
-      return info
+    if info and info.type == "spell" then
+      tracking_names[info.name] = true
+      if info.active then
+        active = active or info
+      end
     end
   end
+  return active
 end
 
-local function update_tracking()
-  local info = tracking()
-  badge.name = info and info.name
-  if info then
-    badge.icon:SetTexture(info.texture)
+local function show_tracking(name, texture)
+  badge.name = name
+  if texture then
+    badge.icon:SetTexture(texture)
     ns.icon(badge.icon)
     badge:Show()
   else
     badge:Hide()
+  end
+end
+
+-- The minimap's list, read out of combat only (secret in combat).
+local function update_tracking()
+  if InCombatLockdown() then
+    return
+  end
+  local ok, info = pcall(tracking)
+  if ok then
+    show_tracking(info and info.name, info and info.texture)
+  end
+end
+
+-- A cast of a tracking spell makes it the one shown.
+local function read_tracking_cast(spell_id)
+  if not spell_id or is_secret(spell_id) then
+    return
+  end
+  local name = spell_name(spell_id)
+  if name and not is_secret(name) and tracking_names[name] then
+    show_tracking(name, spell_texture(spell_id))
   end
 end
 
@@ -213,11 +246,15 @@ events:SetScript("OnEvent", function(_, event, _, _, spell_id)
   end
   if event == "UNIT_SPELLCAST_SUCCEEDED" then
     read_cast(spell_id)
+    if badge then
+      read_tracking_cast(spell_id)
+    end
   elseif event ~= "UPDATE_SHAPESHIFT_FORM" and event ~= "UPDATE_SHAPESHIFT_FORMS" then
     read_buffs()
   end
   update()
-  if event == "PLAYER_ENTERING_WORLD" and badge then
+  if (event == "PLAYER_ENTERING_WORLD" or event == "PLAYER_REGEN_ENABLED")
+     and badge then
     update_tracking()
   end
 end)
