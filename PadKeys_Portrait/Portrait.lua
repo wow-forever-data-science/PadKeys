@@ -5,8 +5,9 @@
 --
 -- Stances and forms come from the stance bar's own flags
 -- (GetShapeshiftFormInfo), plain in combat too. Aspects and auras are
--- buffs: auras are secret in combat, so they are read out of combat only,
--- and a change in combat shows as combat ends.
+-- buffs: auras are secret in combat, so they are read out of combat only.
+-- In combat your own cast of an aspect or aura switches the icon instead
+-- (UNIT_SPELLCAST_SUCCEEDED); one cancelled in combat shows as combat ends.
 --
 -- The icon is a texture of ours on top of Blizzard's portrait, in the same
 -- frame and layer; Blizzard's portrait is only made see-through, so its
@@ -113,6 +114,28 @@ local function read_buffs()
   buff_icon = found
 end
 
+local function is_secret(v)
+  return issecretvalue and issecretvalue(v)
+end
+
+local function spell_texture(id)
+  if C_Spell and C_Spell.GetSpellTexture then
+    return C_Spell.GetSpellTexture(id)
+  end
+  return GetSpellTexture and GetSpellTexture(id)
+end
+
+-- A cast of an aspect or aura (any rank) makes it the one shown.
+local function read_cast(spell_id)
+  if not c.buffs or not spell_id or is_secret(spell_id) then
+    return
+  end
+  local name = spell_name(spell_id)
+  if name and not is_secret(name) and buff_names[name] then
+    buff_icon = spell_texture(spell_id) or buff_icon
+  end
+end
+
 local function update()
   local ok, texture = pcall(stance_icon)
   texture = ok and texture or buff_icon
@@ -179,15 +202,18 @@ events:RegisterEvent("UPDATE_SHAPESHIFT_FORM")
 events:RegisterEvent("UPDATE_SHAPESHIFT_FORMS")
 events:RegisterEvent("PLAYER_REGEN_ENABLED")
 events:RegisterUnitEvent("UNIT_AURA", "player")
+events:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player")
 if badge then
   events:RegisterEvent("MINIMAP_UPDATE_TRACKING")
 end
-events:SetScript("OnEvent", function(_, event)
+events:SetScript("OnEvent", function(_, event, _, _, spell_id)
   if event == "MINIMAP_UPDATE_TRACKING" then
     update_tracking()
     return
   end
-  if event ~= "UPDATE_SHAPESHIFT_FORM" and event ~= "UPDATE_SHAPESHIFT_FORMS" then
+  if event == "UNIT_SPELLCAST_SUCCEEDED" then
+    read_cast(spell_id)
+  elseif event ~= "UPDATE_SHAPESHIFT_FORM" and event ~= "UPDATE_SHAPESHIFT_FORMS" then
     read_buffs()
   end
   update()

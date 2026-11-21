@@ -8,7 +8,8 @@ ns.config.portrait = {
   -- portrait.
   fallback = "class",
   -- Hunter aspects and paladin auras are buffs, read only out of combat
-  -- (in combat they are secret). A change in combat shows as combat ends.
+  -- (in combat they are secret); in combat your own casts switch the icon,
+  -- and one cancelled in combat shows as combat ends.
   -- false shows stances and forms only.
   buffs = true,
   -- What you are tracking (Find Herbs, Track Beasts, ...) as a badge on
