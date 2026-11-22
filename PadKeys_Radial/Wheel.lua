@@ -1,6 +1,7 @@
 -- The wheel both radials draw: Blizzard's gamepad radial art (the atlases
 -- of GamepadRadial, in Forever's Blizzard_Gamepad addon) at our scale, eight
--- segments, a title, page dots and the picked segment's name below.
+-- segments, a title, page dots, the picked segment's name below and an X
+-- in the middle for exit.
 -- It only draws and picks; Menu.lua and Ring.lua decide what the segments
 -- are and what they do.
 --
@@ -135,6 +136,12 @@ function ns.create_wheel(name)
   w.label:SetPoint("TOP", art, "BOTTOM", 0, -6)
   w.label:SetWidth(160)
 
+  -- Exit: lit while letting go of the key would run nothing (back in the
+  -- middle, or pointing at an empty segment).
+  w.exit = ns.text(frame, 24, "white", "OVERLAY", "GameFontNormalHuge")
+  w.exit:SetPoint("CENTER", art)
+  w.exit:SetText("X")
+
   w.title = ns.text(frame, 16, "white", "OVERLAY", "GameFontNormalLarge")
   w.title:SetPoint("BOTTOM", art, "TOP", 0, 22)
 
@@ -258,6 +265,7 @@ function Wheel:select(index, refresh)
   local moved = index ~= self.current
   self.current = index
   local entry = self.entries and self.entries[index]
+  self:light_exit(not entry)
   if not entry then
     self.highlight:Hide()
     self.label:SetText("")
@@ -276,12 +284,15 @@ function Wheel:select(index, refresh)
   end
 end
 
+function Wheel:light_exit(lit)
+  local v = lit and ns.grey.white or ns.grey.dark
+  self.exit:SetTextColor(v, v, v)
+end
+
+-- Back inside the dead zone picks nothing, as Ring.lua's snippet does.
 function Wheel:track()
   local x, y = cursor()
-  local index = ns.pick_index(x - self.origin_x, y - self.origin_y, ns.config.radial.dead_zone)
-  if index then
-    self:select(index)
-  end
+  self:select(ns.pick_index(x - self.origin_x, y - self.origin_y, ns.config.radial.dead_zone))
 end
 
 -- The picked entry's index, or nil.
@@ -304,6 +315,7 @@ function Wheel:open(title)
   self.title:SetText(title)
   self.current = nil
   self.highlight:Hide()
+  self:light_exit(true)
   self.label:SetText("")
   frame:Show()
   play("GAMEPAD_RADIAL_MENU_OPEN")
