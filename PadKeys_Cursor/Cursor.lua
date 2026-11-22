@@ -675,22 +675,33 @@ end
 
 -- Gamepad B: close the window the cursor is in. With no close button (unit
 -- frames, auras, popups) it leaves the cursor instead.
-local function back()
-  if not active or InCombatLockdown() or not current then
+-- A secure click, as PadKeysCursorClick: a close button clicked from addon
+-- code taints what closing does (Settings reopens the game menu, which then
+-- can't call SpellStopCasting).
+local back = CreateFrame("Button", "PadKeysNavBack", UIParent,
+                         "SecureActionButtonTemplate")
+back:RegisterForClicks("AnyDown")
+back:SetAttribute("useOnKeyDown", true)
+back:SetAttribute("type", "click")
+back:SetScript("PreClick", function(self)
+  if InCombatLockdown() then
     stop()
     return
   end
-  candidates()
-  local root = root_of[current]
-  local button = root and close_button(root)
-  if button then
-    button:Click()
-    C_Timer.After(0.1, refresh)
-  else
+  local button
+  if active and current then
+    candidates()
+    local root = root_of[current]
+    button = root and close_button(root)
+  end
+  self:SetAttribute("clickbutton", button)
+  if not button then
     stop()
   end
-end
-nav_button("PadKeysNavBack", back)
+end)
+back:HookScript("PostClick", function()
+  C_Timer.After(0.1, refresh)
+end)
 
 -- Jump to the first button of the next (delta 1) or previous (-1) window,
 -- like the gamepad's "Next Frame" in UI mode.
