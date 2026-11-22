@@ -15,6 +15,9 @@
 -- targeted F moves on to the next ally: the client stops picking soft
 -- targets while you have a target (SoftTargetWithLocked 0, kept so enemy
 -- targets stay put), so F on softfriend would retarget the same ally.
+-- In a raid, ally mode turns F into raid picking (Raid.lua): hold F and
+-- move the mouse a little to walk a highlight over the raid frames,
+-- release to target that member.
 -- Ally mode is opt in because macro conditions can't see soft interact
 -- targets: [@softinteract,exists] is false at a corpse, NPC, mailbox or
 -- herb, so F would target a nearby ally over them. A state driver swaps
@@ -136,7 +139,13 @@ interact_header:SetAttribute("apply", [[
   local key = self:GetAttribute("key")
   local state = self:GetAttribute("state-interact")
   self:ClearBindings()
-  if state == "attack" then
+  if self:GetAttribute("ally") and self:GetAttribute("state-raid") == "on" then
+    -- Raid picking (Raid.lua) takes F over attacking and ally targeting.
+    self:SetBindingClick(true, key, "PadKeysRaidPick")
+    if state == "next" then
+      self:SetBindingClick(false, self:GetAttribute("inspect"), "PadKeysInspect")
+    end
+  elseif state == "attack" then
     self:SetBindingClick(true, key, "PadKeysAttack")
   elseif state == "friend" and self:GetAttribute("ally") then
     self:SetBindingClick(true, key, "PadKeysTargetSoftFriend")
@@ -148,6 +157,10 @@ interact_header:SetAttribute("apply", [[
 interact_header:SetAttribute("_onstate-interact", [[
   self:RunAttribute("apply")
 ]])
+interact_header:SetAttribute("_onstate-raid", [[
+  self:RunAttribute("apply")
+]])
+RegisterStateDriver(interact_header, "raid", "[group:raid] on; off")
 RegisterStateDriver(interact_header, "interact",
   "[combat,harm,nodead] attack; [help,nodead] next; "
   .. "[@softfriend,help,nodead] friend; interact")
