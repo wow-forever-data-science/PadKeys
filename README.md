@@ -35,7 +35,7 @@ error points at one part:
 | **PadKeys** | Key layout (action bars, movement, F interact, X sit, targeting keys), soft targeting, F1 key map, `/padkeys` | — |
 | **PadKeys_Cursor** | UI cursor (windows, unit frames, buffs) and NPC dialogs (F = A, Esc = B) | PadKeys |
 | **PadKeys_Auras** | Aura highlight: your target's nameplate auras (C), your debuffs (Ctrl+C); hold Shift+C for the tooltip | PadKeys |
-| **PadKeys_Targeting** | Party/raid cycling (Ctrl+Tab), F that attacks in combat, and ally mode (\`) where F targets the ally you face | PadKeys |
+| **PadKeys_Targeting** | Party/raid cycling (Ctrl+Tab), F that attacks in combat, and ally mode (\`) where F targets the ally you face, or in a raid picks a raid frame with the mouse | PadKeys |
 | **PadKeys_Radial** | Radials: actions (G, Cmd+G, Option+G), markers (Shift+G), main menu (Ctrl+G) | PadKeys |
 | **PadKeys_Bar** | One bar that shows the layer you hold (Cmd, Shift, Option, Ctrl) | PadKeys (SpellActivationOverlay optional, for its proc glows) |
 | **PadKeys_Fade** | Blizzard's action bars, micro menu and bags fade out until you mouse over them or drag a spell; each bar is labelled with its PadKeys key (Cmd, Shift, G wheel) | PadKeys |
@@ -417,6 +417,7 @@ under the player frame instead), size, `ignore` to drop a buff,
 | \` | Toggle ally mode (off by default). On, F targets the ally you face, then the next ally on each press, Cmd+F inspects the ally you target, and "F targets allies" shows near the top of the screen. Off, F interacts. |
 | Tab / Shift+Tab | Next / previous nearest enemy |
 | F | In combat with a living enemy targeted: start your attack (hunters: Auto Shot; `auto_shot = false` in `PadKeys_Targeting/Config.lua` turns it off). Else a corpse or NPC you face: interact. Else, in ally mode, with an ally targeted: target the next ally in front of you. Else, in ally mode, the ally you face: target them. Else: interact (mailbox, herb, chest) |
+| F in ally mode, in a raid | Hold F and move the mouse a little, wherever it is: a white frame moves over Blizzard's raid frames, from the member you last picked (out of combat: your target). Release F to target that member; a tap targets the one it starts on. `raid.step` and `raid.dead_zone` in `PadKeys_Targeting/Config.lua` set how far the mouse moves per frame. In combat the start doesn't follow a target picked another way, and raid frames created mid-combat can't be picked until combat ends |
 | Ctrl+Tab / Ctrl+Shift+Tab | Next / previous party or raid member, in raid frame order |
 | Shift+F | Assist: target your target's target |
 | Ctrl+F | Last target |

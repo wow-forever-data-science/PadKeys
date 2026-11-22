@@ -17,6 +17,7 @@ b["CTRL-SHIFT-TAB"] = "CLICK PadKeysGroupCycle:RightButton"
 --      front of you, so each press moves on (enemy targets stay put)
 --   3. in ally mode (`), a living ally soft targeted: make them your target
 --   4. otherwise: Interact
+-- In ally mode in a raid, F picks a raid member instead (raid below).
 -- 2 and 3 are opt in because macro conditions can't see soft interact
 -- targets, so F would pick a nearby ally over a mailbox or NPC.
 -- inspect: in ally mode with a living ally targeted, this key (Cmd+F on a
@@ -25,6 +26,16 @@ ns.config.interact = {
   key = "F",
   inspect = ns.config.mod .. "F",
   auto_shot = true,
+  -- In ally mode in a raid, F picks a raid member instead: hold F, move
+  -- the mouse a little (it can be anywhere on screen) to move the
+  -- highlight over the raid frames, release F to target them. A tap
+  -- targets the member you last picked.
+  raid = {
+    -- Mouse distance (UI units) that moves the pick one raid frame.
+    step = 30,
+    -- Mouse distance below which the pick stays where it started.
+    dead_zone = 8,
+  },
 }
 
 -- Ally soft targeting, used by 3 above and by helpful spells, needs these
