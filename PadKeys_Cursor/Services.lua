@@ -100,16 +100,19 @@ end)
 -- your money and the items it costs (MerchantItemButton_OnModifiedClick).
 local function most_affordable(index)
   local most = GetMerchantItemMaxStack(index)
-  local _, _, price, stack_count, _, _, _, extended_cost = GetMerchantItemInfo(index)
-  if price and price > 0 then
-    most = min(most, floor(GetMoney() / (price / stack_count)))
+  local info = C_MerchantFrame.GetItemInfo(index)
+  if not info then
+    return most
   end
-  if extended_cost then
+  if info.price > 0 then
+    most = min(most, floor(GetMoney() / (info.price / info.stackCount)))
+  end
+  if info.hasExtendedCost then
     for i = 1, MAX_ITEM_COST do
       local _, value, link, currency = GetMerchantItemCostItem(index, i)
       if link and not currency then
         local owned = C_Item.GetItemCount(link, false, false, true)
-        most = min(most, floor(owned / (value / stack_count)))
+        most = min(most, floor(owned / (value / info.stackCount)))
       end
     end
   end
