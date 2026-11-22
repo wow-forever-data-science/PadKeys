@@ -75,8 +75,6 @@ end
 local function step()
   if QuestFrame:IsVisible() then
     quest_step()
-  elseif GossipFrame and GossipFrame:IsVisible() then
-    click_focused(GossipFrame)
   end
 end
 
@@ -96,14 +94,19 @@ end
 
 -- F is the step key only while a dialog is open. Override bindings can't
 -- change in combat; then F stays plain interact.
+-- On gossip F is the cursor's secure click: a gossip option clicked from
+-- addon code taints the window it opens (the bank then can't show its
+-- tabs, ADDON_ACTION_FORBIDDEN PurchaseBankTab).
 local function update_bindings()
   if InCombatLockdown() then
     return
   end
   ClearOverrideBindings(owner)
   if dialog_open() then
+    local target = QuestFrame:IsShown() and "PadKeysQuestStep" or
+                     "PadKeysCursorClick"
     for _, key in ipairs(ns.config.quest.step) do
-      SetOverrideBindingClick(owner, true, key, "PadKeysQuestStep")
+      SetOverrideBindingClick(owner, true, key, target)
     end
   end
 end
