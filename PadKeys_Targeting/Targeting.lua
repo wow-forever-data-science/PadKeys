@@ -8,10 +8,11 @@
 -- Interact (F) does what fits what is around you: in combat, with a living
 -- enemy targeted, it starts your attack, Auto Shot for hunters, Shoot with
 -- a wand (Interact would prefer a corpse or herb nearby over the enemy you
--- fight); otherwise
--- it interacts. Out of combat F is left to the client's Interact, which
--- alone sees what is in front of you; pull with an ability, as the
--- gamepad does. Ally mode (one key toggles it) makes F target the ally you
+-- fight); otherwise it interacts. Out of combat F is left to the client's
+-- Interact, which alone sees what is in front of you and starts Auto Shot
+-- on a targeted enemy. It would not start a wand, so with a wand equipped
+-- F also shoots a living enemy you target out of combat.
+-- Ally mode (one key toggles it) makes F target the ally you
 -- face instead, as F picks an enemy by attacking it. With an ally already
 -- targeted F moves on to the next ally: the client stops picking soft
 -- targets while you have a target (SoftTargetWithLocked 0, kept so enemy
@@ -102,6 +103,13 @@ local function wand_type()
     and (subclass_info(Enum.ItemClass.Weapon, Enum.ItemWeaponSubclass.Wand))
 end
 
+local function wand_shot()
+  local shoot, wand = spell_name(SHOOT), wand_type()
+  if ns.config.interact.wand and shoot and wand then
+    return shoot, wand
+  end
+end
+
 local function attack_macro()
   if auto_shot() then
     local name = spell_name(AUTO_SHOT)
@@ -109,8 +117,8 @@ local function attack_macro()
       return "/cast !" .. name
     end
   end
-  local shoot, wand = spell_name(SHOOT), wand_type()
-  if ns.config.interact.wand and shoot and wand then
+  local shoot, wand = wand_shot()
+  if shoot then
     return ("/cast [equipped:%s] !%s\n/startattack [noequipped:%s]")
       :format(wand, shoot, wand)
   end
@@ -181,9 +189,15 @@ interact_header:SetAttribute("_onstate-raid", [[
   self:RunAttribute("apply")
 ]])
 RegisterStateDriver(interact_header, "raid", "[group:raid] on; off")
-RegisterStateDriver(interact_header, "interact",
-  "[combat,harm,nodead] attack; [help,nodead] next; "
-  .. "[@softfriend,help,nodead] friend; interact")
+
+local function interact_states()
+  local _, wand = wand_shot()
+  local wand_state = wand and ("[equipped:%s,harm,nodead] attack; "):format(wand) or ""
+  return "[combat,harm,nodead] attack; " .. wand_state
+    .. "[help,nodead] next; [@softfriend,help,nodead] friend; interact"
+end
+
+RegisterStateDriver(interact_header, "interact", interact_states())
 
 -- Ally mode toggle. Runs in the restricted environment, with owner = the
 -- interact header.
