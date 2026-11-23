@@ -12,7 +12,8 @@ b["CTRL-SHIFT-TAB"] = "CLICK PadKeysGroupCycle:RightButton"
 
 -- The Interact key (F), picked by what is around you, first match wins:
 --   1. a living enemy targeted, in combat: start your attack (hunters:
---      Auto Shot, unless auto_shot is false)
+--      Auto Shot, unless auto_shot is false; with a wand equipped: Shoot,
+--      unless wand is false)
 --   2. in ally mode (`), a living ally targeted: target the next ally in
 --      front of you, so each press moves on (enemy targets stay put)
 --   3. in ally mode (`), a living ally soft targeted: make them your target
@@ -26,6 +27,7 @@ ns.config.interact = {
   key = "F",
   inspect = ns.config.mod .. "F",
   auto_shot = true,
+  wand = true,
   -- In ally mode in a raid, F picks a raid member instead: hold F, move
   -- the mouse a little (it can be anywhere on screen) to move the
   -- highlight over the raid frames, release F to target them. A tap

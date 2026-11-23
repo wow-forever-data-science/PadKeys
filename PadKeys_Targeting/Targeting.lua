@@ -6,8 +6,9 @@
 -- picks the next unit that exists, so it works in combat.
 --
 -- Interact (F) does what fits what is around you: in combat, with a living
--- enemy targeted, it starts your attack, Auto Shot for hunters (Interact
--- would prefer a corpse or herb nearby over the enemy you fight); otherwise
+-- enemy targeted, it starts your attack, Auto Shot for hunters, Shoot with
+-- a wand (Interact would prefer a corpse or herb nearby over the enemy you
+-- fight); otherwise
 -- it interacts. Out of combat F is left to the client's Interact, which
 -- alone sees what is in front of you; pull with an ability, as the
 -- gamepad does. Ally mode (one key toggles it) makes F target the ally you
@@ -79,20 +80,39 @@ ns.group_cycle = button
 -- Hunters attack with Auto Shot (spell 75, by its localized name); the !
 -- keeps a second press from turning it off. In melee range Auto Shot
 -- fails, and a melee ability such as Raptor Strike starts the melee swing.
+-- With a wand equipped F shoots it (spell 5019), else it starts the melee
+-- swing. The macro condition checks the wand on each press, so swapping
+-- weapons in combat needs no rebuild. It takes the localized subclass name.
 local AUTO_SHOT = 75
+local SHOOT = 5019
 
 local function auto_shot()
   local _, class = UnitClass("player")
   return class == "HUNTER" and ns.config.interact.auto_shot
 end
 
+local function spell_name(id)
+  return C_Spell and C_Spell.GetSpellName and C_Spell.GetSpellName(id)
+    or GetSpellInfo and (GetSpellInfo(id))
+end
+
+local function wand_type()
+  local subclass_info = C_Item and C_Item.GetItemSubClassInfo or GetItemSubClassInfo
+  return subclass_info
+    and (subclass_info(Enum.ItemClass.Weapon, Enum.ItemWeaponSubclass.Wand))
+end
+
 local function attack_macro()
   if auto_shot() then
-    local name = C_Spell and C_Spell.GetSpellName and C_Spell.GetSpellName(AUTO_SHOT)
-      or GetSpellInfo and (GetSpellInfo(AUTO_SHOT))
+    local name = spell_name(AUTO_SHOT)
     if name then
       return "/cast !" .. name
     end
+  end
+  local shoot, wand = spell_name(SHOOT), wand_type()
+  if ns.config.interact.wand and shoot and wand then
+    return ("/cast [equipped:%s] !%s\n/startattack [noequipped:%s]")
+      :format(wand, shoot, wand)
   end
   return "/startattack"
 end
