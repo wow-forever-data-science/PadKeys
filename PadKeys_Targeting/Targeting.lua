@@ -13,7 +13,8 @@
 -- on a targeted enemy. It would not start a wand, so with a wand equipped
 -- F also shoots a living enemy you target out of combat.
 -- Ally mode (one key toggles it) makes F target the ally you
--- face instead, as F picks an enemy by attacking it. With an ally already
+-- face instead, as F picks an enemy by attacking it. It takes F over
+-- attacking, so F never shoots in ally mode. With an ally already
 -- targeted F moves on to the next ally: the client stops picking soft
 -- targets while you have a target (SoftTargetWithLocked 0, kept so enemy
 -- targets stay put), so F on softfriend would retarget the same ally.
@@ -173,6 +174,10 @@ interact_header:SetAttribute("apply", [[
     if state == "next" then
       self:SetBindingClick(false, self:GetAttribute("inspect"), "PadKeysInspect")
     end
+  elseif state == "attack" and self:GetAttribute("ally") then
+    -- No soft target exists with an enemy targeted (SoftTargetWithLocked 0),
+    -- so F moves from the enemy to the next ally.
+    self:SetBindingClick(true, key, "PadKeysTargetNextFriend")
   elseif state == "attack" then
     self:SetBindingClick(true, key, "PadKeysAttack")
   elseif state == "friend" and self:GetAttribute("ally") then

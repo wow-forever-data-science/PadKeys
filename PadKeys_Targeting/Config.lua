@@ -11,11 +11,11 @@ b["CTRL-TAB"] = "CLICK PadKeysGroupCycle:LeftButton"
 b["CTRL-SHIFT-TAB"] = "CLICK PadKeysGroupCycle:RightButton"
 
 -- The Interact key (F), picked by what is around you, first match wins:
---   1. a living enemy targeted, in combat: start your attack (hunters:
---      Auto Shot, unless auto_shot is false; with a wand equipped: Shoot,
---      also out of combat, unless wand is false)
---   2. in ally mode (`), a living ally targeted: target the next ally in
---      front of you, so each press moves on (enemy targets stay put)
+--   1. outside ally mode, a living enemy targeted, in combat: start your
+--      attack (hunters: Auto Shot, unless auto_shot is false; with a wand
+--      equipped: Shoot, also out of combat, unless wand is false)
+--   2. in ally mode (`), a living ally or enemy targeted: target the next
+--      ally in front of you, so each press moves on
 --   3. in ally mode (`), a living ally soft targeted: make them your target
 --   4. otherwise: Interact
 -- In ally mode in a raid, F picks a raid member instead (raid below).
