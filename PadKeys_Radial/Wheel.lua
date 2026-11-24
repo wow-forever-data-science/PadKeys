@@ -196,8 +196,15 @@ end
 
 -- A duration object (C_ActionBar.GetActionCooldownDuration) or nil. The
 -- numbers inside are secret in combat; the widget takes the object as is.
+-- Items have no duration object: { start, duration } is tried with
+-- SetCooldown, which may refuse secret numbers, and then shows nothing.
 local function set_cooldown(segment, duration)
-  if duration then
+  if type(duration) == "table" then
+    if not pcall(segment.cooldown.SetCooldown, segment.cooldown,
+                 duration[1], duration[2]) then
+      segment.cooldown:Clear()
+    end
+  elseif duration then
     segment.cooldown:SetCooldownFromDurationObject(duration)
   else
     segment.cooldown:Clear()
@@ -206,7 +213,8 @@ end
 
 -- entries[i] is nil (an empty segment) or
 -- { icon = atlas or texture, label = text, enabled = bool, desaturate = bool,
---   cooldown = duration object or nil, cooling = bool, tint = number,
+--   cooldown = duration object, { start, duration } or nil,
+--   cooling = bool, tint = number,
 --   count = text or nil }.
 -- cooling dims the icon (the spell can't be cast); a cooldown without it
 -- (a charge recharging) only shows the countdown. tint darkens the icon

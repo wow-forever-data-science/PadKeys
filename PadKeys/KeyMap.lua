@@ -98,6 +98,7 @@ local function sections()
     menu_rows[#menu_rows + 1] = action_row("CLICK PadKeysRing:third")
     menu_rows[#menu_rows + 1] = action_row("CLICK PadKeysRing:markers")
     menu_rows[#menu_rows + 1] = action_row("CLICK PadKeysRing:menu")
+    menu_rows[#menu_rows + 1] = action_row("CLICK PadKeysRing:items")
   end
   menu_rows[#menu_rows + 1] = action_row("TOGGLEPINGLISTENER")
   menu_rows[#menu_rows + 1] = action_row("TOGGLESHEATH")
