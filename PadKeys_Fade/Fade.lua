@@ -3,7 +3,14 @@
 -- hidden bar doesn't come back on mouseover. This keeps every bar shown
 -- (set them to "Always" in Edit Mode) and only changes its alpha: a group
 -- fades in while the mouse is over one of its frames, while you drag a
--- spell, item or macro, and in Edit Mode.
+-- spell, item or macro, and in Edit Mode. A group can also show by itself
+-- (Config.lua): while a condition holds (show_when: in combat, with a
+-- target, health or mana not full, ...) or for a few seconds after a game
+-- event (flash_on: experience gained, loot in the bags).
+--
+-- Health and power are secret values in combat, so not_full and
+-- group_hurt read them out of combat only, skip a secret one and wrap the
+-- reads in pcall; in combat those groups rely on "combat".
 --
 -- Nothing here is secure, and it never shows, hides or moves a Blizzard
 -- frame: alpha is all it sets, so it works in combat and the keys keep
@@ -160,13 +167,21 @@ end
 -- --- Groups ---------------------------------------------------------------
 
 local groups = {}
+-- flashes[event] = the groups that event shows for a moment.
+local flashes = {}
 
 local function resolve()
   wipe(groups)
   wipe(labels)
+  wipe(flashes)
   for group_name, names in pairs(c.groups) do
     local group = { name = group_name, frames = {}, labels = {}, alpha = 1,
-                    last_hover = 0 }
+                    last_hover = 0, last_flash = -math.huge,
+                    show_when = names.show_when, flash_for = names.flash_for or 3 }
+    for _, event in ipairs(names.flash_on or {}) do
+      flashes[event] = flashes[event] or {}
+      table.insert(flashes[event], group)
+    end
     for _, name in ipairs(names) do
       local frame = _G[name] or (ALIASES[name] and _G[ALIASES[name]])
       if frame and frame.SetAlpha then
@@ -215,6 +230,85 @@ local function set_alpha(group, a)
   end
 end
 
+-- --- Conditions -----------------------------------------------------------
+
+local function is_secret(v)
+  return issecretvalue and issecretvalue(v)
+end
+
+-- true if a's plain value is below b's; false if either is secret.
+local function below(a, b)
+  if a == nil or b == nil or is_secret(a) or is_secret(b) then
+    return false
+  end
+  return a < b
+end
+
+-- Out of combat: unit's health (and mana, with `mana`) isn't full.
+local function not_full(unit, mana)
+  if InCombatLockdown() or not UnitExists(unit) or UnitIsDeadOrGhost(unit) then
+    return false
+  end
+  local ok, result = pcall(function()
+    if below(UnitHealth(unit), UnitHealthMax(unit)) then
+      return true
+    end
+    local MANA = Enum and Enum.PowerType and Enum.PowerType.Mana or 0
+    return mana and UnitPowerType(unit) == MANA and
+           below(UnitPower(unit, MANA), UnitPowerMax(unit, MANA))
+  end)
+  return ok and result or false
+end
+
+local function group_hurt()
+  for i = 1, 4 do
+    if not_full("party" .. i, false) then
+      return true
+    end
+  end
+  return false
+end
+
+local function talents()
+  local points = UnitCharacterPoints and UnitCharacterPoints("player")
+  return type(points) == "number" and not is_secret(points) and points > 0
+end
+
+local CONDITIONS = {
+  combat = function() return InCombatLockdown() or UnitAffectingCombat("player") end,
+  no_combat = function() return not (InCombatLockdown() or UnitAffectingCombat("player")) end,
+  target = function() return UnitExists("target") end,
+  pet = function() return UnitExists("pet") end,
+  group = function() return IsInGroup() end,
+  resting = function() return IsResting() end,
+  mounted = function() return IsMounted() end,
+  not_full = function() return not_full("player", true) end,
+  group_hurt = group_hurt,
+  talents = talents,
+}
+
+-- Each condition once per check, however many groups ask for it.
+local checked = {}
+
+local function condition(name)
+  local v = checked[name]
+  if v == nil then
+    local f = CONDITIONS[name]
+    v = f and f() and true or false
+    checked[name] = v
+  end
+  return v
+end
+
+local function wanted(group)
+  for _, name in ipairs(group.show_when or {}) do
+    if condition(name) then
+      return true
+    end
+  end
+  return false
+end
+
 local function editing()
   return EditModeManagerFrame and EditModeManagerFrame.IsEditModeActive and
          EditModeManagerFrame:IsEditModeActive()
@@ -238,13 +332,15 @@ driver:SetScript("OnUpdate", function(_, elapsed)
     local now = GetTime()
     local all = ns.db.fade_off or editing()
     local drag = dragging()
+    wipe(checked)
     for _, group in ipairs(groups) do
-      if hovered(group) then
+      if hovered(group) or wanted(group) then
         group.last_hover = now
       end
       show[group] = all or (drag and c.show_while_dragging and
                                 c.show_while_dragging[group.name]) or
-                    now - group.last_hover < (c.linger or 0)
+                    now - group.last_hover < (c.linger or 0) or
+                    now - group.last_flash < group.flash_for
     end
   end
 
@@ -266,12 +362,33 @@ driver:SetScript("OnUpdate", function(_, elapsed)
 end)
 driver:Hide()
 
+-- Events that flash a group. The first seconds after a loading screen
+-- are skipped: the game sends experience and reputation updates then.
+local SETTLE = 5
+local settled_at = math.huge
+local flasher = CreateFrame("Frame")
+flasher:SetScript("OnEvent", function(_, event)
+  local now = GetTime()
+  if now < settled_at then
+    return
+  end
+  for _, group in ipairs(flashes[event] or {}) do
+    group.last_flash = now
+  end
+end)
+
 driver:RegisterEvent("PLAYER_LOGIN")
+driver:RegisterEvent("PLAYER_ENTERING_WORLD")
 driver:RegisterEvent("UPDATE_BINDINGS")
 driver:SetScript("OnEvent", function(self, event)
   if event == "PLAYER_LOGIN" then
     resolve()
+    for name in pairs(flashes) do
+      pcall(flasher.RegisterEvent, flasher, name)
+    end
     self:Show()
+  elseif event == "PLAYER_ENTERING_WORLD" then
+    settled_at = GetTime() + SETTLE
   else
     update_labels()
   end
@@ -281,5 +398,5 @@ end)
 function ns.toggle_fade()
   ns.db.fade_off = not ns.db.fade_off or nil
   ns.say(ns.db.fade_off and "bars stay shown. /padkeys fade fades them again."
-         or "bars fade until you mouse over them or drag a spell.")
+         or "bars fade until you need them (PadKeys_Fade/Config.lua).")
 end
