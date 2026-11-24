@@ -17,7 +17,8 @@ end
 b["SHIFT-G"] = "CLICK PadKeysRing:markers"
 b["CTRL-G"] = "CLICK PadKeysRing:menu"      -- Blizzard's main menu entries
 -- Consumables from your bags (Items.lua): one set in combat, another out.
-b.V = "CLICK PadKeysRing:items"
+-- 5 is free in the base layout (the ping key moved to a mouse button).
+b["5"] = "CLICK PadKeysRing:items"
 
 ns.config.radial = {
   -- Size against Blizzard's gamepad radial (1 = the same size).
@@ -57,7 +58,7 @@ ns.config.radial = {
     marker_macro = "/tm %d",
   },
 
-  -- The consumables page (V, Items.lua). Each set is eight segments
+  -- The consumables page (5, Items.lua). Each set is eight segments
   -- (east, then counter-clockwise; false leaves one empty). A segment is a
   -- list of item names, best first: the first one in your bags is used.
   -- { use = "Drink" } instead takes any item in your bags whose use is

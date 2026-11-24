@@ -1,6 +1,6 @@
 -- A faint copy of the wheels that follows the mouse: each configured page
 -- as a ring of small see-through icons around the cursor (Config.lua,
--- `ghost`; by default the G wheel inside, the V wheel outside). The G
+-- `ghost`; by default the G wheel inside, the 5 wheel outside). The G
 -- ring sits exactly where the G wheel's icons will when you press G there,
 -- so a glance tells you which way to flick. A lit segment (Lights.lua)
 -- shows at full strength with a white frame; the rest stay faint.
