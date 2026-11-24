@@ -504,7 +504,7 @@ What changes fast, beside the mouse pointer, only while it matters:
   each one as the timeline highlights it (a few seconds before it lands),
   with its icon, countdown and name, up to three at once; each goes when
   the timeline drops it;
-- your **tracked buffs**, to the left: Blizzard's Cooldown Manager buff
+- your **tracked buffs**, above right, a bit smaller: Blizzard's Cooldown Manager buff
   icons ("Tracked Buffs") follow the pointer, each while the buff is on
   you, with its time left. Pick them in the Cooldown Manager's options
   (e.g. Rapid Fire and Quick Shots for a hunter). Blizzard reads the

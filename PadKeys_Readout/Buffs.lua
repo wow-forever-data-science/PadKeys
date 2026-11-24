@@ -41,17 +41,26 @@ end
 
 local docked = false
 
+-- The widget's own SetScale: Edit Mode replaces the viewer's method with
+-- its own, which addon code shouldn't run.
+local set_scale = getmetatable(viewer).__index.SetScale
+local home_scale
+
 local function dock()
   if editing() then
     return
   end
   if not docked then
     remember()
+    home_scale = viewer:GetScale()
   end
   docked = true
+  local scale = (home_scale or 1) * (c.buffs_scale or 1)
+  set_scale(viewer, scale)
+  -- Offsets count in the viewer's own scale.
   viewer:ClearAllPoints()
-  viewer:SetPoint(c.buffs_point or "RIGHT", readout, "CENTER",
-                  c.buffs_x or -30, c.buffs_y or 0)
+  viewer:SetPoint(c.buffs_point or "BOTTOMLEFT", readout, "CENTER",
+                  (c.buffs_x or 16) / scale, (c.buffs_y or 18) / scale)
 end
 
 local function undock()
@@ -59,6 +68,9 @@ local function undock()
     return
   end
   docked = false
+  if home_scale then
+    set_scale(viewer, home_scale)
+  end
   if not home[1] then
     return
   end
@@ -68,13 +80,20 @@ local function undock()
   end
 end
 
--- Edit Mode places the viewer from its saved layout; that is the new
--- home, docked again unless Edit Mode is open.
+-- Blizzard placed the viewer again (Edit Mode's saved layout, or a
+-- managed container's layout): that is its new home, docked again unless
+-- Edit Mode is open. The scale goes back first, so the home scale read
+-- is Blizzard's, not ours.
+local function redock()
+  if docked and home_scale then
+    set_scale(viewer, home_scale)
+  end
+  docked = false
+  dock()
+end
+
 if viewer.ApplySystemAnchor then
-  hooksecurefunc(viewer, "ApplySystemAnchor", function()
-    docked = false
-    dock()
-  end)
+  hooksecurefunc(viewer, "ApplySystemAnchor", redock)
 end
 if viewer.OnEditModeEnter then
   hooksecurefunc(viewer, "OnEditModeEnter", undock)
@@ -84,11 +103,7 @@ if viewer.OnEditModeExit then
 end
 
 -- The managed frame containers: each layout there places the viewer
--- again, which is its new home.
-local function redock()
-  docked = false
-  dock()
-end
+-- again.
 local container = GetBottomManagedFrameContainer and
                   GetBottomManagedFrameContainer()
 for _, frame in ipairs({ container, container and container.BottomManagedLayoutContainer }) do
