@@ -503,7 +503,13 @@ What changes fast, beside the mouse pointer, only while it matters:
 - **boss abilities** from Blizzard's encounter timeline, to the right:
   each one as the timeline highlights it (a few seconds before it lands),
   with its icon, countdown and name, up to three at once; each goes when
-  the timeline drops it.
+  the timeline drops it;
+- your **tracked buffs**, to the left: Blizzard's Cooldown Manager buff
+  icons ("Tracked Buffs") follow the pointer, each while the buff is on
+  you, with its time left. Pick them in the Cooldown Manager's options
+  (e.g. Rapid Fire and Quick Shots for a hunter). Blizzard reads the
+  buffs, so this works in combat; PadKeys only moves the icons, and Edit
+  Mode still shows them where Blizzard keeps them.
 
 While you turn with the right mouse button the pointer is hidden, so the
 readout stays where it was. Times, names and icons are secret in combat

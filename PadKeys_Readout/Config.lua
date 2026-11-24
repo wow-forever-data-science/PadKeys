@@ -21,6 +21,16 @@ ns.config.readout = {
   boss = true,
   boss_rows = 3,
 
+  -- Your tracked buffs (Blizzard's Cooldown Manager, "Tracked Buffs")
+  -- beside the mouse, while they are on you, with their time left. Pick
+  -- the buffs in the Cooldown Manager's options. buffs_point is the
+  -- viewer's point placed at x, y from the pointer: "RIGHT" grows the
+  -- icons leftward, away from the rows on the right.
+  buffs = true,
+  buffs_point = "RIGHT",
+  buffs_x = -30,
+  buffs_y = 0,
+
   -- Icon size and text size of the target cast and boss rows, and their
   -- place against the mouse pointer, in pixels (positive y is up).
   icon_size = 28,
