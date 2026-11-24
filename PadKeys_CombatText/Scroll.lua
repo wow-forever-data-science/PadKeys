@@ -1,6 +1,8 @@
 -- A small scroll of combat text lines, shared by Target.lua and
--- Incoming.lua: at most `lines` lines, the newest at the anchor and older
--- ones moved one step in `direction`, each fading after `hold` seconds.
+-- Incoming.lua: at most `lines` lines. Each line starts at the anchor,
+-- drifts `rise` pixels in `direction` over its life and fades out after
+-- `hold` seconds. A new line that would overlap the one before glides
+-- the older ones further along instead of snapping them a row.
 --
 -- Damage amounts are secret in combat: addon code may show them but not
 -- compare them, do arithmetic on them or join them to other text. So a
@@ -40,7 +42,6 @@ local Scroll = {}
 Scroll.__index = Scroll
 
 local function release(scroll, row)
-  row.anim:Stop()
   row:Hide()
   for i, r in ipairs(scroll.rows) do
     if r == row then
@@ -71,26 +72,58 @@ local function new_row(scroll)
     row.text:SetPoint("CENTER")
   end
 
-  row.anim = row:CreateAnimationGroup()
-  local fade = row.anim:CreateAnimation("Alpha")
-  fade:SetFromAlpha(1)
-  fade:SetToAlpha(0)
-  fade:SetStartDelay(c.hold or 1.2)
-  fade:SetDuration(c.fade or 0.5)
-  row.anim:SetScript("OnFinished", function()
-    release(scroll, row)
-  end)
   return row
 end
 
-function Scroll:layout()
+local function life()
+  return (c.hold or 1.2) + (c.fade or 0.5)
+end
+
+-- How far a line has drifted by itself, `age` seconds after it came.
+local function drift(age)
+  return (c.rise or 40) * math.min(age / life(), 1)
+end
+
+-- Each frame: every line drifts, glides toward its push, and fades.
+local GLIDE = 14 -- how fast a pushed line catches up; higher is snappier
+function Scroll:update(elapsed)
+  local now = GetTime()
+  local sign = self.settings.direction == "down" and -1 or 1
+  local point = self.icons and "LEFT" or "CENTER"
+  local hold, fade = c.hold or 1.2, c.fade or 0.5
+  local catch = math.min(elapsed * GLIDE, 1)
+  for i = #self.rows, 1, -1 do
+    local row = self.rows[i]
+    local age = now - row.born
+    if age >= hold + fade then
+      release(self, row)
+    else
+      row.shown_push = row.shown_push + (row.push - row.shown_push) * catch
+      row:ClearAllPoints()
+      row:SetPoint(point, self.frame, point, 0,
+                   sign * (drift(age) + row.shown_push))
+      row:SetAlpha(age <= hold and 1 or 1 - (age - hold) / fade)
+    end
+  end
+  if not self.rows[1] then
+    self.driver:Hide()
+  end
+end
+
+-- Older lines make room for the newest: each sits at least a line's
+-- height past the one after it (where it is headed, not where it is).
+function Scroll:make_room()
   local s = self.settings
   local step = math.floor(s.size * (c.crit_scale or 1.3) + 3)
-  local sign = s.direction == "down" and -1 or 1
-  local point = self.icons and "LEFT" or "CENTER"
-  for i, row in ipairs(self.rows) do
-    row:ClearAllPoints()
-    row:SetPoint(point, self.frame, point, 0, sign * (i - 1) * step)
+  local now = GetTime()
+  local before
+  for _, row in ipairs(self.rows) do
+    local at = drift(now - row.born) + row.push
+    if before and at < before + step then
+      row.push = row.push + before + step - at
+      at = before + step
+    end
+    before = at
   end
 end
 
@@ -121,11 +154,14 @@ function Scroll:add(text, kind, texture)
     end
   end
 
-  self:layout()
-  row.anim:Stop()
+  row.born = GetTime()
+  row.push, row.shown_push = 0, 0
+  self:make_room()
+  row:ClearAllPoints()
+  row:SetPoint(self.icons and "LEFT" or "CENTER", self.frame)
   row:SetAlpha(1)
   row:Show()
-  row.anim:Play()
+  self.driver:Show()
 end
 
 function Scroll:clear()
@@ -140,7 +176,15 @@ function M.new_scroll(settings, icons)
   local frame = CreateFrame("Frame", nil, UIParent)
   frame:SetSize(1, 1)
   frame:SetFrameStrata("MEDIUM")
-  return setmetatable({
+  local scroll = setmetatable({
     frame = frame, settings = settings, icons = icons, rows = {}, free = {},
   }, Scroll)
+  -- Its own frame for the motion: the scroll's frame may have an OnUpdate
+  -- of its own (Incoming.lua follows the cursor with it).
+  scroll.driver = CreateFrame("Frame", nil, frame)
+  scroll.driver:Hide()
+  scroll.driver:SetScript("OnUpdate", function(_, elapsed)
+    scroll:update(elapsed)
+  end)
+  return scroll
 end

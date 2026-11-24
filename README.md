@@ -438,8 +438,8 @@ under the player frame instead), size, `ignore` to drop a buff,
 Two small scrolls in place of Blizzard's floating combat text (turn that
 off in `wow-settings`: its CVars belong there). Lines are white, crits
 red and special abilities yellow; nothing is coloured by school or source.
-Each line fades after about 1.5 s, and older lines always move the same
-way (up).
+Each line drifts smoothly upward (40 px) and fades out over about 1.7 s;
+a new line glides the older ones further up to make room.
 
 - **Your hits** sit beside the right end of the target's nameplate health
   bar (beside the target frame without a nameplate), up to 4 lines, each
