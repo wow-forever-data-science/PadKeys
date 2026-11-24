@@ -7,7 +7,7 @@
 -- * markers (Shift+G): target markers, sent as /tm macros;
 -- * menu (Ctrl+G): Blizzard's main-menu entries (Menu.lua), several pages
 --   turned with the mouse wheel while it is open;
--- * items (V): consumables from your bags (Items.lua), one set in combat
+-- * items (5): consumables from your bags (Items.lua), one set in combat
 --   and another out of it, picked by a macro condition.
 --
 -- Everything runs through the secure button, so it works in combat and

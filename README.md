@@ -38,7 +38,7 @@ error points at one part:
 | **PadKeys_Cursor** | UI cursor (windows, unit frames, buffs) and NPC dialogs (F = A, Esc = B) | PadKeys |
 | **PadKeys_Auras** | Aura highlight: your target's nameplate auras (C), your debuffs (Ctrl+C); hold Shift+C for the tooltip | PadKeys |
 | **PadKeys_Targeting** | Party/raid cycling (Ctrl+Tab), F that attacks in combat, and ally mode (\`) where F targets the ally you face, or in a raid picks a raid frame with the mouse | PadKeys |
-| **PadKeys_Radial** | Radials: actions (G, Cmd+G, Option+G), markers (Shift+G), main menu (Ctrl+G), consumables from your bags (V) | PadKeys |
+| **PadKeys_Radial** | Radials: actions (G, Cmd+G, Option+G), markers (Shift+G), main menu (Ctrl+G), consumables from your bags (5) | PadKeys |
 | **PadKeys_Bar** | One bar that shows the layer you hold (Cmd, Shift, Option, Ctrl) | PadKeys (SpellActivationOverlay optional, for its proc glows) |
 | **PadKeys_Fade** | Blizzard's action bars, micro menu, bags, player, pet and party frames, experience and reputation bars and quest tracker fade out until you need them (mouseover, a dragged spell, combat, a target, regenerating, talent points, loot, experience gained); each bar is labelled with its PadKeys key (Cmd, Shift, G wheel) | PadKeys |
 | **PadKeys_Look** | Every font in the game in the theme font (Roboto Condensed), and chat windows on a black background | PadKeys |
@@ -86,13 +86,13 @@ keyboard with each layer's keys. It's also published at
 | Z | Sheathe / draw weapon | Cmd / Shift / Ctrl+C | Target buff / your debuff / your buff |
 | Shift+\` | UI cursor | X | Sit / stand |
 | F1 | Key map | B | Bags, with the UI cursor inside |
-| V (hold) | Consumables radial (potions in combat, food and water out) | | |
+| 5 (hold) | Consumables radial (potions in combat, food and water out) | | |
 | Side mouse button (hold) | Blizzard's ping key: click a unit, a spot or a bar slot | | |
 
 | Context | Keys |
 |---|---|
 | UI cursor | WASD / arrows move · F / Space click (uses a bag item) · Shift+F right-click · Ctrl+F pick up · Cmd+F buy a stack / create all / open all mail / apply talents or Legacy tree / create auction · Tab / Shift+Tab next / previous window · Esc leave |
-| Radials | point with the mouse · release G (or V): run · Ctrl+G only: mouse wheel pages |
+| Radials | point with the mouse · release G (or 5): run · Ctrl+G only: mouse wheel pages |
 | NPC dialog | W / S move to an option or reward · F choose, accept, continue, complete · Esc close |
 | Auras | C: target's first aura, then the next · Ctrl+C: your debuffs · hold Shift+C: tooltip |
 
@@ -540,7 +540,7 @@ about a third of its size. The modifier you press with G picks the radial:
 | Option+G | Action Bar 8, slots 1-8, the same way (Mac only) | yes |
 | Shift+G | Target markers on your target, skull at the top | yes |
 | Ctrl+G | Blizzard's main-menu entries, three pages | yes |
-| V | Consumables from your bags: potions and healthstone in combat, food, water and hearthstone out of it | yes |
+| 5 | Consumables from your bags: potions and healthstone in combat, food, water and hearthstone out of it | yes |
 
 - **Action Bar 6** is Blizzard's bar 6; it can stay hidden in Edit Mode.
   The action radials show the cooldown countdown over each icon, as the
@@ -556,9 +556,9 @@ about a third of its size. The modifier you press with G picks the radial:
   modifier only matters on press.
 - **Z** is sheathe / draw again.
 
-### Consumables (V)
+### Consumables (5)
 
-Hold **V** for a wheel of what's in your bags, picked for you: no
+Hold **5** for a wheel of what's in your bags, picked for you: no
 dragging new ranks onto a bar as you level or restock. It shows one set
 in combat and another out of it:
 
@@ -584,7 +584,7 @@ sets and their item lists are under `items` in
 ### Faint wheel at the mouse, lit segments
 
 In combat a faint copy of the wheels follows your mouse: the G wheel as a
-ring of small see-through icons around the cursor, and the V wheel as a
+ring of small see-through icons around the cursor, and the 5 wheel as a
 second ring outside it. The G ring sits exactly where the G wheel's icons
 open when you press G there, so you see which way to flick before you
 press. It hides while you turn with the right mouse button, and while a
@@ -595,7 +595,7 @@ at full strength with a white frame, and on the open wheel its slice
 glows. By default:
 
 - the **healing potion** under 35% health and the **healthstone** under
-  50% (V, in combat), the **mana potion** under 25% mana;
+  50% (5, in combat), the **mana potion** under 25% mana;
 - your **opener**, G east: with an enemy targeted before the pull, and for
   the first 6 seconds of combat.
 
@@ -926,23 +926,23 @@ is loaded.
     more in combat: it pops up as it comes back. A short cooldown, and the
     global cooldown, never pop up.
 
-**Stage 13: PadKeys_Radial consumables (V)**
+**Stage 13: PadKeys_Radial consumables (5)**
 
-26. **Items**: `/padkeys apply` (V is a new key). Out of combat, hold V:
+26. **Items**: `/padkeys apply` (5 is a new key). Out of combat, hold 5:
     your drink, food, Hearthstone and bandage, with counts. Pull a mob and
-    hold V: healing potion, healthstone and the rest you carry. Drink a
+    hold 5: healing potion, healthstone and the rest you carry. Drink a
     potion in combat: it greys with its cooldown. Buy a better potion: it
     takes the segment once out of combat.
 
 **Stage 14: faint wheel and lights**
 
 27. **Faint wheel**: pull a mob: two faint rings of icons follow the mouse
-    (G inside, V outside). Hold G where you are: the wheel's icons sit on
+    (G inside, 5 outside). Hold G where you are: the wheel's icons sit on
     the inner ring's. Hold the right mouse button: the rings hide.
 28. **Lights**: target a mob out of combat: G east lights (opener), and
     stays lit for 6 seconds into the fight. Drop under 50% health with a
     healthstone in your bags: its icon lights on the outer ring and its
-    slice glows when you hold V; under 35% the healing potion too. If
+    slice glows when you hold 5; under 35% the healing potion too. If
     neither ever lights, the health curve may need a different scale:
     send `/dump UnitHealthPercent("player")`.
 

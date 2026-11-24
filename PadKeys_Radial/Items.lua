@@ -1,4 +1,4 @@
--- The items page (V): consumables from your bags, picked for you. Each
+-- The items page (5): consumables from your bags, picked for you. Each
 -- segment is a family (Config.lua: healing potions best first, or "any
 -- Drink"), and the best one you carry goes in it.
 --

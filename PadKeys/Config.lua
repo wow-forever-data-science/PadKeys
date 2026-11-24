@@ -51,9 +51,10 @@ local bindings = {
   -- your group.
   TAB = "TARGETNEARESTENEMY",
   ["SHIFT-TAB"] = "TARGETPREVIOUSENEMY",
-  -- 5 is free: Blizzard's ping key moved to the side mouse button
-  -- (BUTTON5), which wow-settings binds. false keeps 5 off the client's
-  -- default (Action Bar 1, slot 5, already on Q).
+  -- 5: Blizzard's ping key moved to the side mouse button (BUTTON5),
+  -- which wow-settings binds. false keeps 5 off the client's default
+  -- (Action Bar 1, slot 5, already on Q); PadKeys_Radial puts its
+  -- consumables wheel there.
   ["5"] = false,
   -- G is PadKeys_Radial's ring; without it, G stays free.
   G = false,
