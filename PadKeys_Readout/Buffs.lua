@@ -60,7 +60,7 @@ local function dock()
   -- Offsets count in the viewer's own scale.
   viewer:ClearAllPoints()
   viewer:SetPoint(c.buffs_point or "BOTTOMLEFT", readout, "CENTER",
-                  (c.buffs_x or 16) / scale, (c.buffs_y or 18) / scale)
+                  (c.buffs_x or 8) / scale, (c.buffs_y or 4) / scale)
 end
 
 local function undock()
