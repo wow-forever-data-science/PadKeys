@@ -1,0 +1,12 @@
+## Interface: 11507, 16001
+## Title: PadKeys - Combat Text
+## Notes: Small combat text: your hits on the target scroll beside its nameplate with the spell's icon, and the hits you take show near your character, more visible the lower your health (earlier as a tank). Needs PadKeys.
+## Author: wow-forever-data-science
+## Version: 0.1.0
+## Dependencies: PadKeys
+## OptionalDeps: PadKeys_Debug
+
+Config.lua
+Scroll.lua
+Target.lua
+Incoming.lua
