@@ -126,6 +126,9 @@ ns.config.radial = {
   --   "ready"            usable and off cooldown; action pages only
   --   "casting"          your target is casting (to interrupt)
   --   { combo = 5 }      5 combo points on your target
+  --   "boss"             Blizzard's encounter timeline highlights a boss
+  --                      ability (a few seconds before it lands): put it on
+  --                      a defensive or a movement spell
   lights = {
     actions = {
       [1] = { pull = 6 },   -- your opener on G, east

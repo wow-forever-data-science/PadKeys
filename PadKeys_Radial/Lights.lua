@@ -75,6 +75,9 @@ end
 
 local combat_start
 local target_casting = false
+-- Boss abilities the encounter timeline highlights now, by event ID (never
+-- secret).
+local boss_soon = {}
 
 local function in_combat()
   return InCombatLockdown() or UnitAffectingCombat("player")
@@ -180,6 +183,8 @@ local function plain(rule, page, index)
     return target_casting
   elseif rule.combo then
     return combo(rule.combo)
+  elseif rule.boss then
+    return next(boss_soon) ~= nil
   end
   return false
 end
@@ -219,7 +224,8 @@ for _, event in ipairs({
   "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED", "PLAYER_TARGET_CHANGED",
   "UNIT_SPELLCAST_START", "UNIT_SPELLCAST_CHANNEL_START", "UNIT_SPELLCAST_STOP",
   "UNIT_SPELLCAST_CHANNEL_STOP", "UNIT_SPELLCAST_INTERRUPTED",
-  "UNIT_SPELLCAST_FAILED",
+  "UNIT_SPELLCAST_FAILED", "ENCOUNTER_TIMELINE_EVENT_HIGHLIGHT",
+  "ENCOUNTER_TIMELINE_EVENT_REMOVED", "ENCOUNTER_END",
 }) do
   pcall(events.RegisterEvent, events, event)
 end
@@ -230,6 +236,12 @@ events:SetScript("OnEvent", function(_, event, unit)
     combat_start = nil
   elseif event == "PLAYER_TARGET_CHANGED" then
     target_casting = false
+  elseif event == "ENCOUNTER_TIMELINE_EVENT_HIGHLIGHT" then
+    boss_soon[unit] = true -- the payload is the event ID
+  elseif event == "ENCOUNTER_TIMELINE_EVENT_REMOVED" then
+    boss_soon[unit] = nil
+  elseif event == "ENCOUNTER_END" then
+    wipe(boss_soon)
   elseif unit == "target" then
     target_casting = CAST_START[event] or false
   end
