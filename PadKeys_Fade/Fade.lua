@@ -155,17 +155,39 @@ local function make_label(frame, name)
   local holder = CreateFrame("Frame", nil, UIParent)
   holder:SetFrameStrata("MEDIUM")
   holder:SetSize(1, 1)
-  -- Above the bar's top left corner, so it never covers a button.
-  holder:SetPoint("BOTTOMLEFT", frame, "TOPLEFT", 0, c.label_gap or 2)
   local text = ns.text(holder, c.label_size or 12, "white", "OVERLAY",
                        "GameFontHighlightSmall")
-  text:SetPoint("BOTTOMLEFT")
-  text:SetJustifyH("LEFT")
   holder.text = text
   holder.bar = frame
   holder.name = name
   holder:SetAlpha(0)
   return holder
+end
+
+-- Beside the bar, vertically centred, so it never covers a button: to
+-- its right, or to its left when the screen ends first (a bar at the
+-- right edge). Placed again only when the side changes.
+local function place_label(label)
+  local bar, gap = label.bar, c.label_gap or 6
+  local right = bar:GetRight()
+  local fits = not right or
+    right + gap + label.text:GetStringWidth() <= UIParent:GetRight()
+  local side = fits and "right" or "left"
+  if label.side == side then
+    return
+  end
+  label.side = side
+  label:ClearAllPoints()
+  label.text:ClearAllPoints()
+  if fits then
+    label:SetPoint("LEFT", bar, "RIGHT", gap, 0)
+    label.text:SetPoint("LEFT")
+    label.text:SetJustifyH("LEFT")
+  else
+    label:SetPoint("RIGHT", bar, "LEFT", -gap, 0)
+    label.text:SetPoint("RIGHT")
+    label.text:SetJustifyH("RIGHT")
+  end
 end
 
 local function update_labels()
@@ -239,6 +261,9 @@ local function set_alpha(group, a)
   local la = faded < 1 and (a - faded) / (1 - faded) or 1
   for _, label in ipairs(group.labels) do
     label:SetShown(label.bar:IsVisible())
+    if la > 0 then
+      place_label(label)
+    end
     label:SetAlpha(la)
   end
 end
