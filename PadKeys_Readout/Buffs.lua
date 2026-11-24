@@ -10,6 +10,10 @@
 -- and SetPoint, plain widget calls). Blizzard's own anchor is kept and put
 -- back while Edit Mode is open, so the viewer can still be arranged and
 -- saved there; Edit Mode applying it again docks it again afterwards.
+--
+-- In its default place the viewer is a managed frame: Blizzard's bottom
+-- container anchors it again on every layout (a buff icon showing is
+-- enough). So it is docked again after each of the container's layouts.
 
 local ns = PadKeys
 local c = ns.config.readout
@@ -77,6 +81,20 @@ if viewer.OnEditModeEnter then
 end
 if viewer.OnEditModeExit then
   hooksecurefunc(viewer, "OnEditModeExit", dock)
+end
+
+-- The managed frame containers: each layout there places the viewer
+-- again, which is its new home.
+local function redock()
+  docked = false
+  dock()
+end
+local container = GetBottomManagedFrameContainer and
+                  GetBottomManagedFrameContainer()
+for _, frame in ipairs({ container, container and container.BottomManagedLayoutContainer }) do
+  if frame and frame.Layout then
+    hooksecurefunc(frame, "Layout", redock)
+  end
 end
 
 local events = CreateFrame("Frame")
