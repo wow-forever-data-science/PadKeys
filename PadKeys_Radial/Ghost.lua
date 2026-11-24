@@ -1,9 +1,14 @@
 -- A faint copy of the wheels that follows the mouse: each configured page
--- as a ring of small see-through icons around the cursor (Config.lua,
--- `ghost`; by default the G wheel inside, the 5 wheel outside). The G
--- ring sits exactly where the G wheel's icons will when you press G there,
--- so a glance tells you which way to flick. A lit segment (Lights.lua)
--- shows at full strength with a white frame; the rest stay faint.
+-- as a ring of small icons around the cursor (Config.lua, `ghost`; by
+-- default the G wheel inside, the 5 wheel outside). The G ring sits
+-- exactly where the G wheel's icons will when you press G there, so a
+-- glance tells you which way to flick. A lit segment (Lights.lua) shows
+-- at full strength with a white frame; the rest stay faint, or with
+-- show = "lit" (the default) don't show at all.
+--
+-- In "lit" mode the copy is always up and each icon's alpha is its light:
+-- a health or mana light is a secret alpha, which SetAlpha takes, so a
+-- low-health potion shows by itself in combat too.
 --
 -- It only draws: no mouse, nothing secure. It hides while you turn with
 -- the mouse (the cursor is hidden then) and while a wheel is open.
@@ -72,8 +77,8 @@ local function any_lit()
   return false
 end
 
--- "combat": in combat, and out of it while a slice is lit; "always"; "lit":
--- only while a slice is lit.
+-- "lit": always up, only lit icons visible; "combat": in combat, and out
+-- of it while a slice is lit; "always".
 local function wanted()
   if IsMouselooking and IsMouselooking() then
     return false
@@ -81,8 +86,8 @@ local function wanted()
   if ns.ring_wheel and ns.ring_wheel:is_open() then
     return false
   end
-  local mode = c.show or "combat"
-  if mode == "always" then
+  local mode = c.show or "lit"
+  if mode == "always" or mode == "lit" then
     return true
   elseif mode == "combat" and in_combat() then
     return true
@@ -91,7 +96,7 @@ local function wanted()
 end
 
 local function update_icons()
-  local idle = c.idle_alpha or 0.25
+  local idle = (c.show or "lit") == "lit" and 0 or (c.idle_alpha or 0.25)
   for _, ring in ipairs(rings) do
     local entries = ns.ring_entries and ns.ring_entries(ring.page) or {}
     for i, item in ipairs(ring.icons) do

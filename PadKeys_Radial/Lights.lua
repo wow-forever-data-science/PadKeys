@@ -154,9 +154,10 @@ end
 
 -- --- Rules ------------------------------------------------------------------
 
--- The rule for a segment: the page's lights, or for the items page the
--- lights of the set showing now.
+-- The rule for a segment: the page's lights ("main" as the page G opens
+-- now), or for the items page the lights of the set showing now.
 local function rule_for(page, index)
+  page = ns.ring_page and ns.ring_page(page) or page
   local list = lights[page]
   if page == "items" and list then
     local set = SecureCmdOptionParse(config.items.pick or "") or ""
