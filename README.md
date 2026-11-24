@@ -462,7 +462,7 @@ about a third of its size. The modifier you press with G picks the radial:
 Three pages, centre page first:
 
 - **Left:** Group Finder, Legacy, Shop, Guild, Buffs, Collections.
-- **Centre:** Bags, Professions, Character, Talents, Map, Menu, Spellbook.
+- **Centre:** Bags, Professions, Character, Talents, Map, Spellbook.
 - **Right:** Clock, Calendar, PvP.
 
 Switch pages with the **mouse wheel** (up: left, down: right) while it is open, in
@@ -474,7 +474,9 @@ The labels, icons and enabled state come from Blizzard's gamepad radial
 own button (`CharacterMicroButton` and so on), not by calling those
 handlers: from addon code their windows open tainted, and tainted Blizzard
 code errors on the client's secret values. Social, Chat and Tracking have
-no button to click, so they are left out. Size, position, dead zone, the
+no button to click, so they are left out. The game menu is left out too:
+its button only opens with the mouse over it, so a `/click` does nothing.
+Esc opens it instead. Size, position, dead zone, the
 pages and the marker order are in `PadKeys_Radial/Config.lua`.
 
 **Buffs** opens the UI cursor on your buffs (or debuffs, if you have no

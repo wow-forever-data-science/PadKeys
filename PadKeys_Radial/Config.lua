@@ -67,11 +67,11 @@ ns.config.radial = {
     start_page = 2,
     -- Names are entries of Blizzard's radial that have a button to click
     -- (Menu.lua): bags, buffs, calendar, character, collections, guild,
-    -- legacy, lfd, map, menu, professions, pvp, spellbook, store, talents,
-    -- time.
+    -- legacy, lfd, map, professions, pvp, spellbook, store, talents, time.
+    -- The game menu is not one: Esc opens it.
     pages = {
       { "lfd", "legacy", "store", "guild", false, "buffs", false, "collections" },
-      { "bags", "professions", "character", "talents", "map", false, "menu", "spellbook" },
+      { "bags", "professions", "character", "talents", "map", false, false, "spellbook" },
       { "time", "calendar", false, false, "pvp", false, false, false },
     },
   },
