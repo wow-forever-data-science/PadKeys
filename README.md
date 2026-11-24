@@ -303,7 +303,7 @@ or the bags, and a hidden bar doesn't come back when you point at it.
 PadKeys_Fade keeps Blizzard's frames and makes them invisible instead:
 
 - **Hover** any action bar and all of them fade in, each with a label
-  above its top left corner: the bar and the PadKeys key that fires it, read from your live
+  to its right (its left at the right edge of the screen): the bar and the PadKeys key that fires it, read from your live
   bindings: `Bar 1 No modifier`, `Bar 2 Cmd`, `Bar 3 Shift`, `Bar 5
   Option`, `Bar 4 Ctrl · slots 1–4`, `Pet bar Ctrl · slots 1–4`, `Bar 6 G
   wheel · combat`, `Bar 7 G wheel · rest`, `Bar 8 Cmd+G wheel` (with
@@ -330,8 +330,8 @@ Set up:
 1. Enable PadKeys_Fade, `/reload`.
 2. In **Edit Mode**, set **Bar Visible: Always** on every bar you want to
    reach by mouse (a bar set to Hidden stays hidden), and stack them at the
-   bottom of the screen. Leave about 18 pixels between stacked bars for
-   the labels above them.
+   bottom of the screen. Leave room to the right of the bars for the
+   labels.
 3. `/padkeys fade` keeps them shown while you arrange things; again to fade.
 
 It only changes the frames' alpha, so it works in combat and the keys
