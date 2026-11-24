@@ -9,7 +9,9 @@
 local ns = PadKeys
 
 -- Entry -> the Blizzard button it clicks. Entries of Blizzard's radial
--- without a button (social, chat, tracking) are left out.
+-- without a button (social, chat, tracking) are left out. So is the game
+-- menu: MainMenuMicroButton opens only with the mouse over it (its OnClick
+-- checks IsMouseOver), so a /click does nothing; Esc opens it.
 local BUTTONS = {
   bags = "MainMenuBarBackpackButton",
   buffs = "PadKeysRadialBuffs",
@@ -20,7 +22,6 @@ local BUTTONS = {
   legacy = "LegacyMicroButton",
   lfd = "LFDMicroButton",
   map = "QuestLogMicroButton",
-  menu = "MainMenuMicroButton",
   professions = "ProfessionMicroButton",
   spellbook = "SpellbookMicroButton",
   store = "StoreMicroButton",
