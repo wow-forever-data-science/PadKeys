@@ -2,6 +2,9 @@
 
 local ns = PadKeys
 
+-- Hold \ to show every group; they fade again as you let go.
+ns.config.bindings["\\"] = "CLICK PadKeysFadeAll:LeftButton"
+
 ns.config.fade = {
   -- Frames that fade together: hovering one shows its whole group. Names
   -- are Blizzard's globals; a name that doesn't exist is skipped. Bars
