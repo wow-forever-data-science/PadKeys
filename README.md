@@ -41,6 +41,7 @@ error points at one part:
 | **PadKeys_Fade** | Blizzard's action bars, micro menu and bags fade out until you mouse over them or drag a spell; each bar is labelled with its PadKeys key (Cmd, Shift, G wheel) | PadKeys |
 | **PadKeys_Look** | Every font in the game in the theme font (Roboto Condensed), and chat windows on a black background | PadKeys |
 | **PadKeys_Combat** | "Combat" / "Out of Combat" fades in the middle of the screen as you enter and leave combat, in white; out of combat, a list of missing or expiring long buffs for your class and group | PadKeys |
+| **PadKeys_CombatText** | Small combat text: your hits scroll beside the target's nameplate with the spell's icon; the hits you take show under your character, fading in as your health drops (earlier as a tank) | PadKeys |
 | **PadKeys_NotReady** | Pressing a key or using an item that is still on cooldown flashes its icon and the time left in the middle of the screen, fading out over a second | PadKeys |
 | **PadKeys_Cooldowns** | Blizzard's Cooldown Manager (cooldowns, buff icons, buff bars) in the PadKeys look: black borders, grey tints, the countdown without a swipe | PadKeys |
 | **PadKeys_Totems** | Blizzard's totem bar in the PadKeys look: black borders, no gold or element frames | PadKeys |
@@ -410,6 +411,34 @@ under the player frame instead), size, `ignore` to drop a buff,
 `hide_resting = false` to keep it in inns and cities,
 `consolidate_in_combat = false` to leave the buff frame alone, and
 `enabled = false` to turn the reminder off.
+
+## Combat text (PadKeys_CombatText)
+
+Two small scrolls in place of Blizzard's floating combat text (turn that
+off in `wow-settings`: its CVars belong there). Lines are white, crits
+red and special abilities yellow; nothing is coloured by school or source.
+Each line fades after about 1.5 s, and older lines always move the same
+way (up).
+
+- **Your hits** sit beside the right end of the target's nameplate health
+  bar (beside the target frame without a nameplate), up to 4 lines, each
+  with an icon. The game doesn't say which spell made a hit, so the icon
+  is your last cast if it ended within 1.5 s before the hit; a melee swing
+  shows your weapon. In a group the target's hits from others look the
+  same, so there only hits that follow one of your casts show
+  (`group_only_linked = false` shows all of them).
+- **Hits you take** show under your character with no icon (the game
+  doesn't name the spell). The whole scroll fades in as your health drops:
+  hidden above 75%, fully shown at 40% and below. As a tank (Defensive
+  Stance, Bear Form, Righteous Fury or the tank role) it is half shown at
+  full health and fully shown at 70%. `anchor = "cursor"` puts it at the
+  mouse pointer instead.
+
+Damage amounts and health are secret in combat: they can be shown but not
+compared, so the alpha comes from Blizzard's health curve
+(`UnitHealthPercent`) and a hit fully absorbed in combat shows as 0. Sizes,
+the health points of both curves and `tank = true / false` are in
+`PadKeys_CombatText/Config.lua`.
 
 ## Not ready flash (PadKeys_NotReady)
 
