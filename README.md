@@ -558,6 +558,39 @@ combat; add sets such as `"[stealth] sneak; [combat] fight; rest"`. The
 sets and their item lists are under `items` in
 `PadKeys_Radial/Config.lua`.
 
+### Faint wheel at the mouse, lit segments
+
+In combat a faint copy of the wheels follows your mouse: the G wheel as a
+ring of small see-through icons around the cursor, and the V wheel as a
+second ring outside it. The G ring sits exactly where the G wheel's icons
+open when you press G there, so you see which way to flick before you
+press. It hides while you turn with the right mouse button, and while a
+wheel is open.
+
+A segment **lights up** when its moment comes: on the faint copy it shows
+at full strength with a white frame, and on the open wheel its slice
+glows. By default:
+
+- the **healing potion** under 35% health and the **healthstone** under
+  50% (V, in combat), the **mana potion** under 25% mana;
+- your **opener**, G east: with an enemy targeted before the pull, and for
+  the first 6 seconds of combat.
+
+Other rules: `"proc"` (the spell's proc glow), `"ready"` (usable and off
+cooldown), `"casting"` (your target is casting, for an interrupt) and
+`{ combo = 5 }`. Set them per segment under `lights` in
+`PadKeys_Radial/Config.lua`, and the faint copy under `ghost` (`show =
+"always"` or `"lit"`, its rings, sizes and alpha). Out of combat it shows
+only while a segment is lit.
+
+Lighting only changes the look: a lit segment does what it always does,
+so this works in combat. Health and mana are secret in combat and addon
+code may not compare them, so the health and mana rules hand the
+comparison to the client: a curve turns the percent into the glow's
+alpha (`UnitHealthPercent` with a curve), and only `SetAlpha` ever sees
+the result. That's also why a health light can't bring the faint copy up
+out of combat by itself.
+
 ### Main menu (Ctrl+G)
 
 Three pages, centre page first:
@@ -876,6 +909,18 @@ is loaded.
     hold V: healing potion, healthstone and the rest you carry. Drink a
     potion in combat: it greys with its cooldown. Buy a better potion: it
     takes the segment once out of combat.
+
+**Stage 14: faint wheel and lights**
+
+27. **Faint wheel**: pull a mob: two faint rings of icons follow the mouse
+    (G inside, V outside). Hold G where you are: the wheel's icons sit on
+    the inner ring's. Hold the right mouse button: the rings hide.
+28. **Lights**: target a mob out of combat: G east lights (opener), and
+    stays lit for 6 seconds into the fight. Drop under 50% health with a
+    healthstone in your bags: its icon lights on the outer ring and its
+    slice glows when you hold V; under 35% the healing potion too. If
+    neither ever lights, the health curve may need a different scale:
+    send `/dump UnitHealthPercent("player")`.
 
 Known risks:
 - The buff reminder reads auras by name out of combat. If a list stays

@@ -308,6 +308,29 @@ local ENTRIES = {
   end,
 }
 
+-- For Ghost.lua and Lights.lua: a page's entries, the action slot behind
+-- a segment, and the wheel.
+function ns.ring_entries(page)
+  return ENTRIES[page] and ENTRIES[page]() or {}
+end
+
+local FIRST_SLOT = {
+  actions = "first_slot", extra = "extra_first_slot", third = "third_first_slot",
+}
+function ns.ring_slot(page, index)
+  local key = FIRST_SLOT[page]
+  return key and ring_config()[key] + index - 1 or nil
+end
+
+ns.ring_wheel = wheel
+
+-- Lit segments on the open wheel (Lights.lua), for an action or items page.
+local function show_lights(page)
+  for i = 1, ns.wheel_segments do
+    wheel:set_lit(i, ns.light_alpha and ns.light_alpha(page, i, 0, 0.45) or 0)
+  end
+end
+
 -- Runs after the paging snippet: show the page it moved to.
 pager:HookScript("OnClick", function(_, _, down)
   if down and wheel:is_open() then
@@ -332,6 +355,7 @@ button:HookScript("OnClick", function(_, page, down)
   if page == "menu" then
     wheel:open(TITLES.menu)
     show_menu_page()
+    show_lights(page)
     return
   end
   local entries = ENTRIES[page]
@@ -341,6 +365,7 @@ button:HookScript("OnClick", function(_, page, down)
   wheel:open(TITLES[page])
   wheel:set_entries(entries())
   wheel:set_page(1, 1)
+  show_lights(page)
   if not next(wheel.entries) then
     if page == "actions" then
       wheel.label:SetText("Put spells, items or macros on Action Bar 6")
@@ -371,6 +396,16 @@ watcher:SetScript("OnEvent", function(_, event)
   end
   if wheel:is_open() and SLOT_PAGES[shown_page] then
     wheel:set_entries(ENTRIES[shown_page]())
+  end
+end)
+
+-- Lights change with health and the fight, not only with events here.
+local lights_elapsed = 0
+watcher:SetScript("OnUpdate", function(_, elapsed)
+  lights_elapsed = lights_elapsed + elapsed
+  if lights_elapsed >= 0.1 and wheel:is_open() and shown_page then
+    lights_elapsed = 0
+    show_lights(shown_page)
   end
 end)
 

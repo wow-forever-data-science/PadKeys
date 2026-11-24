@@ -97,6 +97,48 @@ ns.config.radial = {
     },
   },
 
+  -- A faint copy of the wheels that follows the mouse (Ghost.lua): each
+  -- page in `rings` as a ring of small see-through icons around the
+  -- cursor, the first inside. The G ring sits where the G wheel's icons
+  -- will. Lit segments (below) show at full strength with a white frame.
+  ghost = {
+    enabled = true,
+    rings = { "actions", "items" },
+    -- "combat": in combat, and out of it while a segment is lit by a rule
+    -- other than health or mana; "always"; "lit": only while lit.
+    show = "combat",
+    alpha = 1,          -- the whole copy
+    idle_alpha = 0.25,  -- an icon that isn't lit
+    icon_scale = 0.8,   -- against the wheel's icons
+    spacing = 1.6,      -- each outer ring's distance against the first
+    fade = 0.2,         -- seconds to fade in or out
+  },
+
+  -- Lit segments, on the wheels and their faint copy, per page and
+  -- segment (1 = east, counter-clockwise). For the items page, per set.
+  -- Lighting only changes the look; the segment does what it always does.
+  --   { health = 0.35 }  your health under 35%
+  --   { mana = 0.25 }    your mana under 25%
+  --   { pull = 6 }       an enemy targeted before combat, and the first
+  --                      6 seconds of combat
+  --   "proc"             the spell's proc glow is on (SpellActivationOverlay
+  --                      or Blizzard's own); action pages only
+  --   "ready"            usable and off cooldown; action pages only
+  --   "casting"          your target is casting (to interrupt)
+  --   { combo = 5 }      5 combo points on your target
+  lights = {
+    actions = {
+      [1] = { pull = 6 },   -- your opener on G, east
+    },
+    items = {
+      fight = {
+        [1] = { health = 0.35 },  -- healing potion
+        [2] = { health = 0.5 },   -- healthstone
+        [3] = { mana = 0.25 },    -- mana potion
+      },
+    },
+  },
+
   -- The main-menu page (Menu.lua).
   menu = {
     -- Page keys while it is open, also with a modifier held (Ctrl from
