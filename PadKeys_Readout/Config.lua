@@ -29,7 +29,7 @@ ns.config.readout = {
   -- right. buffs_scale shrinks it against its Edit Mode size while docked.
   buffs = true,
   buffs_point = "BOTTOMLEFT",
-  buffs_x = 4,
+  buffs_x = 8,
   buffs_y = -2,
   buffs_scale = 0.6,
 
