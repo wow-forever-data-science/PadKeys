@@ -16,10 +16,10 @@ ns.config.combattext = {
   -- Crits are this much bigger.
   crit_scale = 1.3,
   -- Seconds a line stays before it fades, and seconds to fade.
-  hold = 1.2,
-  fade = 0.5,
+  hold = 0.6,
+  fade = 0.4,
   -- Pixels a line drifts in its direction over those seconds.
-  rise = 40,
+  rise = 24,
 }
 
 -- Your hits on your target, beside the right end of its nameplate's health
@@ -32,7 +32,7 @@ ns.config.combattext.target = {
   -- "up": older lines move up; "down": they move down.
   direction = "up",
   -- Pixels between the health bar and the icons.
-  gap = 32,
+  gap = 40,
   -- Without a nameplate (off screen, nameplates off): beside the target
   -- frame instead. false: nothing then.
   fallback = true,
