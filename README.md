@@ -42,6 +42,7 @@ error points at one part:
 | **PadKeys_Look** | Every font in the game in the theme font (Roboto Condensed), and chat windows on a black background | PadKeys |
 | **PadKeys_Combat** | "Combat" / "Out of Combat" fades in the middle of the screen as you enter and leave combat, in white; out of combat, a list of missing or expiring long buffs for your class and group | PadKeys |
 | **PadKeys_CombatText** | Small combat text: your hits scroll beside the target's nameplate with the spell's icon; the hits you take show under your character, fading in as your health drops (earlier as a tank) | PadKeys |
+| **PadKeys_NotReady** | Pressing a key or using an item that is still on cooldown flashes its icon and the time left in the middle of the screen, fading out over a second | PadKeys |
 | **PadKeys_Cooldowns** | Blizzard's Cooldown Manager (cooldowns, buff icons, buff bars) in the PadKeys look: black borders, grey tints, the countdown without a swipe | PadKeys |
 | **PadKeys_Totems** | Blizzard's totem bar in the PadKeys look: black borders, no gold or element frames | PadKeys |
 | **PadKeys_Combo** | Combo points as a row of black and white pips above the bar, in place of Blizzard's (rogues, druids in Cat Form) | PadKeys |
@@ -439,6 +440,18 @@ compared, so the alpha comes from Blizzard's health curve
 the health points of both curves and `tank = true / false` are in
 `PadKeys_CombatText/Config.lua`.
 
+## Not ready flash (PadKeys_NotReady)
+
+Press a key whose spell or item is still on cooldown (or out of charges),
+or use such an item from your bags, and its icon flashes in the middle of
+the screen with the time left on it, then fades out over a second. Another
+press on cooldown, of the same key or another, replaces it at once. The
+global cooldown alone flashes nothing.
+
+It listens for the game's own "Spell is not ready yet." / "Item is not
+ready yet." errors and matches them to the key you just pressed. Size,
+position and timings are in `PadKeys_NotReady/Config.lua`.
+
 ## Targeting (works in combat)
 
 | Key | Does |
@@ -770,6 +783,15 @@ is loaded.
 22. **Tracking**: turn on Find Herbs or Track Beasts; a badge shows on the
     minimap's rim, and hovering it shows the name.
 
+**Stage 10: + PadKeys_NotReady**
+
+23. **Not ready**: cast a spell with a cooldown, then press its key again,
+    in and out of combat: its icon flashes mid-screen with the time left
+    and fades out over a second. Press it twice fast: the flash restarts.
+    Press another key on cooldown mid-fade: its icon replaces the first.
+    Spam a key during the global cooldown alone: nothing flashes. Use a
+    potion on cooldown from the bags: it flashes too.
+
 Known risks:
 - The buff reminder reads auras by name out of combat. If a list stays
   empty with a buff missing, `/dump C_UnitAuras.GetAuraDataByIndex("player", 1)`
@@ -792,6 +814,9 @@ Known risks:
   short list of names. A window it misses can be added to `EXTRA_ROOTS` in
   `PadKeys_Cursor/Cursor.lua`.
 - Long scroll lists aren't scrolled by the cursor yet; use the mouse wheel.
+- PadKeys_NotReady needs the game's "not ready yet" error to fire. If a
+  press on cooldown never flashes, or a spell queued in the spell queue
+  window gives no error, send what you see.
 
 ## Related branch
 
