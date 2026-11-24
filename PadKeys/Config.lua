@@ -102,6 +102,7 @@ ns.modules = {
   { addon = "PadKeys_Look", does = "Theme font everywhere, black chat" },
   { addon = "PadKeys_Combat", does = "Combat banner, and missing buffs out of combat" },
   { addon = "PadKeys_Ready", does = "A spell flashes mid-screen as it becomes ready" },
+  { addon = "PadKeys_Readout", does = "GCD, casts and boss timers beside the mouse" },
   { addon = "PadKeys_NotReady", does = "A key on cooldown flashes its icon mid-screen" },
   { addon = "PadKeys_Cooldowns", does = "Blizzard's Cooldown Manager in the PadKeys look" },
   { addon = "PadKeys_Totems", does = "Blizzard's totem bar in the PadKeys look" },

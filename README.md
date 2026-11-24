@@ -45,6 +45,7 @@ error points at one part:
 | **PadKeys_Combat** | "Combat" / "Out of Combat" fades in the middle of the screen as you enter and leave combat, in white; out of combat, a list of missing or expiring long buffs for your class and group | PadKeys |
 | **PadKeys_CombatText** | Small combat text: your hits scroll beside the target's nameplate with the spell's icon; the hits you take show under your character, fading in as your health drops (earlier as a tank) | PadKeys |
 | **PadKeys_Ready** | A spell flashes in the middle of the screen as it becomes ready: reactive abilities (Overpower, Revenge, Execute, Riposte, ...) as they light up, and long cooldowns (30 s or more) as they come back, in combat | PadKeys |
+| **PadKeys_Readout** | Beside the mouse: a faint disc that drains with the global cooldown or your cast, your target's cast (to interrupt), and boss abilities from Blizzard's encounter timeline as they come close | PadKeys |
 | **PadKeys_NotReady** | Pressing a key or using an item that is still on cooldown flashes its icon and the time left in the middle of the screen, fading out over a second | PadKeys |
 | **PadKeys_Cooldowns** | Blizzard's Cooldown Manager (cooldowns, buff icons, buff bars) in the PadKeys look: black borders, grey tints, the countdown without a swipe | PadKeys |
 | **PadKeys_Totems** | Blizzard's totem bar in the PadKeys look: black borders, no gold or element frames | PadKeys |
@@ -485,6 +486,28 @@ from when Blizzard's plain "on cooldown" flag turns on to when it turns
 off. Only spells and items on Blizzard's action bars (any of the eight,
 hidden ones too) count; macros don't.
 
+## Readout at the mouse (PadKeys_Readout)
+
+What changes fast, beside the mouse pointer, only while it matters:
+
+- a **faint disc** around the pointer that drains with the global
+  cooldown in combat, and with your cast or channel while you cast;
+- your **target's cast** or channel, to the upper right: its icon
+  draining, and its name; gone when it stops;
+- **boss abilities** from Blizzard's encounter timeline, to the right:
+  each one as the timeline highlights it (a few seconds before it lands),
+  with its icon, countdown and name, up to three at once; each goes when
+  the timeline drops it.
+
+While you turn with the right mouse button the pointer is hidden, so the
+readout stays where it was. Times, names and icons are secret in combat
+and during encounters; they go straight from Blizzard's duration objects
+and info into the widgets, never compared. Whether Classic raids and
+dungeons on Forever fill Blizzard's encounter timeline isn't known yet:
+if Blizzard's own timeline never shows in a boss fight, the boss rows
+won't either. Sizes, places and switches are in
+`PadKeys_Readout/Config.lua`.
+
 ## Targeting (works in combat)
 
 | Key | Does |
@@ -577,8 +600,9 @@ glows. By default:
   the first 6 seconds of combat.
 
 Other rules: `"proc"` (the spell's proc glow), `"ready"` (usable and off
-cooldown), `"casting"` (your target is casting, for an interrupt) and
-`{ combo = 5 }`. Set them per segment under `lights` in
+cooldown), `"casting"` (your target is casting, for an interrupt),
+`{ combo = 5 }` and `"boss"` (Blizzard's encounter timeline highlights a
+boss ability: put it on a defensive). Set them per segment under `lights` in
 `PadKeys_Radial/Config.lua`, and the faint copy under `ghost` (`show =
 "always"` or `"lit"`, its rings, sizes and alpha). Out of combat it shows
 only while a segment is lit.
@@ -921,6 +945,18 @@ is loaded.
     slice glows when you hold V; under 35% the healing potion too. If
     neither ever lights, the health curve may need a different scale:
     send `/dump UnitHealthPercent("player")`.
+
+**Stage 15: + PadKeys_Readout**
+
+29. **Disc**: in combat, cast an instant: a faint disc drains around the
+    pointer with the global cooldown. Cast something with a cast time: it
+    drains with the cast.
+30. **Target cast**: target a caster mob: its spell's icon and name show
+    upper right of the pointer while it casts.
+31. **Boss**: in a boss fight where Blizzard's encounter timeline shows,
+    each ability shows beside the pointer a few seconds before it lands,
+    with a countdown. If the timeline shows but the rows don't, send the
+    debug file.
 
 Known risks:
 - The buff reminder reads auras by name out of combat. If a list stays
