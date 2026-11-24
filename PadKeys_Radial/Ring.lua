@@ -6,7 +6,9 @@
 -- * third (Option+G, Mac only): Action Bar 8, slots 1-8, the same way;
 -- * markers (Shift+G): target markers, sent as /tm macros;
 -- * menu (Ctrl+G): Blizzard's main-menu entries (Menu.lua), several pages
---   turned with the mouse wheel while it is open.
+--   turned with the mouse wheel while it is open;
+-- * items (V): consumables from your bags (Items.lua), one set in combat
+--   and another out of it, picked by a macro condition.
 --
 -- Everything runs through the secure button, so it works in combat and
 -- nothing it opens is tainted. The pick happens in a restricted snippet: on
@@ -24,6 +26,7 @@ _G["BINDING_NAME_CLICK PadKeysRing:extra"] = "Second action radial, Action Bar 7
 _G["BINDING_NAME_CLICK PadKeysRing:third"] = "Third action radial, Action Bar 8 (hold)"
 _G["BINDING_NAME_CLICK PadKeysRing:markers"] = "Target marker radial (hold)"
 _G["BINDING_NAME_CLICK PadKeysRing:menu"] = "Main menu radial (hold)"
+_G["BINDING_NAME_CLICK PadKeysRing:items"] = "Consumables radial (hold)"
 
 local TITLES = {
   actions = "Actions",
@@ -31,15 +34,21 @@ local TITLES = {
   third = "Even more actions",
   markers = "Target markers",
   menu = FRAME_LABEL_MAIN_MENU or MAINMENU_BUTTON,
+  items = "Items",
 }
 
 -- Runs in the restricted environment: self = the ring button, owner = the
 -- header (as large as the screen, so GetMousePosition always answers),
 -- button = the page, down = key down or up. The
--- direction rule is ns.pick_index's.
+-- direction rule is ns.pick_index's. The items page picks its set on key
+-- down ("items-pick", a macro condition such as "[combat] fight; rest"),
+-- so the set shown and the set used are the same.
 local ON_CLICK = [[
   if down then
     origin_x, origin_y = owner:GetMousePosition()
+    if button == "items" then
+      items_set = SecureCmdOptionParse(self:GetAttribute("items-pick") or "") or ""
+    end
     if button == "menu" then
       self:SetAttribute("menu-open", true)
       self:SetAttribute("menu-page", self:GetAttribute("menu-start"))
@@ -73,6 +82,8 @@ local ON_CLICK = [[
   local segment = button .. index
   if button == "menu" then
     segment = "menu" .. self:GetAttribute("menu-page") .. "x" .. index
+  elseif button == "items" then
+    segment = "items" .. (items_set or "") .. index
   end
   if not self:GetAttribute("*type-" .. segment) then
     return false
@@ -109,6 +120,9 @@ SecureHandlerSetFrameRef(pager, "ring", button)
 SecureHandlerWrapScript(pager, "OnClick", header, PAGE_CLICK)
 
 local wheel = ns.create_wheel("PadKeysRingRadial")
+
+-- For Items.lua, which sets the items page's segments.
+ns.ring_button = button
 
 local function ring_config()
   return ns.config.radial.ring
@@ -289,6 +303,9 @@ local ENTRIES = {
   extra = extra_entries,
   third = third_entries,
   markers = marker_entries,
+  items = function()
+    return ns.item_entries and ns.item_entries() or {}
+  end,
 }
 
 -- Runs after the paging snippet: show the page it moved to.
@@ -331,11 +348,13 @@ button:HookScript("OnClick", function(_, page, down)
       wheel.label:SetText("Put spells, items or macros on Action Bar 7")
     elseif page == "third" then
       wheel.label:SetText("Put spells, items or macros on Action Bar 8")
+    elseif page == "items" then
+      wheel.label:SetText("None of this set's items are in your bags")
     end
   end
 end)
 
-local SLOT_PAGES = { actions = true, extra = true, third = true }
+local SLOT_PAGES = { actions = true, extra = true, third = true, items = true }
 
 -- Cooldowns that start or end while an action page is open (a cast, the
 -- end of the global cooldown), and changes to what can be used (mana, an
