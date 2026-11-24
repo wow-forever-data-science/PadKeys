@@ -53,6 +53,11 @@ ns.config.fade = {
       "PetFrame",
       show_when = { "combat", "target", "not_full" },
     },
+    -- Your buffs, only on hover (debuffs stay). PadKeys_Portrait shows
+    -- your stance, form, aspect or aura.
+    buffs = {
+      "BuffFrame",
+    },
     -- Party frames: in combat, or while someone is hurt.
     party = {
       "PartyFrame",
