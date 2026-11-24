@@ -94,7 +94,7 @@ ns.config.fade = {
   -- Extra pixels around each frame that still count as hovering it.
   padding = 10,
   -- A label above the top left corner of each action bar: its name and the
-  -- PadKeys key that fires it ("Bar 2 · Cmd", "Bar 6 · G wheel"). It needs
+  -- PadKeys key that fires it ("Bar 2 · Cmd", "Bar 6 · G wheel · combat"). It needs
   -- about label_size + label_gap + 4 pixels free above the bar, so leave
   -- that much between stacked bars in Edit Mode.
   labels = true,

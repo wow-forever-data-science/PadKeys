@@ -38,7 +38,7 @@ error points at one part:
 | **PadKeys_Cursor** | UI cursor (windows, unit frames, buffs) and NPC dialogs (F = A, Esc = B) | PadKeys |
 | **PadKeys_Auras** | Aura highlight: your target's nameplate auras (C), your debuffs (Ctrl+C); hold Shift+C for the tooltip | PadKeys |
 | **PadKeys_Targeting** | Party/raid cycling (Ctrl+Tab), F that attacks in combat, and ally mode (\`) where F targets the ally you face, or in a raid picks a raid frame with the mouse | PadKeys |
-| **PadKeys_Radial** | Radials: actions (G, Cmd+G, Option+G), markers (Shift+G), main menu (Ctrl+G), consumables from your bags (5) | PadKeys |
+| **PadKeys_Radial** | Radials: actions (G, by combat; Cmd+G), markers (Shift+G), main menu (Ctrl+G), consumables from your bags (5) | PadKeys |
 | **PadKeys_Bar** | One bar that shows the layer you hold (Cmd, Shift, Option, Ctrl) | PadKeys (SpellActivationOverlay optional, for its proc glows) |
 | **PadKeys_Fade** | Blizzard's action bars, micro menu, bags, player, pet and party frames, experience and reputation bars and quest tracker fade out until you need them (mouseover, a dragged spell, combat, a target, regenerating, talent points, loot, experience gained); each bar is labelled with its PadKeys key (Cmd, Shift, G wheel) | PadKeys |
 | **PadKeys_Look** | Every font in the game in the theme font (Roboto Condensed), and chat windows on a black background | PadKeys |
@@ -82,7 +82,7 @@ keyboard with each layer's keys. It's also published at
 | \` | Ally mode (F targets allies, Cmd+F inspects) | | |
 | Tab / Shift+Tab | Next / previous enemy | Ctrl+F | Last target |
 | Ctrl+Tab / Ctrl+Shift+Tab | Next / previous group member | Cmd+F | Last hostile target |
-| G (hold) | Action radial: Bar 6 in combat or with an enemy targeted, Bar 7 out of combat; with Cmd: Bar 7, Option: Bar 8, Shift: target markers, Ctrl: main menu | C | Target's next debuff tooltip |
+| G (hold) | Action radial: Bar 6 in combat or with an enemy targeted, Bar 7 out of combat; with Cmd: Bar 8, Shift: target markers, Ctrl: main menu | C | Target's next debuff tooltip |
 | Z | Sheathe / draw weapon | Cmd / Shift / Ctrl+C | Target buff / your debuff / your buff |
 | Shift+\` | UI cursor | X | Sit / stand |
 | F1 | Key map | B | Bags, with the UI cursor inside |
@@ -306,7 +306,8 @@ PadKeys_Fade keeps Blizzard's frames and makes them invisible instead:
   above its top left corner: the bar and the PadKeys key that fires it, read from your live
   bindings: `Bar 1 No modifier`, `Bar 2 Cmd`, `Bar 3 Shift`, `Bar 5
   Option`, `Bar 4 Ctrl · slots 1–4`, `Pet bar Ctrl · slots 1–4`, `Bar 6 G
-  wheel` (with PadKeys_Radial).
+  wheel · combat`, `Bar 7 G wheel · rest`, `Bar 8 Cmd+G wheel` (with
+  PadKeys_Radial).
 - **Drag** a spell, item or macro and the action bars fade in until you
   drop it.
 - Other frames show by themselves when they matter (`show_when` and
@@ -541,8 +542,7 @@ about a third of its size. The modifier you press with G picks the radial:
 | Key | Radial | In combat |
 |---|---|---|
 | G | In combat or with an enemy targeted, Action Bar 6, slots 1-8: drag spells, items and macros there. Out of combat, Action Bar 7 (mount, food, buffs) | yes |
-| Cmd+G | Action Bar 7, slots 1-8, the same way | yes |
-| Option+G | Action Bar 8, slots 1-8, the same way (Mac only) | yes |
+| Cmd+G | Action Bar 8, slots 1-8, the same way | yes |
 | Shift+G | Target markers on your target, skull at the top | yes |
 | Ctrl+G | Blizzard's main-menu entries, three pages | yes |
 | 5 | Consumables from your bags: potions and healthstone in combat, food, water and hearthstone out of it | yes |
