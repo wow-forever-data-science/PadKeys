@@ -6,7 +6,7 @@ local ns = PadKeys
 -- Hold to open, point with the mouse, release to run the pick. All work in
 -- combat; the page is the key you press.
 local b = ns.config.bindings
-b.G = "CLICK PadKeysRing:actions"           -- Action Bar 6, slots 1-8
+b.G = "CLICK PadKeysRing:main"              -- Bar 6 in combat, Bar 7 out (main_pick)
 b[ns.config.mod .. "G"] = "CLICK PadKeysRing:extra" -- Action Bar 7, slots 1-8
 -- Option+G, only on a Mac: on Windows Alt is the Cmd+G key above.
 if ns.config.mod ~= "ALT-" then
@@ -46,6 +46,11 @@ ns.config.radial = {
 
   -- The ring pages (Ring.lua).
   ring = {
+    -- The page G opens, as a macro condition: the first that is true.
+    -- By default Action Bar 6 (actions) in combat or with an enemy
+    -- targeted (your opener), else Action Bar 7 (extra: mount, food,
+    -- buffs). Any page works: actions, extra, third, markers, menu, items.
+    main_pick = "[combat][harm,nodead] actions; extra",
     -- Action Bar 6 (Blizzard's MultiBar5) starts at action slot 145.
     first_slot = 145,
     -- The Cmd+G page: Action Bar 7 (MultiBar6) starts at slot 157.
@@ -99,15 +104,17 @@ ns.config.radial = {
   },
 
   -- A faint copy of the wheels that follows the mouse (Ghost.lua): each
-  -- page in `rings` as a ring of small see-through icons around the
-  -- cursor, the first inside. The G ring sits where the G wheel's icons
-  -- will. Lit segments (below) show at full strength with a white frame.
+  -- page in `rings` as a ring of small icons around the cursor, the first
+  -- inside ("main" is whatever G opens now). The G ring sits where the G
+  -- wheel's icons will. Lit segments (below) show at full strength with a
+  -- white frame.
   ghost = {
     enabled = true,
-    rings = { "actions", "items" },
-    -- "combat": in combat, and out of it while a segment is lit by a rule
-    -- other than health or mana; "always"; "lit": only while lit.
-    show = "combat",
+    rings = { "main", "items" },
+    -- "lit": only the lit segments, each where its wheel icon will be;
+    -- "combat": the whole copy in combat, and out of it while a segment is
+    -- lit by a rule other than health or mana; "always".
+    show = "lit",
     alpha = 1,          -- the whole copy
     idle_alpha = 0.25,  -- an icon that isn't lit
     icon_scale = 0.8,   -- against the wheel's icons

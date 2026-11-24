@@ -38,12 +38,12 @@ local BAR_NAMES = {
   PetActionBar = "Pet bar", StanceBar = "Stance bar",
 }
 
--- PadKeys_Radial's G, Cmd+G and Option+G wheels show Action Bars 6, 7
--- and 8 (slots 145, 157 and 169).
+-- PadKeys_Radial's wheels that show Action Bars 6, 7 and 8 (slots 145,
+-- 157 and 169), the first one bound: G opens Action Bar 6 in combat.
 local WHEELS = {
-  MultiBar5 = "CLICK PadKeysRing:actions",
-  MultiBar6 = "CLICK PadKeysRing:extra",
-  MultiBar7 = "CLICK PadKeysRing:third",
+  MultiBar5 = { "CLICK PadKeysRing:main", "CLICK PadKeysRing:actions" },
+  MultiBar6 = { "CLICK PadKeysRing:extra" },
+  MultiBar7 = { "CLICK PadKeysRing:third" },
 }
 
 -- What can be dropped on an action button.
@@ -132,7 +132,10 @@ local function keys_for(frame, name)
         (mod_name(mods) .. " \194\183 slots " .. ranges(list))
     end
   end
-  local wheel = WHEELS[name] and GetBindingKey(WHEELS[name])
+  local wheel
+  for _, command in ipairs(WHEELS[name] or {}) do
+    wheel = wheel or GetBindingKey(command)
+  end
   if wheel then
     local mods, key = wheel:match("^(.+)%-(.+)$")
     parts[#parts + 1] = (mods and (mod_name(mods) .. "+" .. key) or wheel) .. " wheel"

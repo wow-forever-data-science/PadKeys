@@ -1,7 +1,9 @@
--- The ring: one secure button with five pages, picked by the key that
+-- The ring: one secure button with six pages, picked by the key that
 -- opens it (Config.lua):
 --
--- * actions (G): Action Bar 6, slots 1-8 (drag spells, items, macros there);
+-- * main (G): one of the pages below, picked by a macro condition
+--   (main_pick: Action Bar 6 in combat, Action Bar 7 out of it);
+-- * actions: Action Bar 6, slots 1-8 (drag spells, items, macros there);
 -- * extra (Cmd+G): Action Bar 7, slots 1-8, the same way;
 -- * third (Option+G, Mac only): Action Bar 8, slots 1-8, the same way;
 -- * markers (Shift+G): target markers, sent as /tm macros;
@@ -21,6 +23,7 @@
 local ns = PadKeys
 
 BINDING_HEADER_PADKEYS_RADIAL = "PadKeys: radials"
+_G["BINDING_NAME_CLICK PadKeysRing:main"] = "Action radial, combat or not (hold)"
 _G["BINDING_NAME_CLICK PadKeysRing:actions"] = "Action radial, Action Bar 6 (hold)"
 _G["BINDING_NAME_CLICK PadKeysRing:extra"] = "Second action radial, Action Bar 7 (hold)"
 _G["BINDING_NAME_CLICK PadKeysRing:third"] = "Third action radial, Action Bar 8 (hold)"
@@ -40,10 +43,17 @@ local TITLES = {
 -- Runs in the restricted environment: self = the ring button, owner = the
 -- header (as large as the screen, so GetMousePosition always answers),
 -- button = the page, down = key down or up. The
--- direction rule is ns.pick_index's. The items page picks its set on key
--- down ("items-pick", a macro condition such as "[combat] fight; rest"),
--- so the set shown and the set used are the same.
+-- direction rule is ns.pick_index's. The main page (G) and the items
+-- page pick their page or set on key down ("main-pick", "items-pick",
+-- macro conditions such as "[combat] fight; rest"), so what shows on
+-- press is what runs on release.
 local ON_CLICK = [[
+  if button == "main" then
+    if down then
+      main_page = SecureCmdOptionParse(self:GetAttribute("main-pick") or "") or ""
+    end
+    button = main_page or ""
+  end
   if down then
     origin_x, origin_y = owner:GetMousePosition()
     if button == "items" then
@@ -155,6 +165,7 @@ local function setup()
   header:SetAllPoints(UIParent)
   button:SetAttribute("useOnKeyDown", false)
   button:SetAttribute("dead-zone", ns.config.radial.dead_zone)
+  button:SetAttribute("main-pick", config.main_pick)
   for i = 1, ns.wheel_segments do
     button:SetAttribute("*type-actions" .. i, "action")
     button:SetAttribute("*action-actions" .. i, config.first_slot + i - 1)
@@ -308,9 +319,17 @@ local ENTRIES = {
   end,
 }
 
--- For Ghost.lua and Lights.lua: a page's entries, the action slot behind
--- a segment, and the wheel.
+-- For Ghost.lua and Lights.lua: the page "main" stands for now, a page's
+-- entries, the action slot behind a segment, and the wheel.
+function ns.ring_page(page)
+  if page == "main" then
+    return SecureCmdOptionParse(ring_config().main_pick or "") or ""
+  end
+  return page
+end
+
 function ns.ring_entries(page)
+  page = ns.ring_page(page)
   return ENTRIES[page] and ENTRIES[page]() or {}
 end
 
@@ -318,7 +337,7 @@ local FIRST_SLOT = {
   actions = "first_slot", extra = "extra_first_slot", third = "third_first_slot",
 }
 function ns.ring_slot(page, index)
-  local key = FIRST_SLOT[page]
+  local key = FIRST_SLOT[ns.ring_page(page)]
   return key and ring_config()[key] + index - 1 or nil
 end
 
@@ -344,13 +363,15 @@ end)
 -- The page the open wheel shows ("actions"), or nil.
 local shown_page
 
--- Runs after the secure snippet, with the original button name.
+-- Runs after the secure snippet, with the original button name; "main"
+-- reads the same macro condition the snippet just did.
 button:HookScript("OnClick", function(_, page, down)
   if not down then
     shown_page = nil
     wheel:close()
     return
   end
+  page = ns.ring_page(page)
   shown_page = page
   if page == "menu" then
     wheel:open(TITLES.menu)

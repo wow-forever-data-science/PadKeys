@@ -82,7 +82,7 @@ keyboard with each layer's keys. It's also published at
 | \` | Ally mode (F targets allies, Cmd+F inspects) | | |
 | Tab / Shift+Tab | Next / previous enemy | Ctrl+F | Last target |
 | Ctrl+Tab / Ctrl+Shift+Tab | Next / previous group member | Cmd+F | Last hostile target |
-| G (hold) | Action radial (Bar 6); with Cmd: Bar 7, Option: Bar 8, Shift: target markers, Ctrl: main menu | C | Target's next debuff tooltip |
+| G (hold) | Action radial: Bar 6 in combat or with an enemy targeted, Bar 7 out of combat; with Cmd: Bar 7, Option: Bar 8, Shift: target markers, Ctrl: main menu | C | Target's next debuff tooltip |
 | Z | Sheathe / draw weapon | Cmd / Shift / Ctrl+C | Target buff / your debuff / your buff |
 | Shift+\` | UI cursor | X | Sit / stand |
 | F1 | Key map | B | Bags, with the UI cursor inside |
@@ -540,13 +540,17 @@ about a third of its size. The modifier you press with G picks the radial:
 
 | Key | Radial | In combat |
 |---|---|---|
-| G | Action Bar 6, slots 1-8: drag spells, items and macros there | yes |
+| G | In combat or with an enemy targeted, Action Bar 6, slots 1-8: drag spells, items and macros there. Out of combat, Action Bar 7 (mount, food, buffs) | yes |
 | Cmd+G | Action Bar 7, slots 1-8, the same way | yes |
 | Option+G | Action Bar 8, slots 1-8, the same way (Mac only) | yes |
 | Shift+G | Target markers on your target, skull at the top | yes |
 | Ctrl+G | Blizzard's main-menu entries, three pages | yes |
 | 5 | Consumables from your bags: potions and healthstone in combat, food, water and hearthstone out of it | yes |
 
+- **G follows the fight**: which page it opens is a macro condition,
+  read on press (`main_pick = "[combat][harm,nodead] actions; extra"`
+  under `ring` in `PadKeys_Radial/Config.lua`). Any page works there,
+  e.g. `"[combat] actions; items"` for consumables out of combat.
 - **Action Bar 6** is Blizzard's bar 6; it can stay hidden in Edit Mode.
   The action radials show the cooldown countdown over each icon, as the
   PadKeys bar does: a spell on cooldown is dimmed with the seconds on
@@ -588,12 +592,13 @@ sets and their item lists are under `items` in
 
 ### Faint wheel at the mouse, lit segments
 
-In combat a faint copy of the wheels follows your mouse: the G wheel as a
-ring of small see-through icons around the cursor, and the 5 wheel as a
-second ring outside it. The G ring sits exactly where the G wheel's icons
-open when you press G there, so you see which way to flick before you
-press. It hides while you turn with the right mouse button, and while a
-wheel is open.
+A copy of the wheels follows your mouse, but only its **lit segments**
+show: nothing is drawn until a segment's moment comes. Each one sits
+where its icon will be when you open the wheel there: the G wheel (the
+page G opens now) on the inner ring, the 5 wheel on a second ring outside
+it, so you see which way to flick before you press. It hides while you
+turn with the right mouse button, and while a wheel is open.
+`show = "combat"` brings back the whole faint copy in combat.
 
 A segment **lights up** when its moment comes: on the faint copy it shows
 at full strength with a white frame, and on the open wheel its slice
@@ -608,17 +613,17 @@ Other rules: `"proc"` (the spell's proc glow), `"ready"` (usable and off
 cooldown), `"casting"` (your target is casting, for an interrupt),
 `{ combo = 5 }` and `"boss"` (Blizzard's encounter timeline highlights a
 boss ability: put it on a defensive). Set them per segment under `lights` in
-`PadKeys_Radial/Config.lua`, and the faint copy under `ghost` (`show =
-"always"` or `"lit"`, its rings, sizes and alpha). Out of combat it shows
-only while a segment is lit.
+`PadKeys_Radial/Config.lua`, and the copy under `ghost` (`show =
+"lit"`, `"combat"` or `"always"`, its rings, sizes and alpha).
 
 Lighting only changes the look: a lit segment does what it always does,
 so this works in combat. Health and mana are secret in combat and addon
 code may not compare them, so the health and mana rules hand the
 comparison to the client: a curve turns the percent into the glow's
 alpha (`UnitHealthPercent` with a curve), and only `SetAlpha` ever sees
-the result. That's also why a health light can't bring the faint copy up
-out of combat by itself.
+the result. With `show = "lit"` that alpha is the icon's own, so a
+health light shows by itself, in combat too; with `"combat"` it can't
+bring the copy up out of combat.
 
 ### Main menu (Ctrl+G)
 
@@ -942,10 +947,11 @@ is loaded.
 
 **Stage 14: faint wheel and lights**
 
-27. **Faint wheel**: pull a mob: two faint rings of icons follow the mouse
-    (G inside, 5 outside). Hold G where you are: the wheel's icons sit on
-    the inner ring's. Hold the right mouse button: the rings hide.
-28. **Lights**: target a mob out of combat: G east lights (opener), and
+27. **G by context**: out of combat with no target, hold G: Action Bar 7.
+    Target a mob, hold G: Action Bar 6. In combat: Action Bar 6.
+    Nothing follows the mouse until a segment lights.
+28. **Lights**: target a mob out of combat: G east shows at the mouse
+    (opener); hold G there: the wheel's icon sits on it. It
     stays lit for 6 seconds into the fight. Drop under 50% health with a
     healthstone in your bags: its icon lights on the outer ring and its
     slice glows when you hold 5; under 35% the healing potion too. If
