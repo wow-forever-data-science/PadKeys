@@ -18,8 +18,10 @@ without a gamepad, and adds its own code only where Blizzard's doesn't:
 - an in-game **key map** (F1), like Blizzard's Controller Map;
 - **one action bar** that shows the layer you hold, like a gamepad's
   skill panel, so Blizzard's bars can be hidden;
-- **fading bars**: Blizzard's bars, micro menu and bags stay out of sight
-  until you mouse over them or drag a spell, each labelled with its key;
+- **fading bars and frames**: Blizzard's bars, micro menu, bags, unit
+  frames, experience bar and quest tracker stay out of sight until you
+  need them: on mouseover, while you drag a spell, in combat, with a
+  target, while you regenerate, or for a moment as something changes;
 - a **combat banner**: "Combat" / "Out of Combat" fades in and out in the
   middle of the screen as you enter and leave combat;
 - a **buff reminder**: out of combat, the long buffs your class and group
@@ -38,7 +40,7 @@ error points at one part:
 | **PadKeys_Targeting** | Party/raid cycling (Ctrl+Tab), F that attacks in combat, and ally mode (\`) where F targets the ally you face, or in a raid picks a raid frame with the mouse | PadKeys |
 | **PadKeys_Radial** | Radials: actions (G, Cmd+G, Option+G), markers (Shift+G), main menu (Ctrl+G) | PadKeys |
 | **PadKeys_Bar** | One bar that shows the layer you hold (Cmd, Shift, Option, Ctrl) | PadKeys (SpellActivationOverlay optional, for its proc glows) |
-| **PadKeys_Fade** | Blizzard's action bars, micro menu and bags fade out until you mouse over them or drag a spell; each bar is labelled with its PadKeys key (Cmd, Shift, G wheel) | PadKeys |
+| **PadKeys_Fade** | Blizzard's action bars, micro menu, bags, player, pet and party frames, experience and reputation bars and quest tracker fade out until you need them (mouseover, a dragged spell, combat, a target, regenerating, talent points, loot, experience gained); each bar is labelled with its PadKeys key (Cmd, Shift, G wheel) | PadKeys |
 | **PadKeys_Look** | Every font in the game in the theme font (Roboto Condensed), and chat windows on a black background | PadKeys |
 | **PadKeys_Combat** | "Combat" / "Out of Combat" fades in the middle of the screen as you enter and leave combat, in white; out of combat, a list of missing or expiring long buffs for your class and group | PadKeys |
 | **PadKeys_CombatText** | Small combat text: your hits scroll beside the target's nameplate with the spell's icon; the hits you take show under your character, fading in as your health drops (earlier as a tank) | PadKeys |
@@ -303,8 +305,15 @@ PadKeys_Fade keeps Blizzard's frames and makes them invisible instead:
   wheel` (with PadKeys_Radial).
 - **Drag** a spell, item or macro and the action bars fade in until you
   drop it.
-- The **micro menu and bags** are their own group: hover them to see them.
-  The experience and reputation bars don't fade: they always show.
+- Other frames show by themselves when they matter (`show_when` and
+  `flash_on` in `Config.lua`), and on mouseover:
+  - the **micro menu** while you have talent points to spend;
+  - the **bags** for 3 seconds as loot goes into them;
+  - your **player and pet frames** in combat, with a target, or out of
+    combat while your health or mana isn't full;
+  - the **party frames** in combat, or out of combat while someone is hurt;
+  - the **experience and reputation bars** for 4 seconds as they change;
+  - the **quest tracker** out of combat.
 - **Edit Mode** shows everything, labels included.
 
 Set up:
@@ -319,8 +328,11 @@ Set up:
 It only changes the frames' alpha, so it works in combat and the keys
 press the buttons as before. Invisible buttons still take clicks where
 they sit, which is why the bottom of the screen is the place for them.
-Groups, timings, the faded alpha (0 is invisible) and the labels are in
-`PadKeys_Fade/Config.lua`.
+Groups, their conditions and events, timings, the faded alpha (0 is
+invisible) and the labels are in `PadKeys_Fade/Config.lua`; take a frame
+out of its group to keep it always shown. Health and mana are secret in
+combat, so "not full" is only read out of combat; in combat those frames
+show because you are in combat.
 
 ## Look (PadKeys_Look)
 
@@ -791,6 +803,17 @@ is loaded.
     Press another key on cooldown mid-fade: its icon replaces the first.
     Spam a key during the global cooldown alone: nothing flashes. Use a
     potion on cooldown from the bags: it flashes too.
+
+**Stage 11: PadKeys_Fade conditions**
+
+24. **Frames that show by themselves**: out of combat at full health with
+    no target, the player frame, bags and micro menu are faded and the
+    quest tracker shows. Target a mob: the player frame shows. Pull
+    it: the quest tracker fades, the player frame stays. After the fight,
+    the player frame stays until health and mana are full. Kill a mob for
+    experience: the experience bar shows for 4 seconds. Loot an item: the
+    bags show for 3 seconds. In a party, a hurt member shows the party
+    frames out of combat.
 
 Known risks:
 - The buff reminder reads auras by name out of combat. If a list stays
