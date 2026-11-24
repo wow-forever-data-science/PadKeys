@@ -1,0 +1,10 @@
+## Interface: 11507, 16001
+## Title: PadKeys - Ready
+## Notes: Flashes a spell's icon in the middle of the screen as it becomes ready: reactive abilities (Overpower, Revenge, Execute, Riposte, ...) as they light up, and long cooldowns as they come back. Needs PadKeys.
+## Author: wow-forever-data-science
+## Version: 0.1.0
+## Dependencies: PadKeys
+## OptionalDeps: PadKeys_Debug
+
+Config.lua
+Ready.lua

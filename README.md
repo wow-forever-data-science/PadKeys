@@ -44,6 +44,7 @@ error points at one part:
 | **PadKeys_Look** | Every font in the game in the theme font (Roboto Condensed), and chat windows on a black background | PadKeys |
 | **PadKeys_Combat** | "Combat" / "Out of Combat" fades in the middle of the screen as you enter and leave combat, in white; out of combat, a list of missing or expiring long buffs for your class and group | PadKeys |
 | **PadKeys_CombatText** | Small combat text: your hits scroll beside the target's nameplate with the spell's icon; the hits you take show under your character, fading in as your health drops (earlier as a tank) | PadKeys |
+| **PadKeys_Ready** | A spell flashes in the middle of the screen as it becomes ready: reactive abilities (Overpower, Revenge, Execute, Riposte, ...) as they light up, and long cooldowns (30 s or more) as they come back, in combat | PadKeys |
 | **PadKeys_NotReady** | Pressing a key or using an item that is still on cooldown flashes its icon and the time left in the middle of the screen, fading out over a second | PadKeys |
 | **PadKeys_Cooldowns** | Blizzard's Cooldown Manager (cooldowns, buff icons, buff bars) in the PadKeys look: black borders, grey tints, the countdown without a swipe | PadKeys |
 | **PadKeys_Totems** | Blizzard's totem bar in the PadKeys look: black borders, no gold or element frames | PadKeys |
@@ -464,6 +465,25 @@ It listens for the game's own "Spell is not ready yet." / "Item is not
 ready yet." errors and matches them to the key you just pressed. Size,
 position and timings are in `PadKeys_NotReady/Config.lua`.
 
+## Ready flash (PadKeys_Ready)
+
+The opposite of the not-ready flash: a spell's icon and name pop up just
+above the middle of the screen as it becomes ready, then fade out.
+
+- **Reactive abilities** flash as they light up: Overpower after a dodge,
+  Revenge after a block, Execute under 20%, Riposte, Counterattack,
+  Mongoose Bite (the `reactive` list in `Config.lua`).
+- **Cooldowns**: any spell or item on your action bars flashes as it
+  comes back, if its cooldown lasted 30 seconds or more (`cooldown_min`):
+  Evocation, Innervate, trinkets, potions. `ignore` leaves some out
+  (Hearthstone by default).
+- Only in combat or with an enemy targeted (`only_when_fighting`).
+
+Cooldown numbers are secret in combat, so it times each cooldown itself,
+from when Blizzard's plain "on cooldown" flag turns on to when it turns
+off. Only spells and items on Blizzard's action bars (any of the eight,
+hidden ones too) count; macros don't.
+
 ## Targeting (works in combat)
 
 | Key | Does |
@@ -814,6 +834,13 @@ is loaded.
     experience: the experience bar shows for 4 seconds. Loot an item: the
     bags show for 3 seconds. In a party, a hurt member shows the party
     frames out of combat.
+
+**Stage 12: + PadKeys_Ready**
+
+25. **Ready**: as a warrior, fight until a mob dodges: Overpower pops up
+    above the middle of the screen. Use a spell with a cooldown of 30 s or
+    more in combat: it pops up as it comes back. A short cooldown, and the
+    global cooldown, never pop up.
 
 Known risks:
 - The buff reminder reads auras by name out of combat. If a list stays
