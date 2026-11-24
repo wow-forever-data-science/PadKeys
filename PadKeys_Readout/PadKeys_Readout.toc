@@ -1,10 +1,11 @@
 ## Interface: 11507, 16001
 ## Title: PadKeys - Readout
-## Notes: Beside the mouse: the global cooldown and your cast as a faint disc, your target's cast (to interrupt), and boss abilities from Blizzard's encounter timeline as they come close. Needs PadKeys.
+## Notes: Beside the mouse: the global cooldown and your cast as a faint disc, your target's cast (to interrupt), boss abilities from Blizzard's encounter timeline as they come close, and your tracked buffs from the Cooldown Manager. Needs PadKeys.
 ## Author: wow-forever-data-science
 ## Version: 0.1.0
 ## Dependencies: PadKeys
-## OptionalDeps: PadKeys_Debug
+## OptionalDeps: PadKeys_Debug, Blizzard_CooldownViewer
 
 Config.lua
 Readout.lua
+Buffs.lua
