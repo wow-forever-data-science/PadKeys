@@ -73,11 +73,13 @@ ns.config.fade = {
       flash_on = { "PLAYER_XP_UPDATE", "UPDATE_FACTION" },
       flash_for = 4,
     },
-    -- The quest tracker, out of combat.
+    -- The quest tracker, for a few seconds as you take a quest or an
+    -- objective moves.
     quests = {
       "QuestWatchFrame",
       "ObjectiveTrackerFrame",
-      show_when = { "no_combat" },
+      flash_on = { "QUEST_ACCEPTED", "QUEST_WATCH_UPDATE" },
+      flash_for = 5,
     },
   },
   -- Groups that show while you drag a spell, item, macro or pet action.

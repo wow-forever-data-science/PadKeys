@@ -317,7 +317,8 @@ PadKeys_Fade keeps Blizzard's frames and makes them invisible instead:
     combat while your health or mana isn't full;
   - the **party frames** in combat, or out of combat while someone is hurt;
   - the **experience and reputation bars** for 4 seconds as they change;
-  - the **quest tracker** out of combat;
+  - the **quest tracker** for 5 seconds as you take a quest or an
+    objective moves;
   - your **buffs** only on mouseover (PadKeys_Portrait shows your stance,
     form, aspect or aura).
 - **Hold `\`** and everything fades in; let go and it fades out again.
@@ -915,9 +916,10 @@ is loaded.
 **Stage 11: PadKeys_Fade conditions**
 
 24. **Frames that show by themselves**: out of combat at full health with
-    no target, the player frame, bags and micro menu are faded and the
-    quest tracker shows. Target a mob: the player frame shows. Pull
-    it: the quest tracker fades, the player frame stays. After the fight,
+    no target, the player frame, bags, micro menu, buffs and quest
+    tracker are faded. Target a mob: the player frame shows. Pull it:
+    the player frame stays. Kill a quest mob: the quest tracker shows for
+    5 seconds. Hold `\`: everything shows; let go: it fades. After the fight,
     the player frame stays until health and mana are full. Kill a mob for
     experience: the experience bar shows for 4 seconds. Loot an item: the
     bags show for 3 seconds. In a party, a hurt member shows the party
