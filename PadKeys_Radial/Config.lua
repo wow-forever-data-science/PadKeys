@@ -4,13 +4,14 @@
 local ns = PadKeys
 
 -- Hold to open, point with the mouse, release to run the pick. All work in
--- combat; the page is the key you press.
+-- combat; the page is the key you press. One key per bar: G is Bars 6
+-- and 7 (by combat), Cmd+G Bar 8.
 local b = ns.config.bindings
 b.G = "CLICK PadKeysRing:main"              -- Bar 6 in combat, Bar 7 out (main_pick)
-b[ns.config.mod .. "G"] = "CLICK PadKeysRing:extra" -- Action Bar 7, slots 1-8
--- Option+G, only on a Mac: on Windows Alt is the Cmd+G key above.
+b[ns.config.mod .. "G"] = "CLICK PadKeysRing:third" -- Action Bar 8, slots 1-8
+-- Option+G is free on a Mac (on Windows Alt is the Cmd+G key above).
 if ns.config.mod ~= "ALT-" then
-  b["ALT-G"] = "CLICK PadKeysRing:third"    -- Action Bar 8, slots 1-8
+  b["ALT-G"] = false
 end
 -- Not Shift + the side mouse button: Blizzard's ping key there takes a
 -- held modifier too (to ping a bar layer's slots), so both would open.
@@ -53,9 +54,9 @@ ns.config.radial = {
     main_pick = "[combat][harm,nodead] actions; extra",
     -- Action Bar 6 (Blizzard's MultiBar5) starts at action slot 145.
     first_slot = 145,
-    -- The Cmd+G page: Action Bar 7 (MultiBar6) starts at slot 157.
+    -- G's page out of combat: Action Bar 7 (MultiBar6) starts at slot 157.
     extra_first_slot = 157,
-    -- The Option+G page: Action Bar 8 (MultiBar7) starts at slot 169.
+    -- The Cmd+G page: Action Bar 8 (MultiBar7) starts at slot 169.
     third_first_slot = 169,
     -- Target markers 1-8: star, circle, diamond, triangle, moon, square,
     -- cross, skull; sent as marker_macro. Skull at the top.

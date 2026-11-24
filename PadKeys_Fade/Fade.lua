@@ -39,11 +39,14 @@ local BAR_NAMES = {
 }
 
 -- PadKeys_Radial's wheels that show Action Bars 6, 7 and 8 (slots 145,
--- 157 and 169), the first one bound: G opens Action Bar 6 in combat.
+-- 157 and 169), the first one bound, with a note: G opens Action Bar 6 in
+-- combat and Action Bar 7 out of it (main_pick's default).
 local WHEELS = {
-  MultiBar5 = { "CLICK PadKeysRing:main", "CLICK PadKeysRing:actions" },
-  MultiBar6 = { "CLICK PadKeysRing:extra" },
-  MultiBar7 = { "CLICK PadKeysRing:third" },
+  MultiBar5 = { { "CLICK PadKeysRing:main", " \194\183 combat" },
+                { "CLICK PadKeysRing:actions" } },
+  MultiBar6 = { { "CLICK PadKeysRing:main", " \194\183 rest" },
+                { "CLICK PadKeysRing:extra" } },
+  MultiBar7 = { { "CLICK PadKeysRing:third" } },
 }
 
 -- What can be dropped on an action button.
@@ -132,13 +135,16 @@ local function keys_for(frame, name)
         (mod_name(mods) .. " \194\183 slots " .. ranges(list))
     end
   end
-  local wheel
-  for _, command in ipairs(WHEELS[name] or {}) do
-    wheel = wheel or GetBindingKey(command)
+  local wheel, note
+  for _, entry in ipairs(WHEELS[name] or {}) do
+    if not wheel then
+      wheel, note = GetBindingKey(entry[1]), entry[2]
+    end
   end
   if wheel then
     local mods, key = wheel:match("^(.+)%-(.+)$")
-    parts[#parts + 1] = (mods and (mod_name(mods) .. "+" .. key) or wheel) .. " wheel"
+    parts[#parts + 1] = (mods and (mod_name(mods) .. "+" .. key) or wheel) ..
+      " wheel" .. (note or "")
   end
   return #parts > 0 and table.concat(parts, ", ") or nil
 end
