@@ -6,7 +6,8 @@
 -- spell, item or macro, and in Edit Mode. A group can also show by itself
 -- (Config.lua): while a condition holds (show_when: in combat, with a
 -- target, health or mana not full, ...) or for a few seconds after a game
--- event (flash_on: experience gained, loot in the bags).
+-- event (flash_on: experience gained, loot in the bags). Holding the
+-- show-all key (\ in Config.lua) shows every group until it is let go.
 --
 -- Health and power are secret values in combat, so not_full and
 -- group_hurt read them out of combat only, skip a secret one and wrap the
@@ -20,6 +21,9 @@
 
 local ns = PadKeys
 local c = ns.config.fade
+
+BINDING_HEADER_PADKEYS_FADE = "PadKeys: fade"
+_G["BINDING_NAME_CLICK PadKeysFadeAll:LeftButton"] = "Show all faded frames (hold)"
 
 local HOVER_INTERVAL = 0.05
 
@@ -325,12 +329,21 @@ local driver = CreateFrame("Frame")
 local since_hover_check = HOVER_INTERVAL
 local show = {}
 
+-- The show-all key acts on press and release.
+local held = false
+local show_all = CreateFrame("Button", "PadKeysFadeAll", UIParent)
+show_all:RegisterForClicks("AnyDown", "AnyUp")
+show_all:SetScript("OnClick", function(_, _, down)
+  held = down
+  since_hover_check = HOVER_INTERVAL
+end)
+
 driver:SetScript("OnUpdate", function(_, elapsed)
   since_hover_check = since_hover_check + elapsed
   if since_hover_check >= HOVER_INTERVAL then
     since_hover_check = 0
     local now = GetTime()
-    local all = ns.db.fade_off or editing()
+    local all = held or ns.db.fade_off or editing()
     local drag = dragging()
     wipe(checked)
     for _, group in ipairs(groups) do

@@ -95,6 +95,7 @@ keyboard with each layer's keys. It's also published at
 | Radials | point with the mouse · release G (or 5): run · Ctrl+G only: mouse wheel pages |
 | NPC dialog | W / S move to an option or reward · F choose, accept, continue, complete · Esc close |
 | Auras | C: target's first aura, then the next · Ctrl+C: your debuffs · hold Shift+C: tooltip |
+| Faded frames | hold `\`: show them all |
 
 ## Install
 
@@ -316,7 +317,10 @@ PadKeys_Fade keeps Blizzard's frames and makes them invisible instead:
     combat while your health or mana isn't full;
   - the **party frames** in combat, or out of combat while someone is hurt;
   - the **experience and reputation bars** for 4 seconds as they change;
-  - the **quest tracker** out of combat.
+  - the **quest tracker** out of combat;
+  - your **buffs** only on mouseover (PadKeys_Portrait shows your stance,
+    form, aspect or aura).
+- **Hold `\`** and everything fades in; let go and it fades out again.
 - **Edit Mode** shows everything, labels included.
 
 Set up:
