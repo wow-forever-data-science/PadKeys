@@ -24,6 +24,17 @@ local WHEEL_SIZE = 400
 
 ns.wheel_segments = SEGMENT_COUNT
 
+-- Where segment `index`'s icon sits from the wheel's centre, and its size,
+-- in screen units at the configured scale: Ghost.lua draws its faint copy
+-- of a page with the same geometry, so its icons sit where the wheel's will.
+function ns.wheel_icon_place(index)
+  local config = ns.config.radial
+  local radians = math.rad((index - 1) * SEGMENT_ANGLE)
+  local distance = TEXTURE_ICON_DISTANCE * config.scale
+  return distance * math.cos(radians), distance * math.sin(radians),
+         TEXTURE_ICON_SIZE * (config.icon_scale or 1) * config.scale
+end
+
 -- Segment for an offset from the opening point, or nil inside the dead
 -- zone. Segments go counter-clockwise from east, as in Blizzard's radial.
 function ns.pick_index(dx, dy, dead_zone)
@@ -97,7 +108,15 @@ function ns.create_wheel(name)
     disabled:SetPoint("CENTER", polar(i, HIGHLIGHT_DISTANCE))
     disabled:SetRotation(rotation(i))
     disabled:SetDesaturated(true)
-    w.segments[i] = { icon = art:CreateTexture(nil, "OVERLAY"), disabled = disabled }
+    -- Lit (Lights.lua): the segment's shape in white, see-through.
+    local lit = art:CreateTexture(nil, "ARTWORK", nil, 1)
+    lit:SetAtlas("gamepad-radial-menu-selected", true)
+    lit:SetPoint("CENTER", polar(i, HIGHLIGHT_DISTANCE))
+    lit:SetRotation(rotation(i))
+    lit:SetDesaturated(true)
+    lit:SetAlpha(0)
+    w.segments[i] = { icon = art:CreateTexture(nil, "OVERLAY"), disabled = disabled,
+                      lit = lit }
   end
 
   -- Countdowns over the action icons: only the numbers, no swipe, edge or
@@ -252,6 +271,15 @@ function Wheel:set_entries(entries)
   end
   if self.current then
     self:select(self.current, true)
+  end
+end
+
+-- Lights segment i: `alpha` is 0 (off) to 1, and may be a secret value
+-- (a health curve's result); SetAlpha takes it.
+function Wheel:set_lit(i, alpha)
+  local segment = self.segments[i]
+  if segment then
+    segment.lit:SetAlpha(alpha)
   end
 end
 
