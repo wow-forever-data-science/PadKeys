@@ -5,7 +5,8 @@
 -- - yellow and glowing instead when the cast lands while one of your
 --   listed buffs (ring.buffs) is still on you;
 -- - out of a cast, the global cooldown fills it faintly, in combat;
--- - a hit you take flashes it red for a moment: bright on a crit, a
+-- - off by default (ring.hits; the hits you take show lower right of the
+--   mouse instead): a hit you take flashes it red for a moment: bright on a crit, a
 --   crushing blow or a burst of hits, and otherwise as bright as your
 --   health is low (nothing at full health).
 --

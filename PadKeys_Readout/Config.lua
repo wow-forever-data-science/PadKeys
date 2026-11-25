@@ -39,12 +39,14 @@ ns.config.readout = {
     gcd_alpha = 0.35,
     gcd_in_combat_only = true,
 
-    -- A hit you take flashes it red for hit_time seconds. Crits, crushing
+    -- Off: the hits you take show lower right of the mouse instead
+    -- (PadKeys_CombatText). true: a hit you take flashes it red for
+    -- hit_time seconds. Crits, crushing
     -- blows and bursts (burst_hits hits within burst_window seconds) flash
     -- at full strength; other hits as bright as hit_by_health says, as
     -- { health, alpha } points from 0 to 1 joined by straight lines:
     -- nothing above 80% health, full at 50% and below.
-    hits = true,
+    hits = false,
     hit_color = { 1, 0.1, 0.1 },
     hit_time = 0.35,
     hit_min_gap = 0.12,  -- at most one flash per this many seconds
