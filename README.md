@@ -38,7 +38,7 @@ error points at one part:
 | **PadKeys_Cursor** | UI cursor (windows, unit frames, buffs) and NPC dialogs (F = A, Esc = B) | PadKeys |
 | **PadKeys_Auras** | Aura highlight: your target's nameplate auras (C), your debuffs (Ctrl+C); hold Shift+C for the tooltip | PadKeys |
 | **PadKeys_Targeting** | Party/raid cycling (Ctrl+Tab), F that attacks in combat, and ally mode (\`) where F targets the ally you face, or in a raid picks a raid frame with the mouse | PadKeys |
-| **PadKeys_Radial** | Radials: actions (G, by combat; Cmd+G), markers (Shift+G), main menu (Ctrl+G), consumables from your bags (5) | PadKeys |
+| **PadKeys_Radial** | Radials: actions with consumables on an outer ring (G, by combat), Bar 8 (Cmd+G), markers (Shift+G), main menu (Ctrl+G) | PadKeys |
 | **PadKeys_Bar** | One bar that shows the layer you hold (Cmd, Shift, Option, Ctrl) | PadKeys (SpellActivationOverlay optional, for its proc glows) |
 | **PadKeys_Fade** | Blizzard's action bars, micro menu, bags, player, pet and party frames, experience and reputation bars and quest tracker fade out until you need them (mouseover, a dragged spell, combat, a target, regenerating, talent points, loot, experience gained); each bar is labelled with its PadKeys key (Cmd, Shift, G wheel) | PadKeys |
 | **PadKeys_Look** | Every font in the game in the theme font (Roboto Condensed), and chat windows on a black background | PadKeys |
@@ -82,17 +82,16 @@ keyboard with each layer's keys. It's also published at
 | \` | Ally mode (F targets allies, Cmd+F inspects) | | |
 | Tab / Shift+Tab | Next / previous enemy | Ctrl+F | Last target |
 | Ctrl+Tab / Ctrl+Shift+Tab | Next / previous group member | Cmd+F | Last hostile target |
-| G (hold) | Action radial: Bar 6 in combat or with an enemy targeted, Bar 7 out of combat; with Cmd: Bar 8, Shift: target markers, Ctrl: main menu | C | Target's next debuff tooltip |
+| G (hold) | Action radial: Bar 6 in combat or with an enemy targeted, Bar 7 out of combat, consumables on the outer ring; with Cmd: Bar 8, Shift: target markers, Ctrl: main menu | C | Target's next debuff tooltip |
 | Z | Sheathe / draw weapon | Cmd / Shift / Ctrl+C | Target buff / your debuff / your buff |
 | Shift+\` | UI cursor | X | Sit / stand |
 | F1 | Key map | B | Bags, with the UI cursor inside |
-| 5 (hold) | Consumables radial (potions in combat, food and water out) | | |
 | Side mouse button (hold) | Blizzard's ping key: click a unit, a spot or a bar slot | | |
 
 | Context | Keys |
 |---|---|
 | UI cursor | WASD / arrows move · F / Space click (uses a bag item) · Shift+F right-click · Ctrl+F pick up · Cmd+F buy a stack / create all / open all mail / apply talents or Legacy tree / create auction · Tab / Shift+Tab next / previous window · Esc leave |
-| Radials | point with the mouse · release G (or 5): run · Ctrl+G only: mouse wheel pages |
+| Radials | point with the mouse (further out for G's consumables) · release G: run · Ctrl+G only: mouse wheel pages |
 | NPC dialog | W / S move to an option or reward · F choose, accept, continue, complete · Esc close |
 | Auras | C: target's first aura, then the next · Ctrl+C: your debuffs · hold Shift+C: tooltip |
 | Faded frames | hold `\`: show them all |
@@ -556,16 +555,19 @@ about a third of its size. The modifier you press with G picks the radial:
 
 | Key | Radial | In combat |
 |---|---|---|
-| G | In combat or with an enemy targeted, Action Bar 6, slots 1-8: drag spells, items and macros there. Out of combat, Action Bar 7 (mount, food, buffs) | yes |
+| G | In combat or with an enemy targeted, Action Bar 6, slots 1-8: drag spells, items and macros there. Out of combat, Action Bar 7 (mount, food, buffs). Your consumables on a second ring outside: flick further to pick one | yes |
 | Cmd+G | Action Bar 8, slots 1-8, the same way | yes |
 | Shift+G | Target markers on your target, skull at the top | yes |
 | Ctrl+G | Blizzard's main-menu entries, three pages | yes |
-| 5 | Consumables from your bags: potions and healthstone in combat, food, water and hearthstone out of it | yes |
 
 - **G follows the fight**: which page it opens is a macro condition,
   read on press (`main_pick = "[combat][harm,nodead] actions; extra"`
-  under `ring` in `PadKeys_Radial/Config.lua`). Any page works there,
-  e.g. `"[combat] actions; items"` for consumables out of combat.
+  under `ring` in `PadKeys_Radial/Config.lua`). Any page works there.
+  Only G changes; Cmd, Shift and Ctrl+G always open the same radial.
+- **Two rings on G**: the action page on the inner ring, the consumables
+  on an outer ring. A short flick picks from the inner ring; past about
+  59 px (halfway between the rings, `outer_from`) from the outer one.
+  `main_outer = false` gives a single ring.
 - **Action Bar 6** is Blizzard's bar 6; it can stay hidden in Edit Mode.
   The action radials show the cooldown countdown over each icon, as the
   PadKeys bar does: a spell on cooldown is dimmed with the seconds on
@@ -580,9 +582,9 @@ about a third of its size. The modifier you press with G picks the radial:
   modifier only matters on press.
 - **Z** is sheathe / draw again.
 
-### Consumables (5)
+### Consumables (G's outer ring)
 
-Hold **5** for a wheel of what's in your bags, picked for you: no
+G's **outer ring** is what's in your bags, picked for you: no
 dragging new ranks onto a bar as you level or restock. It shows one set
 in combat and another out of it:
 
@@ -610,8 +612,8 @@ sets and their item lists are under `items` in
 A copy of the wheels follows your mouse, but only its **lit segments**
 show: nothing is drawn until a segment's moment comes. Each one sits
 where its icon will be when you open the wheel there: the G wheel (the
-page G opens now) on the inner ring, the 5 wheel on a second ring outside
-it, so you see which way to flick before you press. It hides while you
+page G opens now) on the inner ring, its consumables on the outer ring,
+so you see which way to flick before you press. It hides while you
 turn with the right mouse button, and while a wheel is open.
 `show = "combat"` brings back the whole faint copy in combat.
 
@@ -952,11 +954,16 @@ is loaded.
     more in combat: it pops up as it comes back. A short cooldown, and the
     global cooldown, never pop up.
 
-**Stage 13: PadKeys_Radial consumables (5)**
+**Stage 13: PadKeys_Radial consumables (G's outer ring)**
 
-26. **Items**: `/padkeys apply` (5 is a new key). Out of combat, hold 5:
-    your drink, food, Hearthstone and bandage, with counts. Pull a mob and
-    hold 5: healing potion, healthstone and the rest you carry. Drink a
+26. **Items**: `/padkeys apply` (5 goes back to unbound). Out of combat,
+    hold G: Action Bar 7 inside, and your drink, food, Hearthstone and
+    bandage on the outer ring, with counts. Flick a short way: an inner
+    icon highlights; flick further: an outer one, with a white square.
+    Release on the drink: you drink. Pull a mob and hold G: Action Bar 6
+    inside, healing potion, healthstone and the rest outside. If you
+    often get the outer ring when you meant the inner one, raise
+    `outer_from` (e.g. 66). Drink a
     potion in combat: it greys with its cooldown. Buy a better potion: it
     takes the segment once out of combat.
 
@@ -968,8 +975,8 @@ is loaded.
 28. **Lights**: target a mob out of combat: G east shows at the mouse
     (opener); hold G there: the wheel's icon sits on it. It
     stays lit for 6 seconds into the fight. Drop under 50% health with a
-    healthstone in your bags: its icon lights on the outer ring and its
-    slice glows when you hold 5; under 35% the healing potion too. If
+    healthstone in your bags: its icon lights on the outer ring, and on
+    the open G wheel too; under 35% the healing potion too. If
     neither ever lights, the health curve may need a different scale:
     send `/dump UnitHealthPercent("player")`.
 

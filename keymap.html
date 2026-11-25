@@ -159,14 +159,12 @@ footer p { margin: 0; max-width: 75ch; }
         </div>
         <div class="card">
           <h3>Radials</h3>
-          <p>Hold G, point with the mouse, release G. The modifier picks the radial.</p>
+          <p>Hold G, point with the mouse, release G. The modifier picks the radial; only plain G changes with combat.</p>
           <dl>
-            <dt>G</dt><dd>Action Bar 6, slots 1-8 (in combat too)</dd>
-            <dt>Cmd+G</dt><dd>Action Bar 7, slots 1-8 (in combat too)</dd>
-            <dt>Option+G</dt><dd>Action Bar 8, slots 1-8 (in combat too)</dd>
+            <dt>G</dt><dd>Action Bar 6 in combat, Action Bar 7 out; consumables on the outer ring: flick further (in combat too)</dd>
+            <dt>Cmd+G</dt><dd>Action Bar 8, slots 1-8 (in combat too)</dd>
             <dt>Shift+G</dt><dd>Target markers (in combat too)</dd>
             <dt>Ctrl+G</dt><dd>Main menu; the mouse wheel pages it</dd>
-            <dt>5</dt><dd>Consumables from your bags; potions in combat, food and water out (in combat too)</dd>
           </dl>
           <p>Side mouse button (bound in wow-settings):</p>
           <dl>
@@ -237,8 +235,7 @@ const MAP = {
     B: { a: "Bags", c: "menu", long: "Bags, with the UI cursor inside" },
     C: { a: "Tgt debuffs", c: "act", long: "Target's next debuff tooltip", combat: true },
     Z: { a: "Sheathe", c: "move", long: "Sheathe / draw your weapon" },
-    G: { a: "Actions", c: "menu", long: "Action radial: Action Bar 6, slots 1-8", hold: true, combat: true },
-    "5": { a: "Items", c: "menu", long: "Consumables radial: the best potions, healthstone, food and water in your bags; one set in combat, another out", hold: true, combat: true },
+    G: { a: "Actions", c: "menu", long: "Action radial: Action Bar 6 in combat or with an enemy targeted, Action Bar 7 out of combat; your consumables on an outer ring (potions in combat, food and water out)", hold: true, combat: true },
     F1: { a: "Key map", c: "menu", long: "This key map, in game" },
     esc: { a: "Back", c: "menu", long: "Game menu; closes the cursor or aura view first" },
   },
@@ -259,12 +256,11 @@ const MAP = {
   },
   opt: {
     ...bar("Action Bar 5", "Bar5"),
-    G: { a: "Bar 8", c: "menu", long: "Action radial, Action Bar 8", hold: true, combat: true },
   },
   cmd: {
     ...bar("Action Bar 2", "Bar2"),
     F: { a: "Last hostile", c: "target", long: "Last hostile target; in ally mode, inspect your ally target" },
-    G: { a: "Bar 7", c: "menu", long: "Action radial, Action Bar 7", hold: true, combat: true },
+    G: { a: "Bar 8", c: "menu", long: "Action radial, Action Bar 8", hold: true, combat: true },
     C: { a: "Tgt buffs", c: "act", long: "Target's next buff tooltip", combat: true },
   },
 };
