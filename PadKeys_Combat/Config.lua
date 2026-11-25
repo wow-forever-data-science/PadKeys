@@ -65,7 +65,11 @@ ns.config.combat.buffs = {
   -- Supplies, as grey icons with a count, out of combat.
   supplies = {
     ammo_low = 200,        -- arrows or bullets in the ammo slot; 0 is off
-    durability_low = 0.3,  -- your most worn item under 30%; 0 is off
+    -- Always show your most worn item (its icon and %) and your free bag
+    -- slots, at the end of the bar, also while resting; they turn yellow
+    -- under the two limits below. false shows them only under the limits.
+    always = true,
+    durability_low = 0.3,  -- your most worn item under 30%
     bag_free_low = 3,      -- free bag slots under this
     pet = true,            -- hunter and warlock: no pet, or a dead one
     -- Warlocks: the demon a click on the pet icon summons (nil: no click).
