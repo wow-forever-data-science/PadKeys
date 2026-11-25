@@ -3,13 +3,53 @@
 local ns = PadKeys
 
 ns.config.readout = {
-  -- A faint disc around the mouse pointer that drains with the global
-  -- cooldown, or with your cast or channel while you cast.
-  disc = true,
-  disc_size = 44,
-  disc_alpha = 0.3,
-  -- Only in combat (your casts out of combat still show).
-  disc_in_combat_only = true,
+  -- A ring around the mouse pointer (Ring.lua), empty most of the time.
+  ring = {
+    enabled = true,
+    size = 56,           -- pixels across
+    track_alpha = 0.25,  -- the grey track under the fill, while it fills
+    -- true: the colour grows round the ring as time passes (fills up);
+    -- false: it shrinks (drains).
+    fill = true,
+
+    -- Your cast or channel fills it, blue.
+    cast_color = { 0.25, 0.6, 1 },
+    -- Glowing yellow instead when the cast lands while one of these buffs
+    -- (spell IDs) is still on you, e.g. a proc that the cast should
+    -- benefit from. Decided as the cast starts. If a buff's time is secret
+    -- in combat and the client refuses the comparison, the ring stays blue.
+    buffed_color = { 1, 0.85, 0.2 },
+    glow_pulse = 0.45,   -- seconds per pulse of the yellow glow
+    buffs = {
+      12536,  -- Clearcasting (mage)
+      16870,  -- Clearcasting (druid)
+      16246,  -- Clearcasting (shaman, Elemental Focus)
+      16166,  -- Elemental Mastery
+      14751,  -- Inner Focus
+      10060,  -- Power Infusion
+      12042,  -- Arcane Power
+      16886,  -- Nature's Grace
+    },
+
+    -- Out of a cast, the global cooldown fills it faintly.
+    gcd = true,
+    gcd_color = { 1, 1, 1 },
+    gcd_alpha = 0.35,
+    gcd_in_combat_only = true,
+
+    -- A hit you take flashes it red for hit_time seconds. Crits, crushing
+    -- blows and bursts (burst_hits hits within burst_window seconds) flash
+    -- at full strength; other hits as bright as hit_by_health says, as
+    -- { health, alpha } points from 0 to 1 joined by straight lines:
+    -- nothing above 80% health, full at 50% and below.
+    hits = true,
+    hit_color = { 1, 0.1, 0.1 },
+    hit_time = 0.35,
+    hit_min_gap = 0.12,  -- at most one flash per this many seconds
+    burst_hits = 4,
+    burst_window = 1.5,
+    hit_by_health = { { 0, 1 }, { 0.5, 1 }, { 0.8, 0 }, { 1, 0 } },
+  },
 
   -- Your target's cast or channel beside the mouse: its icon draining,
   -- and its name. Only while it casts.
