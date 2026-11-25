@@ -1,6 +1,7 @@
 -- A ring around the mouse pointer (Config.lua, readout.ring), empty most
 -- of the time:
--- - your cast or channel fills it, blue;
+-- - your cast or channel fills it: blue for a damaging spell, green for
+--   a healing one (C_Spell.IsSpellHelpful, asked as the cast starts);
 -- - yellow and glowing instead when the cast lands while one of your
 --   listed buffs (ring.buffs) is still on you;
 -- - out of a cast, the global cooldown fills it faintly, in combat;
@@ -219,8 +220,39 @@ local function update_gcd()
   refresh_track()
 end
 
+-- Your cast's or channel's spell ID, if plain.
+local function cast_spell()
+  local ok, id = pcall(function()
+    local name, _, _, _, _, _, _, _, id = UnitCastingInfo("player")
+    if not present(name) then
+      name, _, _, _, _, _, _, id = UnitChannelInfo("player")
+    end
+    if not present(name) or is_secret(id) then
+      return nil
+    end
+    return id
+  end)
+  return ok and id or nil
+end
+
+local CAST = r.cast_color or { 0.25, 0.6, 1 }
+local HEAL = r.heal_color or { 0.3, 0.9, 0.4 }
+
+-- Green for a helpful spell (a heal, a buff), blue otherwise.
+local function color_cast()
+  local id = cast_spell()
+  local helpful = false
+  if id and C_Spell and C_Spell.IsSpellHelpful then
+    local ok, h = pcall(C_Spell.IsSpellHelpful, id)
+    helpful = ok and not is_secret(h) and h and true or false
+  end
+  local cr, cg, cb = rgb(helpful and HEAL or CAST)
+  blue.cd:SetSwipeColor(cr, cg, cb, 1)
+end
+
 local function start_cast()
   casting = true
+  color_cast()
   local ok = false
   for _, layer in ipairs({ blue, yellow }) do
     ok = set_duration(layer, UnitCastingDuration, "player")

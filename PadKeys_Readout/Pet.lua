@@ -155,6 +155,7 @@ local function on_hit(action, flags, amount)
   hits = kept
   if flags == "CRITICAL" or flags == "CRUSHING" or #hits >= (p.burst_hits or 3) then
     hit_until = now + (p.hold or 3)
+    ns.pet_hit_until = hit_until -- for the radial's lit slices
     timer:Show()
     update()
   end

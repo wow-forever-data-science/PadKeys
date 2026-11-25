@@ -62,6 +62,11 @@ local function percent_alpha(kind, threshold, on, off)
   local ok, result
   if kind == "health" then
     ok, result = pcall(UnitHealthPercent, "player", true, curve)
+  elseif kind == "pet" then
+    if not UnitExists("pet") or UnitIsDead("pet") then
+      return off
+    end
+    ok, result = pcall(UnitHealthPercent, "pet", true, curve)
   else
     ok, result = pcall(UnitPowerPercent, "player", MANA, false, curve)
   end
@@ -172,7 +177,7 @@ local function plain(rule, page, index)
     rule = { [rule] = true }
   end
   local slot = ns.ring_slot and ns.ring_slot(page, index)
-  if rule.health or rule.mana then
+  if rule.health or rule.mana or rule.pet then
     return nil
   elseif rule.pull then
     return pulling(rule.pull)
@@ -197,7 +202,20 @@ function ns.light_alpha(page, index, off, on)
   if not rule then
     return off
   end
+  -- `hits`: also lit for a few seconds after heavy damage, as the
+  -- readouts at the mouse see it (PadKeys_CombatText for you,
+  -- PadKeys_Readout for your pet). Plain times, so no secret is touched.
+  local now = GetTime()
+  if type(rule) == "table" and rule.pet then
+    if rule.hits ~= false and (ns.pet_hit_until or 0) > now then
+      return on
+    end
+    return percent_alpha("pet", rule.pet, on, off)
+  end
   if type(rule) == "table" and rule.health then
+    if rule.hits and (ns.player_hit_until or 0) > now then
+      return on
+    end
     return percent_alpha("health", rule.health, on, off)
   elseif type(rule) == "table" and rule.mana then
     return percent_alpha("mana", rule.mana, on, off)

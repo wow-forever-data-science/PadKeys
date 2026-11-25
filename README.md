@@ -44,8 +44,8 @@ error points at one part:
 | **PadKeys_Fade** | Blizzard's action bars, micro menu, bags, player, pet and party frames, experience and reputation bars and quest tracker fade out until you need them (mouseover, a dragged spell, combat, a target, regenerating, talent points, loot, experience gained); each bar is labelled with its PadKeys key (Cmd, Shift, G wheel) | PadKeys |
 | **PadKeys_Look** | Every font in the game in the theme font (Roboto Condensed), and chat windows on a black background | PadKeys |
 | **PadKeys_Combat** | "Combat" / "Out of Combat" fades in the middle of the screen as you enter and leave combat, in white; out of combat, a list of missing or expiring long buffs for your class and group | PadKeys |
-| **PadKeys_CombatText** | Small combat text: your hits scroll beside the target's nameplate with the spell's icon; the hits you take show under your character, fading in as your health drops (earlier as a tank) | PadKeys |
-| **PadKeys_Ready** | A spell flashes in the middle of the screen as it becomes ready: reactive abilities (Overpower, Revenge, Execute, Riposte, ...) as they light up, and long cooldowns (30 s or more) as they come back, in combat | PadKeys |
+| **PadKeys_CombatText** | Small combat text: your hits scroll beside the target's nameplate with the spell's icon; the hits you take show lower right of the mouse, fading in as your health drops (earlier as a tank) and fully on heavy damage | PadKeys |
+| **PadKeys_Ready** | A spell flashes above the mouse as it becomes ready: reactive abilities (Overpower, Revenge, Execute, Riposte, ...) as they light up, and long cooldowns (30 s or more) as they come back, in combat | PadKeys |
 | **PadKeys_Readout** | Beside the mouse: a ring that fills with your cast (blue, or glowing yellow while a listed buff outlasts it) and the global cooldown and flashes red on hits you take, your big cooldowns that are ready, and boss abilities from Blizzard's encounter timeline as they come close | PadKeys |
 | **PadKeys_NotReady** | Pressing a key or using an item that is still on cooldown flashes its icon and the time left in the middle of the screen, fading out over a second | PadKeys |
 | **PadKeys_Cooldowns** | Blizzard's Cooldown Manager (cooldowns, buff icons, buff bars) in the PadKeys look: black borders, grey tints, the countdown without a swipe | PadKeys |
@@ -466,12 +466,14 @@ a new line glides the older ones further up to make room.
   shows your weapon. In a group the target's hits from others look the
   same, so there only hits that follow one of your casts show
   (`group_only_linked = false` shows all of them).
-- **Hits you take** show under your character with no icon (the game
-  doesn't name the spell). The whole scroll fades in as your health drops:
-  hidden above 75%, fully shown at 40% and below. As a tank (Defensive
-  Stance, Bear Form, Righteous Fury or the tank role) it is half shown at
-  full health and fully shown at 70%. `anchor = "cursor"` puts it at the
-  mouse pointer instead.
+- **Hits you take** show lower right of the mouse pointer, outside the G
+  radial, with no icon (the game doesn't name the spell). The whole
+  scroll fades in as your health drops: hidden above 75%, fully shown at
+  40% and below. As a tank (Defensive Stance, Bear Form, Righteous Fury
+  or the tank role) it is half shown at full health and fully shown at
+  70%. **Heavy damage** (a crit, a crushing blow, or 4 hits within 1.5 s)
+  shows it fully for 3 seconds whatever your health, and lights G's
+  healing slices. `anchor = "center"` puts it under your character.
 
 Damage amounts and health are secret in combat: they can be shown but not
 compared, so the alpha comes from Blizzard's health curve
@@ -493,8 +495,9 @@ position and timings are in `PadKeys_NotReady/Config.lua`.
 
 ## Ready flash (PadKeys_Ready)
 
-The opposite of the not-ready flash: a spell's icon and name pop up just
-above the middle of the screen as it becomes ready, then fade out.
+The opposite of the not-ready flash: a spell's icon and name pop up above
+the mouse pointer, just outside the G radial, as it becomes ready, then
+fade out. `anchor = "center"` puts it above the middle of the screen.
 
 - **Reactive abilities** flash as they light up: Overpower after a dodge,
   Revenge after a block, Execute under 20%, Riposte, Counterattack,
@@ -515,7 +518,8 @@ hidden ones too) count; macros don't.
 What changes fast, beside the mouse pointer, only while it matters:
 
 - a **ring** around the pointer, empty most of the time:
-  - your **cast or channel** fills it **blue**;
+  - your **cast or channel** fills it: **blue** for a damaging spell,
+    **green** for a heal (or another helpful spell);
   - **glowing yellow** instead when the cast will land while one of your
     listed buffs (`ring.buffs`, spell IDs: Clearcasting, Elemental
     Mastery, Power Infusion, ...) is still on you. This is decided as the
@@ -625,9 +629,10 @@ G's **outer ring** is what's in your bags, picked for you: no
 dragging new ranks onto a bar as you level or restock. It shows one set
 in combat and another out of it:
 
-- **In combat** (east, then counter-clockwise): healing potion,
-  healthstone, mana potion, bandage, Free Action Potion, rage potion,
-  Swiftness Potion, Limited Invulnerability Potion.
+- **In combat**, in the directions of the readouts at the mouse: rage
+  potion east, Limited Invulnerability Potion north-east, Swiftness
+  Potion north, Free Action Potion north-west, bandage west, mana potion
+  south-west, healthstone south, healing potion south-east.
 - **Out of combat**: drink, food, Hearthstone, bandage.
 
 Each segment takes the best one you carry: the first of its list in your
@@ -658,10 +663,21 @@ A segment **lights up** when its moment comes: on the faint copy it shows
 at full strength with a white frame, and on the open wheel its slice
 glows. By default:
 
-- the **healing potion** under 35% health and the **healthstone** under
-  50% (5, in combat), the **mana potion** under 25% mana;
-- your **opener**, G east: with an enemy targeted before the pull, and for
-  the first 6 seconds of combat.
+- the **healing potion** (south-east) under 35% health and the
+  **healthstone** (south) under 50%, and both for 3 seconds after heavy
+  damage; the **mana potion** (south-west) under 25% mana;
+- on Action Bar 6: **slot 6** (south-west, heal your pet) while your pet
+  is under 35% or just took heavy damage, and **slot 8** (south-east, your
+  own heal or defensive) like the healing potion.
+
+**In combat G follows the readouts at the mouse**, so a readout lighting
+up points at the slice that answers it. Put on Action Bar 6: your big
+cooldowns on slot 1 (east; they show ready right of the mouse), your big
+self-buff on slot 2 (north-east, where tracked buffs show), Mend Pet or
+Health Funnel on slot 6 (south-west, where the pet warning shows) and a
+heal or defensive on slot 8 (south-east, where your incoming damage
+shows). Ready cooldowns aren't lit: the column at the mouse shows them.
+`{ pull = 6 }` lights an opener if you want one back.
 
 Other rules: `"proc"` (the spell's proc glow), `"ready"` (usable and off
 cooldown), `"casting"` (your target is casting, for an interrupt),
@@ -990,7 +1006,7 @@ is loaded.
 **Stage 12: + PadKeys_Ready**
 
 25. **Ready**: as a warrior, fight until a mob dodges: Overpower pops up
-    above the middle of the screen. Use a spell with a cooldown of 30 s or
+    above the mouse pointer. Use a spell with a cooldown of 30 s or
     more in combat: it pops up as it comes back. A short cooldown, and the
     global cooldown, never pop up.
 
@@ -1012,11 +1028,11 @@ is loaded.
 27. **G by context**: out of combat with no target, hold G: Action Bar 7.
     Target a mob, hold G: Action Bar 6. In combat: Action Bar 6.
     Nothing follows the mouse until a segment lights.
-28. **Lights**: target a mob out of combat: G east shows at the mouse
-    (opener); hold G there: the wheel's icon sits on it. It
-    stays lit for 6 seconds into the fight. Drop under 50% health with a
-    healthstone in your bags: its icon lights on the outer ring, and on
-    the open G wheel too; under 35% the healing potion too. If
+28. **Lights**: put Mend Pet on Action Bar 6 slot 6. In combat, let your
+    pet drop under 35%: its icon shows lower left at the mouse, and its
+    slice glows when you hold G. Drop under 50% health with a healthstone
+    in your bags: it lights south on the outer ring; under 35% the healing
+    potion south-east too. Take several quick hits: both light for 3 s. If
     neither ever lights, the health curve may need a different scale:
     send `/dump UnitHealthPercent("player")`.
 
@@ -1024,7 +1040,7 @@ is loaded.
 
 29. **Ring**: in combat, cast an instant: a faint white ring fills around
     the pointer with the global cooldown. Cast something with a cast time:
-    a blue ring fills over the cast, on a grey track. If it drains instead
+    a blue ring fills over the cast, on a grey track; a heal fills it green. If it drains instead
     of filling, set `ring.fill = false` and say so. Get a listed buff
     (e.g. Clearcasting) and cast while it's up: the ring is yellow and
     glows. Take hits below 80% health: the ring flashes red, brighter as

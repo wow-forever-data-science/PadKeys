@@ -1,6 +1,9 @@
--- The hits you take, as a small scroll near your character (Config.lua,
--- combattext.incoming). The whole scroll fades in as your health drops, so
--- it stays out of the way while you're fine; as a tank it shows earlier.
+-- The hits you take, as a small scroll lower right of the mouse (Config.lua,
+-- combattext.incoming; or under your character). The whole scroll fades
+-- in as your health drops, so it stays out of the way while you're fine;
+-- as a tank it shows earlier. Heavy damage (a crit, a crushing blow or a
+-- burst of hits) shows it at full strength for a few seconds whatever your
+-- health, and lights the radial's healing slices (ns.player_hit_until).
 --
 -- Health is secret in combat, so the alpha is never worked out here:
 -- UnitHealthPercent takes a curve (health -> alpha) and returns the
@@ -27,6 +30,10 @@ local PHYSICAL = 1
 
 if s.anchor == "cursor" then
   frame:SetScript("OnUpdate", function()
+    -- Turning with the mouse hides the pointer: stay where it was.
+    if IsMouselooking and IsMouselooking() then
+      return
+    end
     local x, y = GetCursorPosition()
     local scale = UIParent:GetEffectiveScale()
     frame:ClearAllPoints()
@@ -97,8 +104,13 @@ local curves = {
 }
 
 local tank = false
+local heavy_until = 0
 
 local function update_alpha()
+  if GetTime() < heavy_until then
+    frame:SetAlpha(1)
+    return
+  end
   local curve = tank and curves.tank or curves.normal
   if curve and UnitHealthPercent then
     local ok, alpha = pcall(UnitHealthPercent, "player", true, curve)
@@ -113,6 +125,37 @@ end
 local function update_tank()
   tank = is_tank()
   update_alpha()
+end
+
+-- --- Heavy damage ------------------------------------------------------------
+
+local recent = {}
+local release = CreateFrame("Frame")
+release:Hide()
+release:SetScript("OnUpdate", function(self)
+  if GetTime() >= heavy_until then
+    self:Hide()
+    update_alpha()
+  end
+end)
+
+-- A hit that landed: heavy if it is a crit or crushing blow, or one of
+-- burst_hits within burst_window seconds.
+local function note_hit(flags)
+  local now = GetTime()
+  local kept = { now }
+  for _, t in ipairs(recent) do
+    if now - t <= (s.burst_window or 1.5) then
+      kept[#kept + 1] = t
+    end
+  end
+  recent = kept
+  if flags == "CRITICAL" or flags == "CRUSHING" or #recent >= (s.burst_hits or 4) then
+    heavy_until = now + (s.heavy_hold or 3)
+    ns.player_hit_until = heavy_until
+    frame:SetAlpha(1)
+    release:Show()
+  end
 end
 
 -- --- Hits --------------------------------------------------------------------
@@ -134,6 +177,7 @@ local function on_hit(event, flags, amount, school)
     end
     return
   end
+  note_hit(flags)
   local kind = school == PHYSICAL and "normal" or "special"
   if flags == "CRITICAL" or flags == "CRUSHING" then
     kind = "crit"
