@@ -1,5 +1,6 @@
--- The opposite of PadKeys_NotReady: a spell flashes in the middle of the
--- screen as it becomes ready, so you see it at the moment you can use it.
+-- The opposite of PadKeys_NotReady: a spell flashes above the mouse
+-- pointer (outside the G radial; or above the middle of the screen) as it
+-- becomes ready, so you see it at the moment you can use it.
 --
 -- - Reactive abilities (Config.lua: Overpower, Revenge, Execute, ...)
 --   flash as they become usable and aren't on a cooldown.
@@ -37,7 +38,22 @@ local IGNORE = name_set(c.ignore)
 
 local frame = CreateFrame("Frame", "PadKeysReady", UIParent)
 frame:SetSize(c.size, c.size)
-frame:SetPoint("CENTER", UIParent, "CENTER", c.x or 0, c.y or 0)
+local at_cursor = c.anchor == "cursor"
+if at_cursor then
+  -- Follows the pointer; turning with the mouse hides it: stay put then.
+  frame:SetScript("OnUpdate", function(self)
+    if IsMouselooking and IsMouselooking() then
+      return
+    end
+    local x, y = GetCursorPosition()
+    local scale = UIParent:GetEffectiveScale()
+    self:ClearAllPoints()
+    self:SetPoint("CENTER", UIParent, "BOTTOMLEFT",
+                  x / scale + (c.x or 0), y / scale + (c.y or 0))
+  end)
+else
+  frame:SetPoint("CENTER", UIParent, "CENTER", c.x or 0, c.y or 0)
+end
 frame:SetFrameStrata("HIGH")
 frame:SetAlpha(0)
 frame:EnableMouse(false)
@@ -54,7 +70,12 @@ ns.icon(icon)
 local label = ns.text(frame, c.label_size or 14, "white", "OVERLAY",
                       "GameFontHighlight")
 label:SetShadowOffset(1, -1)
-label:SetPoint("TOP", frame, "BOTTOM", 0, -4)
+-- Above the icon at the mouse, clear of the radial below it.
+if at_cursor then
+  label:SetPoint("BOTTOM", frame, "TOP", 0, 4)
+else
+  label:SetPoint("TOP", frame, "BOTTOM", 0, -4)
+end
 label:SetShown(c.label and true or false)
 
 -- A short pop as it appears, then the fade.

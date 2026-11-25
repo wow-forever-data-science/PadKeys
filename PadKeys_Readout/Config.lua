@@ -12,8 +12,10 @@ ns.config.readout = {
     -- false: it shrinks (drains).
     fill = true,
 
-    -- Your cast or channel fills it, blue.
+    -- Your cast or channel fills it: blue for a damaging spell, green for
+    -- a healing (or other helpful) one.
     cast_color = { 0.25, 0.6, 1 },
+    heal_color = { 0.3, 0.9, 0.4 },
     -- Glowing yellow instead when the cast lands while one of these buffs
     -- (spell IDs) is still on you, e.g. a proc that the cast should
     -- benefit from. Decided as the cast starts. If a buff's time is secret

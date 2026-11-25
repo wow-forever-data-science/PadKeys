@@ -55,12 +55,17 @@ ns.config.combattext.incoming = {
   enabled = true,
   size = 13,
   lines = 5,
-  direction = "up",
-  -- "center": under your character, offset by x, y (positive y is up).
-  -- "cursor": next to the mouse pointer, offset by x, y.
-  anchor = "center",
-  x = 0,
-  y = -60,
+  direction = "down",
+  -- "cursor": lower right of the mouse pointer, outside the G radial,
+  -- offset by x, y (positive y is up). "center": under your character.
+  anchor = "cursor",
+  x = 110,
+  y = -100,
+  -- Heavy damage shows it at full strength for heavy_hold seconds: a crit,
+  -- a crushing blow, or burst_hits hits within burst_window seconds.
+  burst_hits = 4,
+  burst_window = 1.5,
+  heavy_hold = 3,
   -- Visibility by health, as { health, alpha } points from 0 to 1, joined
   -- by straight lines. Not a tank: nothing above 75% health, all of it at
   -- 40% and below.

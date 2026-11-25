@@ -87,19 +87,21 @@ ns.config.radial = {
     -- "[stealth] sneak; [combat] fight; rest" with a `sneak` set below.
     pick = "[combat] fight; rest",
     sets = {
+      -- In the directions of the readouts at the mouse: buffs upper
+      -- right, healing lower right (where your incoming damage shows).
       fight = {
+        { "Mighty Rage Potion", "Great Rage Potion", "Rage Potion" },   -- E
+        { "Limited Invulnerability Potion" },                           -- NE
+        { "Swiftness Potion" },                                         -- N
+        { "Free Action Potion" },                                       -- NW
+        { use = "First Aid" },                                          -- W
+        { "Major Mana Potion", "Superior Mana Potion", "Greater Mana Potion",
+          "Mana Potion", "Lesser Mana Potion", "Minor Mana Potion" },  -- SW
+        { "Major Healthstone", "Greater Healthstone", "Healthstone",
+          "Lesser Healthstone", "Minor Healthstone" },                  -- S
         { "Major Healing Potion", "Superior Healing Potion",
           "Greater Healing Potion", "Healing Potion", "Lesser Healing Potion",
-          "Minor Healing Potion" },
-        { "Major Healthstone", "Greater Healthstone", "Healthstone",
-          "Lesser Healthstone", "Minor Healthstone" },
-        { "Major Mana Potion", "Superior Mana Potion", "Greater Mana Potion",
-          "Mana Potion", "Lesser Mana Potion", "Minor Mana Potion" },
-        { use = "First Aid" },
-        { "Free Action Potion" },
-        { "Mighty Rage Potion", "Great Rage Potion", "Rage Potion" },
-        { "Swiftness Potion" },
-        { "Limited Invulnerability Potion" },
+          "Minor Healing Potion" },                                     -- SE
       },
       rest = {
         { use = "Drink" },
@@ -136,7 +138,11 @@ ns.config.radial = {
   -- Lit segments, on the wheels and their faint copy, per page and
   -- segment (1 = east, counter-clockwise). For the items page, per set.
   -- Lighting only changes the look; the segment does what it always does.
-  --   { health = 0.35 }  your health under 35%
+  --   { health = 0.35 }  your health under 35%; add hits = true to light
+  --                      it too for a few seconds after heavy damage (the
+  --                      incoming-damage readout's crit or burst)
+  --   { pet = 0.35 }     your pet's health under 35%, or a few seconds
+  --                      after it takes heavy damage (the pet readout)
   --   { mana = 0.25 }    your mana under 25%
   --   { pull = 6 }       an enemy targeted before combat, and the first
   --                      6 seconds of combat
@@ -148,15 +154,28 @@ ns.config.radial = {
   --   "boss"             Blizzard's encounter timeline highlights a boss
   --                      ability (a few seconds before it lands): put it on
   --                      a defensive or a movement spell
+  --
+  -- In combat G's slices follow the readouts at the mouse, so a readout
+  -- lighting up points at the slice that answers it. Put on Action Bar 6:
+  --   slot 1 (east) and its neighbours: your big cooldowns (they show
+  --     ready right of the mouse);
+  --   slot 2 (north-east): your big self-buff (tracked buffs upper right);
+  --   slot 6 (south-west): heal your pet (Mend Pet, Health Funnel; the pet
+  --     warning shows lower left);
+  --   slot 8 (south-east): a heal or defensive for you (your incoming
+  --     damage shows lower right); the healing potion and healthstone sit
+  --     outside it on the consumables ring.
+  -- Ready cooldowns aren't lit: the column right of the mouse shows them.
   lights = {
     actions = {
-      [1] = { pull = 6 },   -- your opener on G, east
+      [6] = { pet = 0.35 },                 -- heal pet, south-west
+      [8] = { health = 0.35, hits = true }, -- your heal, south-east
     },
     items = {
       fight = {
-        [1] = { health = 0.35 },  -- healing potion
-        [2] = { health = 0.5 },   -- healthstone
-        [3] = { mana = 0.25 },    -- mana potion
+        [6] = { mana = 0.25 },                -- mana potion, south-west
+        [7] = { health = 0.5, hits = true },  -- healthstone, south
+        [8] = { health = 0.35, hits = true }, -- healing potion, south-east
       },
     },
   },
