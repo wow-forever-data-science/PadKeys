@@ -24,8 +24,9 @@ without a gamepad, and adds its own code only where Blizzard's doesn't:
   target, while you regenerate, or for a moment as something changes;
 - a **combat banner**: "Combat" / "Out of Combat" fades in and out in the
   middle of the screen as you enter and leave combat;
-- a **buff reminder**: out of combat, the long buffs your class and group
-  are missing or about to lose; it fades away as combat starts;
+- a **buff bar**: out of combat, an icon for each long buff your class
+  and group are missing or about to lose, consumables you haven't used
+  and supplies running low; click one to fix it; combat hides it;
 - one **look** for the whole game: every font in Roboto Condensed, and
   black chat windows.
 
@@ -395,14 +396,29 @@ Texts, size, position and timings are in
 It only sets a text's alpha, so it works in combat. Later this addon is
 meant to show boss timers or, in PvP, enemy cooldowns.
 
-### Buff reminder
+### Buff bar
 
-Long buffs matter before a pull, not during it. Out of combat, a short list
-just below the middle of the screen (under your character; the combat
-banner is above) shows the long buffs that are **missing** or
-have **under 5 minutes** left; when nothing is, it isn't there. As you enter
-combat it fades out as fast as the banner does (`fade_out`), and it fades
-back in as you leave combat (`fade_in`).
+Long buffs matter before a pull, not during it. Out of combat, a row of
+icons just below the middle of the screen (under your character; the
+combat banner is above) shows what needs doing; when nothing does, it
+isn't there. Combat hides it at once, and it fades back in as you leave
+combat (`fade_in`).
+
+- A **red frame**: missing (the icon is grey). A number on its top right
+  is how many in the group miss it.
+- **Yellow** with a time: under 5 minutes left.
+- **Grey** with a number: a supply running low (see below).
+- **Click** an icon to fix it: a group buff you cast goes on whoever needs
+  it first (click again for the next), your own buff on you, a consumable
+  is used, a sharpening stone or oil goes on your main hand, a rogue's
+  poison on its weapon (`poison_main`, `poison_off`), the pet is called or
+  revived. Hover for its name and who is missing it.
+- **Supplies**: ammo under 200, reagents for spells you know (soul shards,
+  poisons and Flash Powder, Sacred Candles, Arcane Powder and Runes of
+  Teleportation, Wild Thornroot, Symbols of Kings, an Ankh), your most
+  worn item under 30%, under 3 free bag slots, and for hunters and
+  warlocks no pet or a dead one. Limits and lists are under `supplies`.
+  Your pet's health in combat is at the mouse (PadKeys_Readout).
 
 What it lists depends on your class and who is in your party or raid:
 
@@ -430,7 +446,7 @@ the 5-minute limit (`warn_at`), position (`anchor = "PlayerFrame"` puts it
 under the player frame instead), size, `ignore` to drop a buff,
 `hide_resting = false` to keep it in inns and cities,
 `consolidate_in_combat = false` to leave the buff frame alone, and
-`enabled = false` to turn the reminder off.
+`enabled = false` to turn the bar off.
 
 ## Combat text (PadKeys_CombatText)
 
@@ -525,6 +541,9 @@ pointer), so holding G never covers it:
 - your **target's cast** (to interrupt) is off: the big cooldowns took
   its place and nameplates show casts. `target_cast = true` brings it
   back, lower right;
+- your **pet's health**, lower left, in combat once it is hurt: its
+  portrait and a thin bar that turns red when it is low. Health is
+  secret in combat; it goes from the client straight into the bar;
 - your **tracked buffs**, above right, a bit smaller: Blizzard's Cooldown Manager buff
   icons ("Tracked Buffs") follow the pointer, each while the buff is on
   you, with its time left. Pick them in the Cooldown Manager's options
@@ -914,11 +933,14 @@ is loaded.
 
 16. **Banner**: pull a mob; "Combat" fades in and out, then "Out of
     Combat" as it dies.
-17. **Buff reminder**: out of combat with a buff missing (cancel one, or
-    join a group with a priest, druid or mage), the list should name it.
-    Pull a mob: the list fades out with the banner, and the buff frame
-    folds its long buffs into one icon; after the fight both come back.
-    In a group where you cast a buff, the list should name who lacks it.
+17. **Buff bar**: out of combat, cancel a buff you cast yourself: its
+    icon shows with a red frame; hover it for its name; click it: you
+    cast it and the icon goes. In a group where you cast a buff, the icon
+    shows how many lack it; each click buffs the next. Pull a mob: the
+    bar is gone at once and the buff frame folds its long buffs into one
+    icon; after the fight both come back. Supplies: go under 200 arrows
+    (hunter) or bring a pet out and dismiss it: a grey icon with a count,
+    or the pet icon (click: Call Pet).
 
 **Stage 8: + PadKeys_Look**
 
@@ -1011,7 +1033,11 @@ is loaded.
     mob: their icons show in a column right of the pointer. Use one: it
     goes, and pops back in when its cooldown ends. Out of mana, its icon
     is dimmed. With no enemy targeted out of combat, nothing shows.
-31. **Boss**: in a boss fight where Blizzard's encounter timeline shows,
+31. **Pet**: as a hunter or warlock, fight with your pet: once it is
+    under 90% health its portrait and a green bar show lower left of the
+    pointer; under 35% the bar turns red. If the bar stays full while the
+    pet is hurt, send `/run print(UnitHealthPercent("pet"))`.
+32. **Boss**: in a boss fight where Blizzard's encounter timeline shows,
     each ability shows upper left of the pointer a few seconds before it
     lands, with a countdown. If the timeline shows but the rows don't, send the
     debug file.
