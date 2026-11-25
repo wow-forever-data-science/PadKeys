@@ -46,7 +46,7 @@ error points at one part:
 | **PadKeys_Combat** | "Combat" / "Out of Combat" fades in the middle of the screen as you enter and leave combat, in white; out of combat, a list of missing or expiring long buffs for your class and group | PadKeys |
 | **PadKeys_CombatText** | Small combat text: your hits scroll beside the target's nameplate with the spell's icon; the hits you take show lower right of the mouse, fading in as your health drops (earlier as a tank) and fully on heavy damage | PadKeys |
 | **PadKeys_Ready** | A spell flashes above the mouse as it becomes ready: reactive abilities (Overpower, Revenge, Execute, Riposte, ...) as they light up, and long cooldowns (30 s or more) as they come back, in combat | PadKeys |
-| **PadKeys_Readout** | Beside the mouse: a ring that fills with your cast (blue, or glowing yellow while a listed buff outlasts it) and the global cooldown and flashes red on hits you take, your big cooldowns that are ready, and boss abilities from Blizzard's encounter timeline as they come close | PadKeys |
+| **PadKeys_Readout** | Beside the mouse: a ring that fills with your cast (blue, green for heals, or glowing yellow while a listed buff outlasts it) and the global cooldown, your big cooldowns that are ready, and boss abilities from Blizzard's encounter timeline as they come close | PadKeys |
 | **PadKeys_NotReady** | Pressing a key or using an item that is still on cooldown flashes its icon and the time left in the middle of the screen, fading out over a second | PadKeys |
 | **PadKeys_Cooldowns** | Blizzard's Cooldown Manager (cooldowns, buff icons, buff bars) in the PadKeys look: black borders, grey tints, the countdown without a swipe | PadKeys |
 | **PadKeys_Totems** | Blizzard's totem bar in the PadKeys look: black borders, no gold or element frames | PadKeys |
@@ -526,9 +526,8 @@ What changes fast, beside the mouse pointer, only while it matters:
     cast starts; if the client keeps a buff's time secret in combat and
     refuses the comparison, the ring stays blue;
   - out of a cast, the **global cooldown** fills it faintly, in combat;
-  - a **hit you take** flashes it **red** for a moment: at full strength
-    on a crit, a crushing blow or a burst of hits (4 within 1.5 s), and
-    otherwise as bright as your health is low (nothing above 80%);
+  - hits you take no longer flash it red: they show lower right of the
+    mouse (PadKeys_CombatText). `ring.hits = true` brings the flash back;
 Everything else sits outside the G radial (about 84 px from the
 pointer), so holding G never covers it:
 
@@ -1043,8 +1042,7 @@ is loaded.
     a blue ring fills over the cast, on a grey track; a heal fills it green. If it drains instead
     of filling, set `ring.fill = false` and say so. Get a listed buff
     (e.g. Clearcasting) and cast while it's up: the ring is yellow and
-    glows. Take hits below 80% health: the ring flashes red, brighter as
-    health drops; a crit or several quick hits flash it fully. If the
+    glows. If the
     ring stays blue with the buff up in combat but turns yellow out of
     combat, the buff's time is refused in combat: send
     `/run local a=C_UnitAuras.GetPlayerAuraBySpellID(16870) print(a and issecretvalue(a.expirationTime))`
