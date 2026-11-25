@@ -45,7 +45,7 @@ error points at one part:
 | **PadKeys_Combat** | "Combat" / "Out of Combat" fades in the middle of the screen as you enter and leave combat, in white; out of combat, a list of missing or expiring long buffs for your class and group | PadKeys |
 | **PadKeys_CombatText** | Small combat text: your hits scroll beside the target's nameplate with the spell's icon; the hits you take show under your character, fading in as your health drops (earlier as a tank) | PadKeys |
 | **PadKeys_Ready** | A spell flashes in the middle of the screen as it becomes ready: reactive abilities (Overpower, Revenge, Execute, Riposte, ...) as they light up, and long cooldowns (30 s or more) as they come back, in combat | PadKeys |
-| **PadKeys_Readout** | Beside the mouse: a faint disc that drains with the global cooldown or your cast, your target's cast (to interrupt), and boss abilities from Blizzard's encounter timeline as they come close | PadKeys |
+| **PadKeys_Readout** | Beside the mouse: a ring that fills with your cast (blue, or glowing yellow while a listed buff outlasts it) and the global cooldown and flashes red on hits you take, your target's cast (to interrupt), and boss abilities from Blizzard's encounter timeline as they come close | PadKeys |
 | **PadKeys_NotReady** | Pressing a key or using an item that is still on cooldown flashes its icon and the time left in the middle of the screen, fading out over a second | PadKeys |
 | **PadKeys_Cooldowns** | Blizzard's Cooldown Manager (cooldowns, buff icons, buff bars) in the PadKeys look: black borders, grey tints, the countdown without a swipe | PadKeys |
 | **PadKeys_Totems** | Blizzard's totem bar in the PadKeys look: black borders, no gold or element frames | PadKeys |
@@ -496,8 +496,17 @@ hidden ones too) count; macros don't.
 
 What changes fast, beside the mouse pointer, only while it matters:
 
-- a **faint disc** around the pointer that drains with the global
-  cooldown in combat, and with your cast or channel while you cast;
+- a **ring** around the pointer, empty most of the time:
+  - your **cast or channel** fills it **blue**;
+  - **glowing yellow** instead when the cast will land while one of your
+    listed buffs (`ring.buffs`, spell IDs: Clearcasting, Elemental
+    Mastery, Power Infusion, ...) is still on you. This is decided as the
+    cast starts; if the client keeps a buff's time secret in combat and
+    refuses the comparison, the ring stays blue;
+  - out of a cast, the **global cooldown** fills it faintly, in combat;
+  - a **hit you take** flashes it **red** for a moment: at full strength
+    on a crit, a crushing blow or a burst of hits (4 within 1.5 s), and
+    otherwise as bright as your health is low (nothing above 80%);
 - your **target's cast** or channel, to the upper right: its icon
   draining, and its name; gone when it stops;
 - **boss abilities** from Blizzard's encounter timeline, to the right:
@@ -966,9 +975,17 @@ is loaded.
 
 **Stage 15: + PadKeys_Readout**
 
-29. **Disc**: in combat, cast an instant: a faint disc drains around the
-    pointer with the global cooldown. Cast something with a cast time: it
-    drains with the cast.
+29. **Ring**: in combat, cast an instant: a faint white ring fills around
+    the pointer with the global cooldown. Cast something with a cast time:
+    a blue ring fills over the cast, on a grey track. If it drains instead
+    of filling, set `ring.fill = false` and say so. Get a listed buff
+    (e.g. Clearcasting) and cast while it's up: the ring is yellow and
+    glows. Take hits below 80% health: the ring flashes red, brighter as
+    health drops; a crit or several quick hits flash it fully. If the
+    ring stays blue with the buff up in combat but turns yellow out of
+    combat, the buff's time is refused in combat: send
+    `/run local a=C_UnitAuras.GetPlayerAuraBySpellID(16870) print(a and issecretvalue(a.expirationTime))`
+    with the buff's ID.
 30. **Target cast**: target a caster mob: its spell's icon and name show
     upper right of the pointer while it casts.
 31. **Boss**: in a boss fight where Blizzard's encounter timeline shows,

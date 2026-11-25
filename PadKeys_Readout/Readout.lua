@@ -1,15 +1,14 @@
 -- Fast-changing information beside the mouse, where your eyes already
 -- are, and only while it matters:
--- - a faint disc around the pointer that drains with the global cooldown,
---   or with your own cast or channel;
+-- - a ring around the pointer (Ring.lua): your cast, the global cooldown
+--   and hits you take;
 -- - your target's cast or channel, to interrupt: icon, drain and name;
 -- - boss abilities from Blizzard's encounter timeline (C_EncounterTimeline)
 --   as the timeline highlights them, with their countdown.
 --
 -- Times, spell names and icons are secret in combat and during an
 -- encounter. None is compared here: durations come as duration objects
--- (C_Spell.GetSpellCooldownDuration, UnitCastingDuration,
--- C_EncounterTimeline.GetEventTimer) and go to a Cooldown frame's
+-- (UnitCastingDuration, C_EncounterTimeline.GetEventTimer) and go to a Cooldown frame's
 -- SetCooldownFromDurationObject; names go to SetText and icons to
 -- SetTexture, which take secret values. Each is wrapped in pcall, so a
 -- refusal hides the piece instead of erroring. What shows when comes from
@@ -19,8 +18,6 @@
 
 local ns = PadKeys
 local c = ns.config.readout
-
-local GCD_SPELL = 61304
 
 local frame = CreateFrame("Frame", "PadKeysReadout", UIParent)
 frame:SetFrameStrata("DIALOG")
@@ -40,10 +37,6 @@ local function present(v)
   return v ~= nil
 end
 
-local function in_combat()
-  return InCombatLockdown() or UnitAffectingCombat("player")
-end
-
 local function set_duration(cooldown, get, ...)
   local ok = pcall(function(...)
     cooldown:SetCooldownFromDurationObject(get(...))
@@ -52,37 +45,6 @@ local function set_duration(cooldown, get, ...)
     cooldown:Clear()
   end
   return ok
-end
-
--- --- Disc -------------------------------------------------------------------
-
-local disc = CreateFrame("Cooldown", nil, frame, "CooldownFrameTemplate")
-disc:SetSize(c.disc_size or 44, c.disc_size or 44)
-disc:SetPoint("CENTER")
-disc:SetDrawEdge(false)
-disc:SetDrawBling(false)
-disc:SetHideCountdownNumbers(true)
-disc:SetReverse(true)
-pcall(disc.SetSwipeTexture, disc, "Interface\\Masks\\CircleMaskScalable")
-pcall(disc.SetUseCircularEdge, disc, true)
-disc:SetSwipeColor(1, 1, 1, c.disc_alpha or 0.3)
-disc:SetShown(c.disc and true or false)
-
-local casting = false
-
-local function update_disc()
-  if not c.disc then
-    return
-  end
-  if casting then
-    if not set_duration(disc, UnitCastingDuration, "player") then
-      set_duration(disc, UnitChannelDuration, "player")
-    end
-  elseif in_combat() or not c.disc_in_combat_only then
-    set_duration(disc, C_Spell.GetSpellCooldownDuration, GCD_SPELL)
-  else
-    disc:Clear()
-  end
 end
 
 -- --- Rows (target cast, boss abilities) ---------------------------------------
@@ -219,14 +181,8 @@ frame:SetScript("OnUpdate", function(self)
   self:SetPoint("CENTER", UIParent, "BOTTOMLEFT", x / scale, y / scale)
 end)
 
-local CAST_START = {
-  UNIT_SPELLCAST_START = true, UNIT_SPELLCAST_CHANNEL_START = true,
-  UNIT_SPELLCAST_DELAYED = true, UNIT_SPELLCAST_CHANNEL_UPDATE = true,
-}
-
 local events = CreateFrame("Frame")
 for _, event in ipairs({
-  "SPELL_UPDATE_COOLDOWN", "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED",
   "PLAYER_TARGET_CHANGED", "PLAYER_ENTERING_WORLD",
   "UNIT_SPELLCAST_START", "UNIT_SPELLCAST_STOP", "UNIT_SPELLCAST_FAILED",
   "UNIT_SPELLCAST_INTERRUPTED", "UNIT_SPELLCAST_DELAYED",
@@ -244,18 +200,11 @@ events:SetScript("OnEvent", function(_, event, arg)
     remove_boss_event(arg)
   elseif event == "ENCOUNTER_END" or event == "PLAYER_ENTERING_WORLD" then
     remove_boss_event(nil)
-    casting = false
-    update_disc()
   elseif event:find("^UNIT_SPELLCAST") then
-    if arg == "player" then
-      casting = CAST_START[event] or false
-      update_disc()
-    elseif arg == "target" then
+    if arg == "target" then
       update_target_cast()
     end
   elseif event == "PLAYER_TARGET_CHANGED" then
     update_target_cast()
-  else
-    update_disc()
   end
 end)
