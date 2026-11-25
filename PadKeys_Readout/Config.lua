@@ -51,34 +51,63 @@ ns.config.readout = {
     hit_by_health = { { 0, 1 }, { 0.5, 1 }, { 0.8, 0 }, { 1, 0 } },
   },
 
-  -- Your target's cast or channel beside the mouse: its icon draining,
-  -- and its name. Only while it casts.
-  target_cast = true,
+  -- Everything below sits outside the G radial (about 84 px from the
+  -- pointer at its scale 0.35), so holding G never covers it.
 
-  -- Boss abilities from Blizzard's encounter timeline, beside the mouse,
-  -- as the timeline highlights them (a few seconds before they land): icon,
-  -- countdown and name. Up to this many at once.
+  -- Your big cooldowns that are ready (Big.lua), right of the pointer: a
+  -- column of icons for self-buffs, trinkets and impactful spells on any
+  -- action bar (hidden bars count; put trinkets on one). Big means a
+  -- cooldown of at least `min` seconds, learned as you use them and
+  -- saved; `names` adds some before they were ever used. Each pops in as
+  -- it comes back and goes as you use it; dimmed while you can't use it.
+  big = {
+    enabled = true,
+    min = 60,
+    max = 4,              -- icons at most
+    icon_size = 26,
+    gap = 4,
+    x = 92,               -- left edge of the column, from the pointer
+    y = 0,
+    only_when_fighting = true,  -- in combat or with an enemy targeted
+    names = {},           -- e.g. { "Recklessness", "Innervate" }
+    ignore = { "Hearthstone" },
+  },
+
+  -- Your target's cast or channel beside the mouse: its icon draining,
+  -- and its name. Off: the big cooldowns took its place, and nameplates
+  -- show casts too. true shows it above right of the pointer again.
+  target_cast = false,
+
+  -- Boss abilities from Blizzard's encounter timeline, upper left of the
+  -- pointer, as the timeline highlights them (a few seconds before they
+  -- land): icon, countdown and name to the left. Up to this many at once,
+  -- stacking upwards from boss_x, boss_y (the lowest row's lower right).
+  -- Blizzard's own timeline stays where it is.
   boss = true,
   boss_rows = 3,
+  boss_x = -72,
+  boss_y = 44,
 
   -- Your tracked buffs (Blizzard's Cooldown Manager, "Tracked Buffs")
   -- beside the mouse, while they are on you, with their time left. Pick
   -- the buffs in the Cooldown Manager's options. buffs_point is the
   -- viewer's point placed at x, y from the pointer: "BOTTOMLEFT" puts it
-  -- above and to the right, clear of the arrow and of the rows below
-  -- right. buffs_scale shrinks it against its Edit Mode size while docked.
+  -- above and to the right, outside the radial and above the big
+  -- cooldowns. buffs_scale shrinks it against its Edit Mode size while
+  -- docked.
   buffs = true,
   buffs_point = "BOTTOMLEFT",
-  buffs_x = 8,
-  buffs_y = -2,
+  buffs_x = 62,
+  buffs_y = 62,
   buffs_scale = 0.6,
 
-  -- Icon size and text size of the target cast and boss rows, and their
-  -- place against the mouse pointer, in pixels (positive y is up).
+  -- Icon size and text size of the target cast and boss rows, and the
+  -- target cast's place against the mouse pointer, in pixels (positive y
+  -- is up).
   icon_size = 28,
   text_size = 13,
-  x = 34,
-  y = -6,
+  x = 92,
+  y = -80,
   -- Slightly rounded corners, as on the PadKeys bar; false for square.
   rounded = true,
 }

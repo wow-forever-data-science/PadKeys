@@ -1,6 +1,6 @@
 ## Interface: 11507, 16001
 ## Title: PadKeys - Readout
-## Notes: Beside the mouse: a ring for your cast (yellow while a listed buff outlasts it), the global cooldown and hits you take, your target's cast (to interrupt), boss abilities from Blizzard's encounter timeline as they come close, and your tracked buffs from the Cooldown Manager. Needs PadKeys.
+## Notes: Beside the mouse: a ring for your cast (yellow while a listed buff outlasts it), the global cooldown and hits you take, your big cooldowns that are ready, boss abilities from Blizzard's encounter timeline as they come close, and your tracked buffs from the Cooldown Manager. Needs PadKeys.
 ## Author: wow-forever-data-science
 ## Version: 0.1.0
 ## Dependencies: PadKeys
@@ -9,4 +9,5 @@
 Config.lua
 Readout.lua
 Ring.lua
+Big.lua
 Buffs.lua
