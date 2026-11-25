@@ -73,16 +73,21 @@ ns.config.readout = {
     ignore = { "Hearthstone" },
   },
 
-  -- Your pet's health (Pet.lua), lower left of the pointer: its portrait
-  -- and a thin bar, in combat, once it is under show_below; red over the
-  -- bar under `low`. Out of combat the buff bar tells you it is missing.
+  -- Your pet in trouble (Pet.lua), lower left of the pointer: its
+  -- portrait with a pulsing red ring, only for `hold` seconds after it
+  -- takes a lot of damage (a crit or crushing blow, or burst_hits hits
+  -- within burst_window seconds), and while its health is under `low`.
+  -- Otherwise nothing. Out of combat the buff bar tells you it's missing.
   pet = {
     enabled = true,
-    size = 26,
+    size = 30,
     x = -90,             -- its top right, from the pointer
     y = -40,
-    show_below = 0.9,
     low = 0.35,
+    burst_hits = 3,
+    burst_window = 2,
+    hold = 3,
+    pulse = 0.35,        -- seconds per pulse
     combat_only = true,
   },
 
