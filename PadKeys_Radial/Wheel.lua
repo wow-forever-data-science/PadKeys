@@ -24,6 +24,20 @@ local WHEEL_SIZE = 400
 
 ns.wheel_segments = SEGMENT_COUNT
 
+-- A wheel may have a second, outer ring of eight icons (segments 9-16,
+-- same directions), further out by this factor; Ghost.lua uses the same.
+local function outer_spacing()
+  return ns.config.radial.outer_spacing or 1.6
+end
+
+-- How far the mouse has to go to pick from the outer ring: halfway
+-- between the two rings, unless Config.lua sets outer_from.
+function ns.wheel_outer_from()
+  local config = ns.config.radial
+  return config.outer_from or
+    TEXTURE_ICON_DISTANCE * config.scale * (1 + outer_spacing()) / 2
+end
+
 -- Where segment `index`'s icon sits from the wheel's centre, and its size,
 -- in screen units at the configured scale: Ghost.lua draws its faint copy
 -- of a page with the same geometry, so its icons sit where the wheel's will.
@@ -37,12 +51,18 @@ end
 
 -- Segment for an offset from the opening point, or nil inside the dead
 -- zone. Segments go counter-clockwise from east, as in Blizzard's radial.
-function ns.pick_index(dx, dy, dead_zone)
-  if dx * dx + dy * dy < dead_zone * dead_zone then
+-- With outer_from, as far or further picks the outer ring (index + 8).
+function ns.pick_index(dx, dy, dead_zone, outer_from)
+  local d2 = dx * dx + dy * dy
+  if d2 < dead_zone * dead_zone then
     return nil
   end
   local degrees = math.deg(math.atan2(dy, dx)) % 360
-  return math.floor(degrees / SEGMENT_ANGLE + 0.5) % SEGMENT_COUNT + 1
+  local index = math.floor(degrees / SEGMENT_ANGLE + 0.5) % SEGMENT_COUNT + 1
+  if outer_from and d2 >= outer_from * outer_from then
+    index = index + SEGMENT_COUNT
+  end
+  return index
 end
 
 -- The cursor in UIParent units, the units of the dead zone.
@@ -52,7 +72,15 @@ local function cursor()
   return x / scale, y / scale
 end
 
+local function is_outer(index)
+  return index > SEGMENT_COUNT
+end
+
 local function polar(index, distance)
+  if is_outer(index) then
+    index = index - SEGMENT_COUNT
+    distance = distance * outer_spacing()
+  end
   local radians = math.rad((index - 1) * SEGMENT_ANGLE)
   return distance * math.cos(radians), distance * math.sin(radians)
 end
@@ -118,6 +146,20 @@ function ns.create_wheel(name)
     w.segments[i] = { icon = art:CreateTexture(nil, "OVERLAY"), disabled = disabled,
                       lit = lit }
   end
+  -- The outer ring: no slice art of its own; a white square behind a lit
+  -- icon, a dark one over a disabled icon, and its own highlight.
+  for i = SEGMENT_COUNT + 1, 2 * SEGMENT_COUNT do
+    local lit = art:CreateTexture(nil, "ARTWORK", nil, 3)
+    lit:SetColorTexture(1, 1, 1, 0.8)
+    lit:SetAlpha(0)
+    local disabled = art:CreateTexture(nil, "OVERLAY", nil, 2)
+    disabled:SetColorTexture(0, 0, 0, 0.55)
+    w.segments[i] = { icon = art:CreateTexture(nil, "OVERLAY"), disabled = disabled,
+                      lit = lit, outer = true }
+  end
+  w.outer_highlight = art:CreateTexture(nil, "ARTWORK", nil, 4)
+  w.outer_highlight:SetColorTexture(1, 1, 1, 1)
+  w.outer_highlight:Hide()
 
   -- Countdowns over the action icons: only the numbers, no swipe, edge or
   -- flash, as on the PadKeys bar. On the unscaled frame, so the numbers
@@ -191,6 +233,9 @@ end
 -- wheel's centre, in the art's (scaled) units.
 local function draw_icon(tex, index, icon)
   local grow = ns.config.radial.icon_scale or 1
+  if is_outer(index) then
+    grow = grow * (ns.config.radial.outer_icon_scale or 0.85)
+  end
   local distance = TEXTURE_ICON_DISTANCE
   if type(icon) == "string" and C_Texture.GetAtlasInfo(icon) then
     local info = C_Texture.GetAtlasInfo(icon)
@@ -260,6 +305,14 @@ function Wheel:set_entries(entries)
       segment.icon:SetVertexColor(v, v, v)
       segment.icon:SetAlpha(entry.cooling and dim or 1)
       segment.icon:Show()
+      if segment.outer then
+        -- Square marks around (lit) and over (disabled) the icon.
+        local size = segment.icon:GetWidth()
+        segment.lit:SetSize(size + 6, size + 6)
+        segment.lit:ClearAllPoints()
+        segment.lit:SetPoint("CENTER", x, y)
+        segment.disabled:SetAllPoints(segment.icon)
+      end
       segment.disabled:SetShown(not entry.enabled)
       set_cooldown(segment, entry.cooldown)
     else
@@ -278,7 +331,7 @@ end
 -- (a health curve's result); SetAlpha takes it.
 function Wheel:set_lit(i, alpha)
   local segment = self.segments[i]
-  if segment then
+  if segment and (not segment.outer or self.two_rings) then
     segment.lit:SetAlpha(alpha)
   end
 end
@@ -302,9 +355,27 @@ function Wheel:select(index, refresh)
   self.current = index
   local entry = self.entries and self.entries[index]
   self:light_exit(not entry)
+  self.outer_highlight:Hide()
   if not entry then
     self.highlight:Hide()
     self.label:SetText("")
+    return
+  end
+  if is_outer(index) then
+    -- A white square behind the icon, as on the faint copy.
+    local icon = self.segments[index].icon
+    local x, y = polar(index, TEXTURE_ICON_DISTANCE)
+    self.outer_highlight:SetSize(icon:GetWidth() + 8, icon:GetHeight() + 8)
+    self.outer_highlight:ClearAllPoints()
+    self.outer_highlight:SetPoint("CENTER", x, y)
+    self.outer_highlight:Show()
+    self.highlight:Hide()
+    self.label:SetText(entry.label or "")
+    local v = entry.enabled and ns.grey.white or ns.grey.mid
+    self.label:SetTextColor(v, v, v)
+    if moved then
+      play("GAMEPAD_RADIAL_MENU_HIGHLIGHT")
+    end
     return
   end
   self.highlight:ClearAllPoints()
@@ -328,7 +399,9 @@ end
 -- Back inside the dead zone picks nothing, as Ring.lua's snippet does.
 function Wheel:track()
   local x, y = cursor()
-  self:select(ns.pick_index(x - self.origin_x, y - self.origin_y, ns.config.radial.dead_zone))
+  self:select(ns.pick_index(x - self.origin_x, y - self.origin_y,
+                            ns.config.radial.dead_zone,
+                            self.two_rings and ns.wheel_outer_from() or nil))
 end
 
 -- The picked entry's index, or nil.
@@ -350,7 +423,12 @@ function Wheel:open(title)
   self.art:SetScale(config.scale)
   self.title:SetText(title)
   self.current = nil
+  self.two_rings = false
+  for i = SEGMENT_COUNT + 1, 2 * SEGMENT_COUNT do
+    self.segments[i].lit:SetAlpha(0)
+  end
   self.highlight:Hide()
+  self.outer_highlight:Hide()
   self:light_exit(true)
   self.label:SetText("")
   frame:Show()

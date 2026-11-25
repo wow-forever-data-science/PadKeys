@@ -1,6 +1,6 @@
 -- A faint copy of the wheels that follows the mouse: each configured page
 -- as a ring of small icons around the cursor (Config.lua, `ghost`; by
--- default the G wheel inside, the 5 wheel outside). The G ring sits
+-- default the G wheel inside, its consumables outside). The G ring sits
 -- exactly where the G wheel's icons will when you press G there, so a
 -- glance tells you which way to flick. A lit segment (Lights.lua) shows
 -- at full strength with a white frame; the rest stay faint, or with
@@ -55,7 +55,7 @@ end
 
 for r, page in ipairs(c.rings or { "actions" }) do
   local ring = { page = page, icons = {} }
-  local radius_scale = 1 + (r - 1) * ((c.spacing or 1.6) - 1)
+  local radius_scale = 1 + (r - 1) * ((c.spacing or config.outer_spacing or 1.6) - 1)
   for i = 1, ns.wheel_segments do
     ring.icons[i] = make_icon(radius_scale, i)
   end

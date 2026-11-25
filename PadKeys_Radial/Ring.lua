@@ -2,15 +2,18 @@
 -- opens it (Config.lua):
 --
 -- * main (G): one of the pages below, picked by a macro condition
---   (main_pick: Action Bar 6 in combat, Action Bar 7 out of it);
+--   (main_pick: Action Bar 6 in combat, Action Bar 7 out of it), with the
+--   consumables (items) as a second, outer ring (main_outer): flick
+--   further to pick from it;
 -- * actions: Action Bar 6, slots 1-8 (drag spells, items, macros there);
 -- * extra: Action Bar 7, slots 1-8, the same way;
 -- * third (Cmd+G): Action Bar 8, slots 1-8, the same way;
 -- * markers (Shift+G): target markers, sent as /tm macros;
 -- * menu (Ctrl+G): Blizzard's main-menu entries (Menu.lua), several pages
 --   turned with the mouse wheel while it is open;
--- * items (5): consumables from your bags (Items.lua), one set in combat
---   and another out of it, picked by a macro condition.
+-- * items: consumables from your bags (Items.lua), one set in combat
+--   and another out of it, picked by a macro condition; G's outer ring,
+--   or a page of its own on any key bound to it.
 --
 -- Everything runs through the secure button, so it works in combat and
 -- nothing it opens is tainted. The pick happens in a restricted snippet: on
@@ -23,7 +26,7 @@
 local ns = PadKeys
 
 BINDING_HEADER_PADKEYS_RADIAL = "PadKeys: radials"
-_G["BINDING_NAME_CLICK PadKeysRing:main"] = "Action radial, combat or not (hold)"
+_G["BINDING_NAME_CLICK PadKeysRing:main"] = "Action radial with consumables, combat or not (hold)"
 _G["BINDING_NAME_CLICK PadKeysRing:actions"] = "Action radial, Action Bar 6 (hold)"
 _G["BINDING_NAME_CLICK PadKeysRing:extra"] = "Second action radial, Action Bar 7 (hold)"
 _G["BINDING_NAME_CLICK PadKeysRing:third"] = "Third action radial, Action Bar 8 (hold)"
@@ -48,15 +51,17 @@ local TITLES = {
 -- macro conditions such as "[combat] fight; rest"), so what shows on
 -- press is what runs on release.
 local ON_CLICK = [[
+  local outer = false
   if button == "main" then
     if down then
       main_page = SecureCmdOptionParse(self:GetAttribute("main-pick") or "") or ""
     end
     button = main_page or ""
+    outer = self:GetAttribute("main-outer") and true or false
   end
   if down then
     origin_x, origin_y = owner:GetMousePosition()
-    if button == "items" then
+    if button == "items" or outer then
       items_set = SecureCmdOptionParse(self:GetAttribute("items-pick") or "") or ""
     end
     if button == "menu" then
@@ -90,7 +95,10 @@ local ON_CLICK = [[
   local degrees = math.deg(math.atan2(dy, dx)) % 360
   local index = math.floor(degrees / 45 + 0.5) % 8 + 1
   local segment = button .. index
-  if button == "menu" then
+  local outer_from = self:GetAttribute("outer-from")
+  if outer and outer_from and dx * dx + dy * dy >= outer_from * outer_from then
+    segment = "items" .. (items_set or "") .. index
+  elseif button == "menu" then
     segment = "menu" .. self:GetAttribute("menu-page") .. "x" .. index
   elseif button == "items" then
     segment = "items" .. (items_set or "") .. index
@@ -166,6 +174,8 @@ local function setup()
   button:SetAttribute("useOnKeyDown", false)
   button:SetAttribute("dead-zone", ns.config.radial.dead_zone)
   button:SetAttribute("main-pick", config.main_pick)
+  button:SetAttribute("main-outer", config.main_outer and true or nil)
+  button:SetAttribute("outer-from", ns.wheel_outer_from())
   for i = 1, ns.wheel_segments do
     button:SetAttribute("*type-actions" .. i, "action")
     button:SetAttribute("*action-actions" .. i, config.first_slot + i - 1)
@@ -343,11 +353,34 @@ end
 
 ns.ring_wheel = wheel
 
--- Lit segments on the open wheel (Lights.lua), for an action or items page.
+-- Lit segments on the open wheel (Lights.lua), for an action or items page,
+-- and the consumables on G's outer ring.
 local function show_lights(page)
-  for i = 1, ns.wheel_segments do
+  local n = ns.wheel_segments
+  for i = 1, n do
     wheel:set_lit(i, ns.light_alpha and ns.light_alpha(page, i, 0, 0.45) or 0)
+    if wheel.two_rings then
+      wheel:set_lit(n + i, ns.light_alpha and ns.light_alpha("items", i, 0, 0.8) or 0)
+    end
   end
+end
+
+-- A page's entries, with the consumables after them (9-16) while G's
+-- wheel has its outer ring.
+local function entries_for(page)
+  local entries = ENTRIES[page]()
+  if wheel.two_rings then
+    local n = ns.wheel_segments
+    local combined = {}
+    for i = 1, n do
+      combined[i] = entries[i]
+    end
+    for i, entry in pairs(ENTRIES.items()) do
+      combined[n + i] = entry
+    end
+    return combined
+  end
+  return entries
 end
 
 -- Runs after the paging snippet: show the page it moved to.
@@ -371,6 +404,7 @@ button:HookScript("OnClick", function(_, page, down)
     wheel:close()
     return
   end
+  local two_rings = page == "main" and ring_config().main_outer and true or false
   page = ns.ring_page(page)
   shown_page = page
   if page == "menu" then
@@ -384,7 +418,8 @@ button:HookScript("OnClick", function(_, page, down)
     return
   end
   wheel:open(TITLES[page])
-  wheel:set_entries(entries())
+  wheel.two_rings = two_rings and page ~= "items"
+  wheel:set_entries(entries_for(page))
   wheel:set_page(1, 1)
   show_lights(page)
   if not next(wheel.entries) then
@@ -416,7 +451,7 @@ watcher:SetScript("OnEvent", function(_, event)
     read_gcd()
   end
   if wheel:is_open() and SLOT_PAGES[shown_page] then
-    wheel:set_entries(ENTRIES[shown_page]())
+    wheel:set_entries(entries_for(shown_page))
   end
 end)
 

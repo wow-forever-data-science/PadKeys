@@ -4,10 +4,11 @@
 local ns = PadKeys
 
 -- Hold to open, point with the mouse, release to run the pick. All work in
--- combat; the page is the key you press. One key per bar: G is Bars 6
--- and 7 (by combat), Cmd+G Bar 8.
+-- combat; the page is the key you press. Only G changes with combat: Bar 6
+-- in a fight and Bar 7 out of it, with your consumables as an outer ring
+-- (potions in a fight, food and water out). The other keys never change.
 local b = ns.config.bindings
-b.G = "CLICK PadKeysRing:main"              -- Bar 6 in combat, Bar 7 out (main_pick)
+b.G = "CLICK PadKeysRing:main"              -- Bar 6 in combat, Bar 7 out (main_pick), consumables outside
 b[ns.config.mod .. "G"] = "CLICK PadKeysRing:third" -- Action Bar 8, slots 1-8
 -- Option+G is free on a Mac (on Windows Alt is the Cmd+G key above).
 if ns.config.mod ~= "ALT-" then
@@ -17,9 +18,8 @@ end
 -- held modifier too (to ping a bar layer's slots), so both would open.
 b["SHIFT-G"] = "CLICK PadKeysRing:markers"
 b["CTRL-G"] = "CLICK PadKeysRing:menu"      -- Blizzard's main menu entries
--- Consumables from your bags (Items.lua): one set in combat, another out.
--- 5 is free in the base layout (the ping key moved to a mouse button).
-b["5"] = "CLICK PadKeysRing:items"
+-- The consumables are G's outer ring (ring.main_outer), so 5 stays free.
+-- For them on a key of their own as well: b["5"] = "CLICK PadKeysRing:items"
 
 ns.config.radial = {
   -- Size against Blizzard's gamepad radial (1 = the same size).
@@ -41,6 +41,13 @@ ns.config.radial = {
   cooldown_alpha = 0.35,
   -- Mouse distance before a direction picks a segment.
   dead_zone = 8,
+  -- A second ring of icons (G's consumables): its distance against the
+  -- first ring, and its icons' size against the first ring's. Flicking at
+  -- least outer_from pixels picks from it; nil is halfway between the
+  -- rings (about 59 px at scale 0.35).
+  outer_spacing = 1.6,
+  outer_icon_scale = 0.85,
+  outer_from = nil,
 
   -- Segments go counter-clockwise from east (right), eight per page;
   -- false leaves one empty.
@@ -52,6 +59,9 @@ ns.config.radial = {
     -- targeted (your opener), else Action Bar 7 (extra: mount, food,
     -- buffs). Any page works: actions, extra, third, markers, menu, items.
     main_pick = "[combat][harm,nodead] actions; extra",
+    -- The consumables (items, below) as G's outer ring: flick further out
+    -- to use one. false for a single ring.
+    main_outer = true,
     -- Action Bar 6 (Blizzard's MultiBar5) starts at action slot 145.
     first_slot = 145,
     -- G's page out of combat: Action Bar 7 (MultiBar6) starts at slot 157.
@@ -64,7 +74,7 @@ ns.config.radial = {
     marker_macro = "/tm %d",
   },
 
-  -- The consumables page (5, Items.lua). Each set is eight segments
+  -- The consumables (G's outer ring, Items.lua). Each set is eight segments
   -- (east, then counter-clockwise; false leaves one empty). A segment is a
   -- list of item names, best first: the first one in your bags is used.
   -- { use = "Drink" } instead takes any item in your bags whose use is
@@ -118,8 +128,8 @@ ns.config.radial = {
     show = "lit",
     alpha = 1,          -- the whole copy
     idle_alpha = 0.25,  -- an icon that isn't lit
-    icon_scale = 0.8,   -- against the wheel's icons
-    spacing = 1.6,      -- each outer ring's distance against the first
+    icon_scale = 0.8,   -- against the wheel's icons; outer rings are
+                        -- spaced by outer_spacing above, as on the wheel
     fade = 0.2,         -- seconds to fade in or out
   },
 
