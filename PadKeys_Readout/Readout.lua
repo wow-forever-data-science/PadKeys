@@ -2,7 +2,9 @@
 -- are, and only while it matters:
 -- - a ring around the pointer (Ring.lua): your cast, the global cooldown
 --   and hits you take;
--- - your target's cast or channel, to interrupt: icon, drain and name;
+-- - your big cooldowns that are ready (Big.lua);
+-- - your target's cast or channel, to interrupt: icon, drain and name
+--   (off by default);
 -- - boss abilities from Blizzard's encounter timeline (C_EncounterTimeline)
 --   as the timeline highlights them, with their countdown.
 --
@@ -49,7 +51,8 @@ end
 
 -- --- Rows (target cast, boss abilities) ---------------------------------------
 
-local function make_row()
+-- side "left": the label left of the icon, for rows left of the pointer.
+local function make_row(side)
   local size = c.icon_size or 28
   local row = CreateFrame("Frame", nil, frame)
   row:SetSize(size, size)
@@ -74,14 +77,19 @@ local function make_row()
   row.label = ns.text(row, c.text_size or 13, "white", "OVERLAY",
                       "GameFontHighlight")
   row.label:SetShadowOffset(1, -1)
-  row.label:SetPoint("LEFT", row, "RIGHT", 6, 0)
-  row.label:SetJustifyH("LEFT")
+  if side == "left" then
+    row.label:SetPoint("RIGHT", row, "LEFT", -6, 0)
+    row.label:SetJustifyH("RIGHT")
+  else
+    row.label:SetPoint("LEFT", row, "RIGHT", 6, 0)
+    row.label:SetJustifyH("LEFT")
+  end
   row:Hide()
   return row
 end
 
 local cast_row = make_row()
-cast_row:SetPoint("TOPLEFT", frame, "CENTER", c.x or 34, (c.y or -6) + (c.icon_size or 28) + 4)
+cast_row:SetPoint("TOPLEFT", frame, "CENTER", c.x or 92, (c.y or -80) + (c.icon_size or 28) + 4)
 cast_row.cooldown:SetReverse(true)
 cast_row.cooldown:SetHideCountdownNumbers(true)
 -- A cast that ends without a stop event reaching us still goes away.
@@ -111,12 +119,13 @@ local function update_target_cast()
   cast_row:SetShown(ok)
 end
 
--- Boss rows, newest at the bottom: rows[i].event = the timeline event ID.
+-- Boss rows, upper left of the pointer, stacking upwards:
+-- rows[i].event = the timeline event ID.
 local boss_rows = {}
 for i = 1, c.boss_rows or 3 do
-  local row = make_row()
-  row:SetPoint("TOPLEFT", frame, "CENTER", c.x or 34,
-               (c.y or -6) - (i - 1) * ((c.icon_size or 28) + 4))
+  local row = make_row("left")
+  row:SetPoint("BOTTOMRIGHT", frame, "CENTER", c.boss_x or -72,
+               (c.boss_y or 44) + (i - 1) * ((c.icon_size or 28) + 4))
   row.cooldown:SetHideCountdownNumbers(false)
   boss_rows[i] = row
 end

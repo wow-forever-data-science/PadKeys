@@ -45,7 +45,7 @@ error points at one part:
 | **PadKeys_Combat** | "Combat" / "Out of Combat" fades in the middle of the screen as you enter and leave combat, in white; out of combat, a list of missing or expiring long buffs for your class and group | PadKeys |
 | **PadKeys_CombatText** | Small combat text: your hits scroll beside the target's nameplate with the spell's icon; the hits you take show under your character, fading in as your health drops (earlier as a tank) | PadKeys |
 | **PadKeys_Ready** | A spell flashes in the middle of the screen as it becomes ready: reactive abilities (Overpower, Revenge, Execute, Riposte, ...) as they light up, and long cooldowns (30 s or more) as they come back, in combat | PadKeys |
-| **PadKeys_Readout** | Beside the mouse: a ring that fills with your cast (blue, or glowing yellow while a listed buff outlasts it) and the global cooldown and flashes red on hits you take, your target's cast (to interrupt), and boss abilities from Blizzard's encounter timeline as they come close | PadKeys |
+| **PadKeys_Readout** | Beside the mouse: a ring that fills with your cast (blue, or glowing yellow while a listed buff outlasts it) and the global cooldown and flashes red on hits you take, your big cooldowns that are ready, and boss abilities from Blizzard's encounter timeline as they come close | PadKeys |
 | **PadKeys_NotReady** | Pressing a key or using an item that is still on cooldown flashes its icon and the time left in the middle of the screen, fading out over a second | PadKeys |
 | **PadKeys_Cooldowns** | Blizzard's Cooldown Manager (cooldowns, buff icons, buff bars) in the PadKeys look: black borders, grey tints, the countdown without a swipe | PadKeys |
 | **PadKeys_Totems** | Blizzard's totem bar in the PadKeys look: black borders, no gold or element frames | PadKeys |
@@ -506,12 +506,25 @@ What changes fast, beside the mouse pointer, only while it matters:
   - a **hit you take** flashes it **red** for a moment: at full strength
     on a crit, a crushing blow or a burst of hits (4 within 1.5 s), and
     otherwise as bright as your health is low (nothing above 80%);
-- your **target's cast** or channel, to the upper right: its icon
-  draining, and its name; gone when it stops;
-- **boss abilities** from Blizzard's encounter timeline, to the right:
+Everything else sits outside the G radial (about 84 px from the
+pointer), so holding G never covers it:
+
+- your **big cooldowns that are ready**, to the right: a column of icons
+  for self-buffs, trinkets and impactful spells, one per spell or item
+  on any action bar (hidden bars count, so put trinkets on one) whose
+  cooldown is a minute or longer and isn't running. Each pops in as it
+  comes back and goes as you use it; dimmed while you can't use it (no
+  mana, no target). Only in combat or with an enemy targeted. Which
+  cooldowns are big is learned as you use them (and saved), so a spell
+  shows once you've used it once; `big.names` adds some up front;
+- **boss abilities** from Blizzard's encounter timeline, upper left:
   each one as the timeline highlights it (a few seconds before it lands),
-  with its icon, countdown and name, up to three at once; each goes when
-  the timeline drops it;
+  with its icon, countdown and name to its left, up to three at once,
+  stacking upwards; each goes when the timeline drops it. Blizzard's own
+  timeline stays where it is;
+- your **target's cast** (to interrupt) is off: the big cooldowns took
+  its place and nameplates show casts. `target_cast = true` brings it
+  back, lower right;
 - your **tracked buffs**, above right, a bit smaller: Blizzard's Cooldown Manager buff
   icons ("Tracked Buffs") follow the pointer, each while the buff is on
   you, with its time left. Pick them in the Cooldown Manager's options
@@ -993,11 +1006,14 @@ is loaded.
     combat, the buff's time is refused in combat: send
     `/run local a=C_UnitAuras.GetPlayerAuraBySpellID(16870) print(a and issecretvalue(a.expirationTime))`
     with the buff's ID.
-30. **Target cast**: target a caster mob: its spell's icon and name show
-    upper right of the pointer while it casts.
+30. **Big cooldowns**: put a spell with a cooldown of a minute or more
+    (and a trinket you can use) on any bar. Use each once, then target a
+    mob: their icons show in a column right of the pointer. Use one: it
+    goes, and pops back in when its cooldown ends. Out of mana, its icon
+    is dimmed. With no enemy targeted out of combat, nothing shows.
 31. **Boss**: in a boss fight where Blizzard's encounter timeline shows,
-    each ability shows beside the pointer a few seconds before it lands,
-    with a countdown. If the timeline shows but the rows don't, send the
+    each ability shows upper left of the pointer a few seconds before it
+    lands, with a countdown. If the timeline shows but the rows don't, send the
     debug file.
 
 Known risks:
