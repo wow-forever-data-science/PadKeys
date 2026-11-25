@@ -421,7 +421,7 @@ combat (`fade_in`).
   worn item, with its own icon and its durability %, and your free bag
   slots; yellow under 30% and under 3 slots (`supplies.always = false`
   shows them only then). Limits and lists are under `supplies`.
-  Your pet's health in combat is at the mouse (PadKeys_Readout).
+  Your pet in trouble in combat shows at the mouse (PadKeys_Readout).
 
 What it lists depends on your class and who is in your party or raid:
 
@@ -544,9 +544,11 @@ pointer), so holding G never covers it:
 - your **target's cast** (to interrupt) is off: the big cooldowns took
   its place and nameplates show casts. `target_cast = true` brings it
   back, lower right;
-- your **pet's health**, lower left, in combat once it is hurt: its
-  portrait and a thin bar that turns red when it is low. Health is
-  secret in combat; it goes from the client straight into the bar;
+- your **pet in trouble**, lower left, in combat: its portrait with a
+  pulsing red ring, for 3 seconds after it takes a lot of damage (a crit,
+  a crushing blow, or 3 hits within 2 seconds) and for as long as its
+  health is under 35%; otherwise nothing. Health is secret in combat; it
+  goes from the client straight into the ring's visibility;
 - your **tracked buffs**, above right, a bit smaller: Blizzard's Cooldown Manager buff
   icons ("Tracked Buffs") follow the pointer, each while the buff is on
   you, with its time left. Pick them in the Cooldown Manager's options
@@ -1036,10 +1038,11 @@ is loaded.
     mob: their icons show in a column right of the pointer. Use one: it
     goes, and pops back in when its cooldown ends. Out of mana, its icon
     is dimmed. With no enemy targeted out of combat, nothing shows.
-31. **Pet**: as a hunter or warlock, fight with your pet: once it is
-    under 90% health its portrait and a green bar show lower left of the
-    pointer; under 35% the bar turns red. If the bar stays full while the
-    pet is hurt, send `/run print(UnitHealthPercent("pet"))`.
+31. **Pet**: as a hunter or warlock, fight with your pet: nothing shows
+    while it is fine. When it takes several hits quickly or a crit, its
+    portrait shows lower left of the pointer with a pulsing red ring for
+    3 seconds. Under 35% health it stays until healed. If it never shows
+    at low health, send `/run print(UnitHealthPercent("pet"))`.
 32. **Boss**: in a boss fight where Blizzard's encounter timeline shows,
     each ability shows upper left of the pointer a few seconds before it
     lands, with a countdown. If the timeline shows but the rows don't, send the
