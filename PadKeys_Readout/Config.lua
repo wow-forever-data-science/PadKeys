@@ -95,6 +95,29 @@ ns.config.readout = {
     combat_only = true,
   },
 
+  -- Your debuffs, left of the pointer: Blizzard's debuff frame (Dock.lua),
+  -- with its icons, times and dispel-type borders. debuffs_point is the
+  -- frame's point placed at x, y from the pointer ("RIGHT": it grows
+  -- leftwards from there). debuffs_scale against its Edit Mode size. Edit
+  -- Mode still shows it where Blizzard keeps it.
+  debuffs = true,
+  debuffs_point = "RIGHT",
+  debuffs_x = -96,
+  debuffs_y = 0,
+  debuffs_scale = 0.7,
+
+  -- Your totems below the pointer (Totems.lua): one icon per totem that
+  -- is down, draining with its time left, the seconds on it.
+  totems = {
+    enabled = true,
+    icon_size = 22,
+    gap = 3,
+    x = 0,            -- the row's top centre, from the pointer
+    y = -88,
+    countdown = true,
+    countdown_size = 11,
+  },
+
   -- Your target's cast or channel beside the mouse: its icon draining,
   -- and its name. Off: the big cooldowns took its place, and nameplates
   -- show casts too. true shows it above right of the pointer again.

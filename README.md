@@ -46,7 +46,7 @@ error points at one part:
 | **PadKeys_Combat** | "Combat" / "Out of Combat" fades in the middle of the screen as you enter and leave combat, in white; out of combat, a list of missing or expiring long buffs for your class and group | PadKeys |
 | **PadKeys_CombatText** | Small combat text: your hits scroll beside the target's nameplate with the spell's icon; the hits you take show lower right of the mouse, fading in as your health drops (earlier as a tank) and fully on heavy damage | PadKeys |
 | **PadKeys_Ready** | A spell flashes above the mouse as it becomes ready: reactive abilities (Overpower, Revenge, Execute, Riposte, ...) as they light up, and long cooldowns (30 s or more) as they come back, in combat | PadKeys |
-| **PadKeys_Readout** | Beside the mouse: a ring that fills with your cast (blue, green for heals, or glowing yellow while a listed buff outlasts it) and the global cooldown, your big cooldowns that are ready, and boss abilities from Blizzard's encounter timeline as they come close | PadKeys |
+| **PadKeys_Readout** | Beside the mouse: a ring that fills with your cast (blue, green for heals, or glowing yellow while a listed buff outlasts it) and the global cooldown, your big cooldowns that are ready, your debuffs, your totems, and boss abilities from Blizzard's encounter timeline as they come close | PadKeys |
 | **PadKeys_NotReady** | Pressing a key or using an item that is still on cooldown flashes its icon and the time left in the middle of the screen, fading out over a second | PadKeys |
 | **PadKeys_Cooldowns** | Blizzard's Cooldown Manager (cooldowns, buff icons, buff bars) in the PadKeys look: black borders, grey tints, the countdown without a swipe | PadKeys |
 | **PadKeys_Totems** | Blizzard's totem bar in the PadKeys look: black borders, no gold or element frames | PadKeys |
@@ -552,6 +552,12 @@ pointer), so holding G never covers it:
   a crushing blow, or 3 hits within 2 seconds) and for as long as its
   health is under 35%; otherwise nothing. Health is secret in combat; it
   goes from the client straight into the ring's visibility;
+- your **debuffs**, left: Blizzard's own debuff frame, docked like the
+  tracked buffs, with its icons, times and dispel-type borders. Blizzard
+  reads the debuffs, so this works in combat; Edit Mode still shows it
+  where Blizzard keeps it;
+- your **totems**, below: one small icon per totem that is down, draining
+  with its time left and the seconds on it; gone when none are down;
 - your **tracked buffs**, above right, a bit smaller: Blizzard's Cooldown Manager buff
   icons ("Tracked Buffs") follow the pointer, each while the buff is on
   you, with its time left. Pick them in the Cooldown Manager's options
@@ -1057,7 +1063,11 @@ is loaded.
     portrait shows lower left of the pointer with a pulsing red ring for
     3 seconds. Under 35% health it stays until healed. If it never shows
     at low health, send `/run print(UnitHealthPercent("pet"))`.
-32. **Boss**: in a boss fight where Blizzard's encounter timeline shows,
+32. **Debuffs and totems**: get a debuff (a mob's poison, or a curse):
+    its icon shows left of the pointer with its time. As a shaman, drop
+    totems: their icons show below the pointer, draining. A new file:
+    restart the client first.
+33. **Boss**: in a boss fight where Blizzard's encounter timeline shows,
     each ability shows upper left of the pointer a few seconds before it
     lands, with a countdown. If the timeline shows but the rows don't, send the
     debug file.
