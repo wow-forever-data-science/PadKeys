@@ -73,6 +73,19 @@ ns.config.readout = {
     ignore = { "Hearthstone" },
   },
 
+  -- Your pet's health (Pet.lua), lower left of the pointer: its portrait
+  -- and a thin bar, in combat, once it is under show_below; red over the
+  -- bar under `low`. Out of combat the buff bar tells you it is missing.
+  pet = {
+    enabled = true,
+    size = 26,
+    x = -90,             -- its top right, from the pointer
+    y = -40,
+    show_below = 0.9,
+    low = 0.35,
+    combat_only = true,
+  },
+
   -- Your target's cast or channel beside the mouse: its icon draining,
   -- and its name. Off: the big cooldowns took its place, and nameplates
   -- show casts too. true shows it above right of the pointer again.

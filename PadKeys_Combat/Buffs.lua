@@ -1,7 +1,9 @@
--- Buff reminder: out of combat, a short list of the long buffs that matter
+-- Buff bar: out of combat, a row of icons for the long buffs that matter
 -- for your class and group and are missing or running out (under 5
--- minutes, Config.lua). It fades out as you enter combat, as fast as the
--- combat banner fades, and comes back as you leave it.
+-- minutes, Config.lua), consumables whose buff you don't have, and your
+-- supplies (ammo, reagents, durability, bag space, pet). Each icon is a
+-- secure button that fixes it on a click. Combat hides it at once; it
+-- fades back in as you leave combat.
 --
 -- What counts depends on who is in your party or raid:
 -- - group buffs (Fortitude, Mark of the Wild, Arcane Intellect,
@@ -21,8 +23,8 @@
 -- so they keep Blizzard's own filters; PadKeys_Auras (C) reads them.
 --
 -- Auras are read only out of combat (in combat they are secret), and every
--- read is wrapped in pcall. Nothing here is secure: the list is plain
--- textures and font strings that never take the mouse.
+-- read is wrapped in pcall. The icons are secure action buttons, set up
+-- out of combat only; in combat a state driver keeps the bar hidden.
 
 local ns = PadKeys
 local c = ns.config.combat
@@ -228,17 +230,33 @@ end
 
 -- Who is missing it (names) and the lowest time under warn_at among the
 -- rest, over `units`.
+-- Also returns the unit to cast on first: the first missing it, else the
+-- one with the least time left.
 local function survey(buff, units, source)
   local missing, lowest, lowest_who = {}, nil, nil
+  local first, lowest_unit
   for _, unit in ipairs(units) do
     local left = time_left(unit, buff, source)
     if left == nil then
       missing[#missing + 1] = short_name(unit)
+      first = first or unit
     elseif left and left < cfg.warn_at and (not lowest or left < lowest) then
-      lowest, lowest_who = left, short_name(unit)
+      lowest, lowest_who, lowest_unit = left, short_name(unit), unit
     end
   end
-  return missing, lowest, lowest_who
+  return missing, lowest, lowest_who, first or lowest_unit
+end
+
+-- The best rank you know of a family, by name: the last spell of the list
+-- you know (single-target versions come first in the lists above).
+local function best_known(buff)
+  local best
+  for _, id in ipairs(buff.spells) do
+    if knows(id) then
+      best = id
+    end
+  end
+  return best and spell_name(best)
 end
 
 local function group_row(buff, units, casters)
@@ -257,8 +275,14 @@ local function group_row(buff, units, casters)
         targets[#targets + 1] = unit
       end
     end
-    row.missing, row.left, row.who =
+    local unit
+    row.missing, row.left, row.who, unit =
       survey(buff, targets, buff.per_caster and "player" or nil)
+    -- Click: the single-target spell on whoever needs it first.
+    local spell = spell_name(buff.spells[1])
+    if unit and spell then
+      row.click = { type = "spell", spell = spell, unit = unit }
+    end
   elseif eligible("player") then
     if buff.per_caster then
       -- One blessing from each paladin in the group.
@@ -300,11 +324,13 @@ local function own_row(buff, my_class)
   if left == false or not low(left, buff.warn_at) then
     return nil
   end
+  local spell = best_known(buff)
   return {
     icon = spell_icon(buff.spells[1]),
     label = label_of(buff),
     missing = left == nil and { "you" } or {},
     left = left,
+    click = spell and { type = "spell", spell = spell, unit = "player" },
   }
 end
 
@@ -356,11 +382,28 @@ local function weapon_rows(buff, my_class, rows)
     if is_weapon(item) then
       local left = enchant_left(slot)
       if left ~= false and low(left, buff.warn_at) then
+        local click
+        if my_class == "ROGUE" then
+          -- A poison from your bags onto this weapon.
+          local poison = ns.bag_item_named and
+            ns.bag_item_named(slot.inv == 16 and cfg.poison_main or cfg.poison_off)
+          if poison then
+            click = { type = "macro",
+                      macrotext = format("/use %s\n/use %d", poison, slot.inv) }
+          end
+        elseif slot.inv == 16 then
+          -- A shaman's imbue: the best one you know, on the main hand.
+          local spell = best_known(buff)
+          if spell then
+            click = { type = "spell", spell = spell, unit = "player" }
+          end
+        end
         rows[#rows + 1] = {
           icon = GetInventoryItemTexture("player", slot.inv),
           label = slot.name .. " " .. label_of(buff):lower(),
           missing = left == nil and { "you" } or {},
           left = left,
+          click = click,
         }
       end
     end
@@ -476,7 +519,8 @@ local function consumable_rows(rows)
             end
           end
           if wanted then
-            found[#found + 1] = { id = id, icon = icon }
+            found[#found + 1] = { id = id, icon = icon,
+                                  weapon = consumable_kind(id, subclass_id) == "weapon" }
           end
         end
       end
@@ -489,7 +533,134 @@ local function consumable_rows(rows)
         icon = item.icon,
         label = format("%s (%d)", name, counts[item.id]),
         missing = { "you" },
+        count = counts[item.id] > 1 and tostring(counts[item.id]) or nil,
+        -- Stones and oils go on the main hand.
+        click = item.weapon and
+          { type = "macro", macrotext = format("/use %s\n/use 16", name) } or
+          { type = "item", item = name },
       }
+    end
+  end
+end
+
+-- --- Supplies ---------------------------------------------------------------
+
+-- Every item in your bags: counts by name, and free slots.
+local function bag_counts()
+  local counts, free = {}, 0
+  for bag = 0, NUM_BAG_SLOTS or 4 do
+    free = free + (C_Container.GetContainerNumFreeSlots(bag) or 0)
+    for slot = 1, C_Container.GetContainerNumSlots(bag) or 0 do
+      local id = C_Container.GetContainerItemID(bag, slot)
+      local name = id and item_name(id)
+      if name then
+        local info = C_Container.GetContainerItemInfo(bag, slot)
+        counts[name] = (counts[name] or 0) + (info and info.stackCount or 1)
+      end
+    end
+  end
+  return counts, free
+end
+
+-- The first item in your bags whose name holds `part` (e.g. "Instant
+-- Poison"), or any poison; nil if none. For the poison click.
+function ns.bag_item_named(part)
+  local counts = bag_counts()
+  local fallback
+  for name in pairs(counts) do
+    if part and name:find(part, 1, true) then
+      return name
+    end
+    if name:find("Poison", 1, true) and not name:find("Antidote", 1, true) then
+      fallback = fallback or name
+    end
+  end
+  return fallback
+end
+
+local AMMO_SLOT = 0
+local CALL_PET, REVIVE_PET = 883, 982
+
+-- Ammo, reagents, durability, bag space and your pet: out of combat only.
+local function supply_rows(rows, my_class)
+  local s = cfg.supplies
+  if not s then
+    return
+  end
+  local counts, free = bag_counts()
+
+  -- Ammo: what is in the ammo slot, counted across your bags.
+  if s.ammo_low and s.ammo_low > 0 then
+    local ammo = GetInventoryItemID("player", AMMO_SLOT)
+    if ammo then
+      local n = GetInventoryItemCount("player", AMMO_SLOT) or 0
+      if n < s.ammo_low then
+        rows[#rows + 1] = { icon = GetInventoryItemTexture("player", AMMO_SLOT),
+                            label = "Ammo", count = tostring(n), supply = true,
+                            missing = {} }
+      end
+    elseif my_class == "HUNTER" then
+      rows[#rows + 1] = { icon = "Interface\\Icons\\INV_Ammo_Arrow_02", label = "No ammo", missing = { "you" },
+                          supply = true }
+    end
+  end
+
+  -- Reagents for spells you know; `match` sums every item holding it.
+  for _, r in ipairs((s.reagents or {})[my_class] or {}) do
+    if not r.spell or knows(r.spell) then
+      local n = 0
+      for name, count in pairs(counts) do
+        if name == r.item or (r.match and name:find(r.match, 1, true)) then
+          n = n + count
+        end
+      end
+      if n < (r.min or 1) then
+        rows[#rows + 1] = { icon = r.icon or 134400, label = r.item or r.match,
+                            count = tostring(n), supply = true, missing = {} }
+      end
+    end
+  end
+
+  -- Durability: the most worn item.
+  if s.durability_low and s.durability_low > 0 then
+    local worst
+    for slot = 1, 18 do
+      local cur, max = GetInventoryItemDurability(slot)
+      if cur and max and max > 0 then
+        worst = math.min(worst or 1, cur / max)
+      end
+    end
+    if worst and worst < s.durability_low then
+      rows[#rows + 1] = { icon = "Interface\\Icons\\Trade_BlackSmithing", label = "Durability",
+                          count = format("%d%%", worst * 100), supply = true,
+                          missing = {} }
+    end
+  end
+
+  -- Bag space.
+  if s.bag_free_low and free < s.bag_free_low then
+    rows[#rows + 1] = { icon = "Interface\\Icons\\INV_Misc_Bag_08", label = "Bag space",
+                        count = tostring(free), supply = true, missing = {} }
+  end
+
+  -- Your pet, if you have one to call: missing or dead.
+  if s.pet and (my_class == "HUNTER" or my_class == "WARLOCK") then
+    local dead = UnitExists("pet") and UnitIsDead("pet")
+    if not UnitExists("pet") or dead then
+      local click
+      if my_class == "HUNTER" then
+        local id = (dead or not knows(CALL_PET)) and REVIVE_PET or CALL_PET
+        if knows(id) then
+          click = { type = "spell", spell = spell_name(id) }
+        end
+      elseif s.warlock_pet then
+        click = { type = "spell", spell = s.warlock_pet }
+      end
+      if click or my_class == "WARLOCK" then
+        rows[#rows + 1] = { icon = "Interface\\Icons\\Ability_Hunter_BeastCall",
+                            label = dead and "Pet dead" or "No pet",
+                            missing = { "you" }, click = click }
+      end
     end
   end
 end
@@ -527,9 +698,12 @@ local function collect()
   end
   if #rows < cfg.max_rows then
     pcall(consumable_rows, rows)
-    for i = #rows, cfg.max_rows + 1, -1 do
-      rows[i] = nil
-    end
+  end
+  if #rows < cfg.max_rows then
+    pcall(supply_rows, rows, my_class)
+  end
+  for i = #rows, cfg.max_rows + 1, -1 do
+    rows[i] = nil
   end
   return rows
 end
@@ -566,70 +740,135 @@ local function row_text(row)
   return text
 end
 
--- --- Panel ------------------------------------------------------------------
+-- --- Bar --------------------------------------------------------------------
 
-local panel = CreateFrame("Frame", "PadKeysBuffReminder", UIParent)
-panel:SetSize(1, 1)
--- In the middle of the screen (its top centre at the screen's centre, a
--- block of left-aligned rows), or under a frame (its top left at the
--- frame's bottom left), offset by x, y. A named frame is looked up when
--- the list shows, so one moved in Edit Mode is followed.
+-- One icon per row, side by side: a red frame when something is missing,
+-- yellow with the time when it runs out, grey with a number for supplies.
+-- Each icon is a secure button: clicking it casts the buff on whoever
+-- needs it first, uses the consumable, puts poison on the weapon or calls
+-- the pet. Its name and who is missing it show on hover. Secure buttons
+-- can only change out of combat, so the bar is set up out of combat and a
+-- state driver hides it as combat starts (and shows it after).
+local bar = CreateFrame("Frame", "PadKeysBuffReminder", UIParent,
+                        "SecureHandlerStateTemplate")
+bar:SetSize(1, 1)
+-- Centred under the middle of the screen, or under a frame (its top left
+-- at the frame's bottom left), offset by x, y. A named frame is looked up
+-- as the bar is set up, so one moved in Edit Mode is followed.
 local function place()
   local frame = cfg.anchor ~= "center" and _G[cfg.anchor]
-  panel:ClearAllPoints()
+  bar:ClearAllPoints()
   if frame then
-    panel:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", cfg.x, cfg.y)
+    bar:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", cfg.x, cfg.y)
   else
-    panel:SetPoint("TOP", UIParent, "CENTER", cfg.x, cfg.y)
+    bar:SetPoint("TOP", UIParent, "CENTER", cfg.x, cfg.y)
   end
 end
 place()
-panel:SetFrameStrata("MEDIUM")
-panel:EnableMouse(false)
-panel:SetAlpha(0)
-panel:Hide()
+bar:SetFrameStrata("MEDIUM")
+bar:SetAlpha(0)
+RegisterStateDriver(bar, "visibility", "[combat] hide; show")
 
-local ICON = cfg.size + 6
-local lines = {}
+local ICON = cfg.icon_size or 32
+local GAP = 4
+local buttons = {}
 
-local function line(i)
-  if lines[i] then
-    return lines[i]
+local SHADES = {
+  missing = { 0.9, 0.15, 0.15 },
+  low = { 1, 0.8, 0.2 },
+  supply = { 0.45, 0.45, 0.45 },
+}
+
+local function on_enter(self)
+  if not self.row then
+    return
   end
-  local l = {}
-  l.icon = panel:CreateTexture(nil, "ARTWORK")
-  l.icon:SetSize(ICON, ICON)
-  l.icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
-  ns.icon(l.icon)
-  l.text = ns.text(panel, cfg.size)
-  l.text:SetJustifyH("LEFT")
-  l.icon:SetPoint("TOPLEFT", panel, "TOPLEFT", 0, -(i - 1) * (ICON + 4))
-  l.text:SetPoint("LEFT", l.icon, "RIGHT", 6, 0)
-  lines[i] = l
-  return l
+  GameTooltip:SetOwner(self, "ANCHOR_TOP")
+  GameTooltip:SetText(row_text(self.row), 1, 1, 1, 1, true)
+  if self.row.click then
+    GameTooltip:AddLine("Click to fix", 0.6, 0.6, 0.6)
+  end
+  GameTooltip:Show()
 end
 
--- Lays out the rows; returns how many there are.
+local function button(i)
+  if buttons[i] then
+    return buttons[i]
+  end
+  local b = CreateFrame("Button", "PadKeysBuffReminderButton" .. i, bar,
+                        "SecureActionButtonTemplate")
+  b:SetSize(ICON, ICON)
+  b:RegisterForClicks("LeftButtonUp")
+  b.edge = b:CreateTexture(nil, "BACKGROUND")
+  b.edge:SetPoint("TOPLEFT", -2, 2)
+  b.edge:SetPoint("BOTTOMRIGHT", 2, -2)
+  b.edge:SetColorTexture(1, 1, 1, 1)
+  b.icon = b:CreateTexture(nil, "ARTWORK")
+  b.icon:SetAllPoints()
+  b.icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+  ns.icon(b.icon)
+  b.text = ns.text(b, cfg.size, "white", "OVERLAY", "NumberFontNormal")
+  b.text:SetPoint("BOTTOMRIGHT", -1, 2)
+  b.badge = ns.text(b, cfg.size - 2, "white", "OVERLAY", "NumberFontNormal")
+  b.badge:SetPoint("TOPRIGHT", -1, -2)
+  b:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square", "ADD")
+  b:SetScript("OnEnter", on_enter)
+  b:SetScript("OnLeave", GameTooltip_Hide)
+  buttons[i] = b
+  return b
+end
+
+-- What a click does; nil clears it.
+local function set_click(b, click)
+  b:SetAttribute("type", click and click.type or nil)
+  b:SetAttribute("spell", click and click.spell or nil)
+  b:SetAttribute("unit", click and click.unit or nil)
+  b:SetAttribute("item", click and click.item or nil)
+  b:SetAttribute("macrotext", click and click.macrotext or nil)
+end
+
+-- Out of combat only. Returns how many icons show.
 local function draw(rows)
-  local width = 0
+  if InCombatLockdown() then
+    return 0
+  end
+  place()
+  local n = #rows
+  local width = n * ICON + math.max(n - 1, 0) * GAP
   for i, row in ipairs(rows) do
-    local l = line(i)
-    l.icon:SetTexture(row.icon or 134400) -- question mark
-    l.text:SetText(row_text(row))
-    l.icon:Show()
-    l.text:Show()
-    width = math.max(width, ICON + 6 + l.text:GetStringWidth())
+    local b = button(i)
+    b.row = row
+    b:ClearAllPoints()
+    if cfg.anchor == "center" then
+      b:SetPoint("TOPLEFT", bar, "TOP", -width / 2 + (i - 1) * (ICON + GAP), 0)
+    else
+      b:SetPoint("TOPLEFT", bar, "TOPLEFT", (i - 1) * (ICON + GAP), 0)
+    end
+    b.icon:SetTexture(row.icon or 134400) -- question mark
+    local missing = row.missing and #row.missing or 0
+    local shade = row.supply and "supply" or (missing > 0 and "missing") or "low"
+    b.edge:SetVertexColor(unpack(SHADES[shade]))
+    b.icon:SetDesaturated(shade == "missing")
+    -- Bottom right: a count, or the time left; top right: how many miss it.
+    local text = row.count
+    if not text and row.left and row.left ~= math.huge then
+      text = clock(row.left)
+    end
+    b.text:SetText(text or "")
+    local others = missing > 1 or (missing == 1 and row.missing[1] ~= "you")
+    b.badge:SetText(others and tostring(missing) or "")
+    set_click(b, row.click)
+    b:Show()
   end
-  for i = #rows + 1, #lines do
-    lines[i].icon:Hide()
-    lines[i].text:Hide()
+  for i = n + 1, #buttons do
+    buttons[i].row = nil
+    set_click(buttons[i], nil)
+    buttons[i]:Hide()
   end
-  panel:SetSize(math.max(width, 1), math.max(#rows * (ICON + 4) - 4, 1))
-  return #rows
+  return n
 end
 
--- Fading: the panel's alpha moves to `target` over `duration` seconds;
--- at 0 the panel hides.
+-- Fading in and out out of combat; combat itself hides the bar at once.
 local fade_from, fade_to, fade_for, fade_t = 0, 0, 0, 0
 
 local function fade_step(self, elapsed)
@@ -639,23 +878,12 @@ local function fade_step(self, elapsed)
   self:SetAlpha(fade_from + (fade_to - fade_from) * p)
   if done then
     self:SetScript("OnUpdate", nil)
-    if fade_to == 0 then
-      self:Hide()
-    end
   end
 end
 
 local function fade(target, duration)
-  if target > 0 then
-    if not panel:IsShown() then
-      place()
-    end
-    panel:Show()
-  elseif not panel:IsShown() then
-    return
-  end
-  fade_from, fade_to, fade_for, fade_t = panel:GetAlpha(), target, math.max(duration or 0, 0.01), 0
-  panel:SetScript("OnUpdate", fade_step)
+  fade_from, fade_to, fade_for, fade_t = bar:GetAlpha(), target, math.max(duration or 0, 0.01), 0
+  bar:SetScript("OnUpdate", fade_step)
 end
 
 -- --- Refresh ----------------------------------------------------------------
@@ -728,11 +956,11 @@ events:SetScript("OnEvent", function(_, event, unit)
   if event == "PLAYER_REGEN_DISABLED" then
     in_combat = true
     stop_ticker()
-    fade(0, c.fade_out or 0.6)
+    bar:SetAlpha(0)
   elseif event == "PLAYER_REGEN_ENABLED" then
     in_combat = false
     wanted = false
-    panel:SetAlpha(0)
+    bar:SetAlpha(0)
     refresh()
     start_ticker()
   elseif event == "PLAYER_ENTERING_WORLD" then
