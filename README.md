@@ -415,9 +415,12 @@ combat (`fade_in`).
   revived. Hover for its name and who is missing it.
 - **Supplies**: ammo under 200, reagents for spells you know (soul shards,
   poisons and Flash Powder, Sacred Candles, Arcane Powder and Runes of
-  Teleportation, Wild Thornroot, Symbols of Kings, an Ankh), your most
-  worn item under 30%, under 3 free bag slots, and for hunters and
-  warlocks no pet or a dead one. Limits and lists are under `supplies`.
+  Teleportation, Wild Thornroot, Symbols of Kings, an Ankh), and for hunters and
+  warlocks no pet or a dead one.
+- **Always**, at the end of the bar (also in inns and cities): your most
+  worn item, with its own icon and its durability %, and your free bag
+  slots; yellow under 30% and under 3 slots (`supplies.always = false`
+  shows them only then). Limits and lists are under `supplies`.
   Your pet's health in combat is at the mouse (PadKeys_Readout).
 
 What it lists depends on your class and who is in your party or raid:

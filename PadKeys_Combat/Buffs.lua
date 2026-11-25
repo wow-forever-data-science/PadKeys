@@ -587,7 +587,7 @@ local function supply_rows(rows, my_class)
   if not s then
     return
   end
-  local counts, free = bag_counts()
+  local counts = bag_counts()
 
   -- Ammo: what is in the ammo slot, counted across your bags.
   if s.ammo_low and s.ammo_low > 0 then
@@ -621,27 +621,6 @@ local function supply_rows(rows, my_class)
     end
   end
 
-  -- Durability: the most worn item.
-  if s.durability_low and s.durability_low > 0 then
-    local worst
-    for slot = 1, 18 do
-      local cur, max = GetInventoryItemDurability(slot)
-      if cur and max and max > 0 then
-        worst = math.min(worst or 1, cur / max)
-      end
-    end
-    if worst and worst < s.durability_low then
-      rows[#rows + 1] = { icon = "Interface\\Icons\\Trade_BlackSmithing", label = "Durability",
-                          count = format("%d%%", worst * 100), supply = true,
-                          missing = {} }
-    end
-  end
-
-  -- Bag space.
-  if s.bag_free_low and free < s.bag_free_low then
-    rows[#rows + 1] = { icon = "Interface\\Icons\\INV_Misc_Bag_08", label = "Bag space",
-                        count = tostring(free), supply = true, missing = {} }
-  end
 
   -- Your pet, if you have one to call: missing or dead.
   if s.pet and (my_class == "HUNTER" or my_class == "WARLOCK") then
@@ -663,6 +642,48 @@ local function supply_rows(rows, my_class)
       end
     end
   end
+end
+
+-- Your most worn item, with its icon and durability, and your free bag
+-- slots: always out of combat (supplies.always), or only under their
+-- limits. Yellow under their limits, grey otherwise.
+local function fixed_rows()
+  local s = cfg.supplies
+  local rows = {}
+  if not s then
+    return rows
+  end
+  local worst, worst_slot
+  for slot = 1, 18 do
+    local cur, max = GetInventoryItemDurability(slot)
+    if cur and max and max > 0 and (not worst or cur / max < worst) then
+      worst, worst_slot = cur / max, slot
+    end
+  end
+  if worst then
+    local id = GetInventoryItemID("player", worst_slot)
+    rows[#rows + 1] = {
+      icon = GetInventoryItemTexture("player", worst_slot),
+      label = format("Most worn: %s", id and item_name(id) or "item"),
+      count = format("%d%%", worst * 100), supply = true, missing = {},
+      warn = worst < (s.durability_low or 0),
+    }
+  end
+  local _, free = bag_counts()
+  rows[#rows + 1] = {
+    icon = "Interface\\Icons\\INV_Misc_Bag_08", label = "Free bag slots",
+    count = tostring(free), supply = true, missing = {},
+    warn = free < (s.bag_free_low or 0),
+  }
+  if not s.always then
+    -- Only under their limits.
+    for i = #rows, 1, -1 do
+      if not rows[i].warn then
+        table.remove(rows, i)
+      end
+    end
+  end
+  return rows
 end
 
 local function collect()
@@ -702,8 +723,12 @@ local function collect()
   if #rows < cfg.max_rows then
     pcall(supply_rows, rows, my_class)
   end
-  for i = #rows, cfg.max_rows + 1, -1 do
+  local fixed = fixed_rows()
+  for i = #rows, cfg.max_rows - #fixed + 1, -1 do
     rows[i] = nil
+  end
+  for _, row in ipairs(fixed) do
+    rows[#rows + 1] = row
   end
   return rows
 end
@@ -846,7 +871,8 @@ local function draw(rows)
     end
     b.icon:SetTexture(row.icon or 134400) -- question mark
     local missing = row.missing and #row.missing or 0
-    local shade = row.supply and "supply" or (missing > 0 and "missing") or "low"
+    local shade = row.supply and (row.warn and "low" or "supply") or
+                  (missing > 0 and "missing") or "low"
     b.edge:SetVertexColor(unpack(SHADES[shade]))
     b.icon:SetDesaturated(shade == "missing")
     -- Bottom right: a count, or the time left; top right: how many miss it.
@@ -896,9 +922,14 @@ local function refresh()
     return
   end
   local hide_now = UnitIsDeadOrGhost("player") or UnitOnTaxi("player")
-     or (cfg.hide_resting and IsResting())
+  -- Resting: only durability and bag space.
+  local resting = cfg.hide_resting and IsResting()
   local ok, count = pcall(function()
-    return hide_now and draw({}) or draw(collect())
+    if hide_now then
+      return draw({})
+    end
+    wipe(aura_cache)
+    return draw(resting and fixed_rows() or collect())
   end)
   if not ok then
     count = 0
