@@ -312,6 +312,12 @@ local function talents()
   return type(points) == "number" and not is_secret(points) and points > 0
 end
 
+-- A chat line being typed: the active chat edit box has the focus.
+local function typing()
+  local box = ChatEdit_GetActiveWindow and ChatEdit_GetActiveWindow()
+  return box ~= nil and box:HasFocus()
+end
+
 local CONDITIONS = {
   combat = function() return InCombatLockdown() or UnitAffectingCombat("player") end,
   no_combat = function() return not (InCombatLockdown() or UnitAffectingCombat("player")) end,
@@ -323,6 +329,7 @@ local CONDITIONS = {
   not_full = function() return not_full("player", true) end,
   group_hurt = group_hurt,
   talents = talents,
+  typing = typing,
 }
 
 -- Each condition once per check, however many groups ask for it.

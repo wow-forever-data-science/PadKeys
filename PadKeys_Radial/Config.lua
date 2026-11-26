@@ -4,9 +4,11 @@
 local ns = PadKeys
 
 -- Hold to open, point with the mouse, release to run the pick. All work in
--- combat; the page is the key you press. Only G changes with combat: Bar 6
--- in a fight and Bar 7 out of it, with your consumables as an outer ring
--- (potions in a fight, food and water out). The other keys never change.
+-- combat; the page is the key you press. Only G changes with the
+-- situation: Bar 6 in a fight, your professions while resting in an inn
+-- or a city, Bar 7 otherwise, with your consumables as an outer ring
+-- (potions in a fight, food and water out; none while resting). The other
+-- keys never change.
 local b = ns.config.bindings
 b.G = "CLICK PadKeysRing:main"              -- Bar 6 in combat, Bar 7 out (main_pick), consumables outside
 b[ns.config.mod .. "G"] = "CLICK PadKeysRing:third" -- Action Bar 8, slots 1-8
@@ -56,11 +58,12 @@ ns.config.radial = {
   ring = {
     -- The page G opens, as a macro condition: the first that is true.
     -- By default Action Bar 6 (actions) in combat or with an enemy
-    -- targeted (your opener), else Action Bar 7 (extra: mount, food,
-    -- buffs). Any page works: actions, extra, third, markers, menu, items.
-    main_pick = "[combat][harm,nodead] actions; extra",
+    -- targeted (your opener), the town page (town, below) while resting
+    -- in an inn or a city, else Action Bar 7 (extra: mount, food, buffs).
+    -- Any page works: actions, extra, third, markers, menu, items, town.
+    main_pick = "[combat][harm,nodead] actions; [resting] town; extra",
     -- The consumables (items, below) as G's outer ring: flick further out
-    -- to use one. false for a single ring.
+    -- to use one. false for a single ring. The town page never has one.
     main_outer = true,
     -- Action Bar 6 (Blizzard's MultiBar5) starts at action slot 145.
     first_slot = 145,
@@ -114,6 +117,27 @@ ns.config.radial = {
         false,
       },
     },
+  },
+
+  -- The town page (Town.lua): G while resting. Eight segments, east then
+  -- counter-clockwise; false leaves one empty. A segment is a list of
+  -- spell names, best first: the first you know that no earlier segment
+  -- took, cast to open its window. { menu = "bags" } opens a main-menu
+  -- entry instead (the names under menu.pages below). Mailboxes, banks
+  -- and auctioneers are people and objects you walk up to, so they aren't
+  -- here: PadKeys_Cursor handles their windows.
+  town = {
+    -- E and NE: your two crafting professions.
+    { "Alchemy", "Blacksmithing", "Engineering", "Leatherworking",
+      "Tailoring", "Enchanting", "Jewelcrafting" },
+    { "Alchemy", "Blacksmithing", "Engineering", "Leatherworking",
+      "Tailoring", "Enchanting", "Jewelcrafting" },
+    { "Cooking" },                         -- N
+    { "First Aid" },                       -- NW
+    { "Smelting", "Poisons" },             -- W
+    { "Disenchant", "Basic Campfire" },    -- SW
+    { menu = "professions" },              -- S: the profession book
+    { menu = "bags" },                     -- SE
   },
 
   -- A faint copy of the wheels that follows the mouse (Ghost.lua): each

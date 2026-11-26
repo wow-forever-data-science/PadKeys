@@ -41,7 +41,7 @@ error points at one part:
 | **PadKeys_Targeting** | Party/raid cycling (Ctrl+Tab), F that attacks in combat, and ally mode (\`) where F targets the ally you face, or in a raid picks a raid frame with the mouse | PadKeys |
 | **PadKeys_Radial** | Radials: actions with consumables on an outer ring (G, by combat), Bar 8 (Cmd+G), markers (Shift+G), main menu (Ctrl+G) | PadKeys |
 | **PadKeys_Bar** | One bar that shows the layer you hold (Cmd, Shift, Option, Ctrl) | PadKeys (SpellActivationOverlay optional, for its proc glows) |
-| **PadKeys_Fade** | Blizzard's action bars, micro menu, bags, player, pet and party frames, experience and reputation bars and quest tracker fade out until you need them (mouseover, a dragged spell, combat, a target, regenerating, talent points, loot, experience gained); each bar is labelled with its PadKeys key (Cmd, Shift, G wheel) | PadKeys |
+| **PadKeys_Fade** | Blizzard's action bars, micro menu, bags, player, pet and party frames, experience and reputation bars, quest tracker and chat fade out until you need them (mouseover, a dragged spell, combat, a target, regenerating, talent points, loot, experience gained; chat fades in combat but comes back for whispers, group and raid chat and boss text); each bar is labelled with its PadKeys key (Cmd, Shift, G wheel) | PadKeys |
 | **PadKeys_Look** | Every font in the game in the theme font (Roboto Condensed), and chat windows on a black background | PadKeys |
 | **PadKeys_Combat** | "Combat" / "Out of Combat" fades in the middle of the screen as you enter and leave combat, in white; out of combat, a list of missing or expiring long buffs for your class and group | PadKeys |
 | **PadKeys_CombatText** | Small combat text: your hits scroll beside the target's nameplate with the spell's icon; the hits you take show lower right of the mouse, fading in as your health drops (earlier as a tank) and fully on heavy damage | PadKeys |
@@ -83,7 +83,7 @@ keyboard with each layer's keys. It's also published at
 | \` | Ally mode (F targets allies, Cmd+F inspects) | | |
 | Tab / Shift+Tab | Next / previous enemy | Ctrl+F | Last target |
 | Ctrl+Tab / Ctrl+Shift+Tab | Next / previous group member | Cmd+F | Last hostile target |
-| G (hold) | Action radial: Bar 6 in combat or with an enemy targeted, Bar 7 out of combat, consumables on the outer ring; with Cmd: Bar 8, Shift: target markers, Ctrl: main menu | C | Target's next debuff tooltip |
+| G (hold) | Action radial: Bar 6 in combat or with an enemy targeted, your professions while resting, Bar 7 otherwise, consumables on the outer ring; with Cmd: Bar 8, Shift: target markers, Ctrl: main menu | C | Target's next debuff tooltip |
 | Z | Sheathe / draw weapon | Cmd / Shift / Ctrl+C | Target buff / your debuff / your buff |
 | Shift+\` | UI cursor | X | Sit / stand |
 | F1 | Key map | B | Bags, with the UI cursor inside |
@@ -320,6 +320,10 @@ PadKeys_Fade keeps Blizzard's frames and makes them invisible instead:
   - the **experience and reputation bars** for 4 seconds as they change;
   - the **quest tracker** for 5 seconds as you take a quest or an
     objective moves;
+  - **chat** out of combat and while you type. In combat it fades, and
+    comes back for 8 seconds on a whisper, party, raid or instance chat, a
+    raid warning, or a boss's emote, yell or speech. Raid warnings and boss
+    emotes also show mid-screen as always;
   - your **buffs** only on mouseover (PadKeys_Portrait shows your stance,
     form, aspect or aura).
 - **Hold `\`** and everything fades in; let go and it fades out again.
@@ -602,14 +606,21 @@ about a third of its size. The modifier you press with G picks the radial:
 
 | Key | Radial | In combat |
 |---|---|---|
-| G | In combat or with an enemy targeted, Action Bar 6, slots 1-8: drag spells, items and macros there. Out of combat, Action Bar 7 (mount, food, buffs). Your consumables on a second ring outside: flick further to pick one | yes |
+| G | In combat or with an enemy targeted, Action Bar 6, slots 1-8: drag spells, items and macros there. Resting in an inn or a city, the town page: your professions. Otherwise Action Bar 7 (mount, food, buffs). Your consumables on a second ring outside (not on the town page): flick further to pick one | yes |
 | Cmd+G | Action Bar 8, slots 1-8, the same way | yes |
 | Shift+G | Target markers on your target, skull at the top | yes |
 | Ctrl+G | Blizzard's main-menu entries, three pages | yes |
 
 - **G follows the fight**: which page it opens is a macro condition,
-  read on press (`main_pick = "[combat][harm,nodead] actions; extra"`
-  under `ring` in `PadKeys_Radial/Config.lua`). Any page works there.
+  read on press (`main_pick = "[combat][harm,nodead] actions; [resting]
+  town; extra"` under `ring` in `PadKeys_Radial/Config.lua`). Any page
+  works there.
+- **The town page** (resting, not fighting) is fixed entries, one ring:
+  your two crafting professions east and north-east, Cooking north, First
+  Aid north-west, Smelting or Poisons west, Disenchant or a campfire
+  south-west, the profession book south and your bags south-east. Each
+  profession segment takes the first spell of its list you know, so two
+  crafting professions fill both. Edit the lists under `town`.
   Only G changes; Cmd, Shift and Ctrl+G always open the same radial.
 - **Two rings on G**: the action page on the inner ring, the consumables
   on an outer ring. A short flick picks from the inner ring; past about
@@ -1082,6 +1093,20 @@ is loaded.
     each ability shows upper left of the pointer a few seconds before it
     lands, with a countdown. If the timeline shows but the rows don't, send the
     debug file.
+
+**Stage 16: town page and chat**
+
+34. **Town page**: a new file, so restart the client first. In a city or
+    an inn, out of combat with no enemy targeted, hold G: one ring with
+    your professions (east, north-east), Cooking, First Aid and the rest;
+    no consumables outside. Flick to a profession: its window opens.
+    Leave the city: G opens Action Bar 7 with food outside again. If G
+    still opens Bar 7 in a city, the client may not know `[resting]`:
+    send `/run print(SecureCmdOptionParse("[resting] yes; no"))` in an
+    inn.
+35. **Chat**: start a fight: chat fades. Have someone whisper you or
+    write in party or raid: chat shows for 8 seconds. Press Enter to type:
+    it shows while you type. Leave combat: it stays.
 
 Known risks:
 - The buff reminder reads auras by name out of combat. If a list stays
