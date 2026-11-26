@@ -10,6 +10,10 @@
 -- snippet picks the set with the "items-pick" macro condition, which can
 -- change in combat (Ring.lua).
 --
+-- { quest_items = true } is a segment of its own: shown while you carry a
+-- quest item with a use, it opens the bags that hold them (by /clicking
+-- Blizzard's bag buttons), and QuestItems.lua lights them up there.
+--
 -- Item counts and cooldowns are only read for display; a secret one is
 -- never compared (the cooldown goes to SetCooldown in a pcall, the count
 -- to SetText).
@@ -35,16 +39,39 @@ local NUM_BAGS = NUM_BAG_SLOTS or 4
 -- picks[set][i] = { id, name } for the item on that segment, or nil.
 local picks = {}
 
+local QUEST_CLASS = Enum and Enum.ItemClass and Enum.ItemClass.Questitem or 12
+
+-- A quest item you can use (it has a Use: spell), in bag, slot.
+function ns.usable_quest_item(bag, slot, id)
+  if not (id and GetItemSpell(id)) then
+    return false
+  end
+  local quest = C_Container.GetContainerItemQuestInfo and
+                C_Container.GetContainerItemQuestInfo(bag, slot)
+  if quest and (quest.isQuestItem or quest.questID) then
+    return true
+  end
+  local _, _, _, _, _, class_id = C_Item.GetItemInfoInstant(id)
+  return class_id == QUEST_CLASS
+end
+
 -- Everything in your bags: by_name[name] = itemID, and by_use[spell] =
 -- { itemID, ... } for items whose use is that spell.
 local function read_bags()
   local by_name, by_use = {}, {}
   local seen = {}
   local missing = false
+  -- Usable quest items: the first item, how many kinds, which bags.
+  local quest = { bags = {}, count = 0 }
   for bag = 0, NUM_BAGS do
     for slot = 1, C_Container.GetContainerNumSlots(bag) or 0 do
       local info = C_Container.GetContainerItemInfo(bag, slot)
       local id = info and info.itemID
+      if id and not seen[id] and ns.usable_quest_item(bag, slot, id) then
+        quest.first = quest.first or id
+        quest.count = quest.count + 1
+        quest.bags[bag] = true
+      end
       if id and not seen[id] then
         seen[id] = true
         local name = GetItemInfo(id)
@@ -61,7 +88,19 @@ local function read_bags()
       end
     end
   end
-  return by_name, by_use, missing
+  return by_name, by_use, missing, quest
+end
+
+-- The bags holding usable quest items, opened by Blizzard's own buttons:
+-- the backpack (all bags with Combined Bags on), then each other bag.
+local function quest_macro(quest)
+  local lines = { "/click MainMenuBarBackpackButton" }
+  for bag = 1, NUM_BAGS do
+    if quest.bags[bag] then
+      lines[#lines + 1] = "/click CharacterBag" .. (bag - 1) .. "Slot"
+    end
+  end
+  return table.concat(lines, "\n")
 end
 
 -- The best item for "use = spell": the highest item level your level allows.
@@ -115,16 +154,22 @@ local function fill()
     return
   end
   dirty = false
-  local by_name, by_use, missing = read_bags()
+  local by_name, by_use, missing, quest = read_bags()
   incomplete = missing
   button:SetAttribute("items-pick", config.pick)
   wipe(picks)
   for _, set in ipairs(set_names()) do
     picks[set] = {}
     for i = 1, ns.wheel_segments do
-      local id = pick(config.sets[set][i], by_name, by_use)
+      local family = config.sets[set][i]
       local segment = "items" .. set .. i
-      if id then
+      local id = not (family and family.quest_items) and pick(family, by_name, by_use)
+      if family and family.quest_items and quest.first then
+        picks[set][i] = { id = quest.first, quest = quest.count,
+                          name = format("Quest items (%d)", quest.count) }
+        button:SetAttribute("*type-" .. segment, "macro")
+        button:SetAttribute("*macrotext-" .. segment, quest_macro(quest))
+      elseif id then
         picks[set][i] = { id = id, name = GetItemInfo(id) }
         button:SetAttribute("*type-" .. segment, "macro")
         button:SetAttribute("*macrotext-" .. segment, "/use item:" .. id)
@@ -139,6 +184,10 @@ end
 -- --- The wheel --------------------------------------------------------------
 
 local function entry(item)
+  if item.quest then
+    return { icon = GetItemIcon(item.id), label = item.name, enabled = true,
+             count = item.quest }
+  end
   local count = GetItemCount(item.id)
   local start, duration = C_Container.GetItemCooldown(item.id)
   local cooling = false

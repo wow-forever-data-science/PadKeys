@@ -46,6 +46,8 @@ One owner per setting, so this repo and `wow-settings` never undo each other.
 | Bindings of PadKeys' keys (`Config.lua`, saved in `PadKeysDB.keys`) | PadKeys | `wow-settings` leaves them out of snapshot and apply |
 | All other key bindings | `wow-settings` | PadKeys does not bind them |
 | CVars, incl. soft targeting | `wow-settings` (incl. its `WowSettings` addon for CVars the client does not save) | PadKeys sets no CVars |
+| Edit Mode layouts (their contents) | `wow-settings` | PadKeys never edits a layout |
+| Which of `Healer` / `Damage` is active (`PadKeys_Fade` `Roles.lua`) | PadKeys, at runtime | `wow-settings` should not snapshot or apply the active layout (proposed; not yet changed there) |
 
 - Never edit `wow-settings` files from a session here - say what should change there instead
 - A CVar PadKeys needs goes into `wow-settings`, not `SetCVar` in an addon here

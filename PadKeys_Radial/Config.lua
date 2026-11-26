@@ -111,12 +111,22 @@ ns.config.radial = {
         { use = "Food" },
         { "Hearthstone" },
         { use = "First Aid" },
-        false,
+        -- W: while you carry quest items you can use, opens the bags
+        -- holding them, with those items lit (QuestItems.lua).
+        { quest_items = true },
         false,
         false,
         false,
       },
     },
+  },
+
+  -- Quest items with a Use: get a pulsing gold border in your open bags
+  -- (QuestItems.lua), however the bags were opened.
+  quest_glow = {
+    enabled = true,
+    color = { 1, 0.82, 0.1 },
+    pulse = 1,           -- seconds per pulse
   },
 
   -- The town page (Town.lua): G while resting, for town errands. Eight

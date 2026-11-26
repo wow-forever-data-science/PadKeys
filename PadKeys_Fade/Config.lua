@@ -122,4 +122,20 @@ ns.config.fade = {
   labels = true,
   label_size = 12,
   label_gap = 6,      -- pixels between the label and the bar
+
+  -- Group frames by role (Roles.lua): make two Edit Mode layouts with
+  -- these names, the party and raid frames bottom centre in the healer
+  -- one and at the left in the other, and pick one of them once. From
+  -- then on the layout follows your role, out of combat: the role you
+  -- hold in the group, else your talents (most points in Holy,
+  -- Discipline or Restoration means healer). role = "healer" or "other"
+  -- decides it yourself instead of "auto". Any other layout you pick is
+  -- left alone. The layouts themselves belong to wow-settings.
+  roles = {
+    enabled = true,
+    healer_layout = "Healer",
+    other_layout = "Damage",
+    role = "auto",
+    announce = true,     -- a chat line when it switches
+  },
 }
