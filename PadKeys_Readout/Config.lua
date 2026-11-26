@@ -77,7 +77,8 @@ ns.config.readout = {
     ignore = { "Hearthstone" },
   },
 
-  -- Your pet in trouble (Pet.lua), lower left of the pointer: its
+  -- Your pet in trouble (Pet.lua), below the pointer (the bottom of the
+  -- wheel is health: yours lower right, your pet's below): its
   -- portrait with a pulsing red ring, only for `hold` seconds after it
   -- takes a lot of damage (a crit or crushing blow, or burst_hits hits
   -- within burst_window seconds), and while its health is under `low`.
@@ -85,8 +86,8 @@ ns.config.readout = {
   pet = {
     enabled = true,
     size = 30,
-    x = -90,             -- its top right, from the pointer
-    y = -40,
+    x = 15,              -- its top right, from the pointer
+    y = -88,
     low = 0.35,
     burst_hits = 3,
     burst_window = 2,
@@ -106,14 +107,18 @@ ns.config.readout = {
   debuffs_y = 0,
   debuffs_scale = 0.7,
 
-  -- Your totems below the pointer (Totems.lua): one icon per totem that
-  -- is down, draining with its time left, the seconds on it.
+  -- Your totems above right of the pointer, over the tracked buffs
+  -- (Totems.lua): timers running on you, like them. One icon per totem
+  -- that is down, draining with its time left, the seconds on it. point
+  -- is the row's point placed at x, y from the pointer: "BOTTOMLEFT"
+  -- grows right from there, "TOP" centres the row under it.
   totems = {
     enabled = true,
     icon_size = 22,
     gap = 3,
-    x = 0,            -- the row's top centre, from the pointer
-    y = -88,
+    point = "BOTTOMLEFT",
+    x = 62,
+    y = 96,
     countdown = true,
     countdown_size = 11,
   },

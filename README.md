@@ -547,7 +547,7 @@ pointer), so holding G never covers it:
 - your **target's cast** (to interrupt) is off: the big cooldowns took
   its place and nameplates show casts. `target_cast = true` brings it
   back, lower right;
-- your **pet in trouble**, lower left, in combat: its portrait with a
+- your **pet in trouble**, below, in combat: its portrait with a
   pulsing red ring, for 3 seconds after it takes a lot of damage (a crit,
   a crushing blow, or 3 hits within 2 seconds) and for as long as its
   health is under 35%; otherwise nothing. Health is secret in combat; it
@@ -556,7 +556,8 @@ pointer), so holding G never covers it:
   tracked buffs, with its icons, times and dispel-type borders. Blizzard
   reads the debuffs, so this works in combat; Edit Mode still shows it
   where Blizzard keeps it;
-- your **totems**, below: one small icon per totem that is down, draining
+- your **totems**, above right over the tracked buffs (timers running on
+  you, like them): one small icon per totem that is down, draining
   with its time left and the seconds on it; gone when none are down;
 - your **tracked buffs**, above right, a bit smaller: Blizzard's Cooldown Manager buff
   icons ("Tracked Buffs") follow the pointer, each while the buff is on
@@ -671,17 +672,23 @@ glows. By default:
 - the **healing potion** (south-east) under 35% health and the
   **healthstone** (south) under 50%, and both for 3 seconds after heavy
   damage; the **mana potion** (south-west) under 25% mana;
-- on Action Bar 6: **slot 6** (south-west, heal your pet) while your pet
-  is under 35% or just took heavy damage, and **slot 8** (south-east, your
+- on Action Bar 6: **slot 6** (south-west, a mana spell) under 25% mana;
+  **slot 7** (south, heal your pet) while your pet is under 35% or just
+  took heavy damage, or with no pet out like the healthstone, for a
+  second heal or defensive of your own; and **slot 8** (south-east, your
   own heal or defensive) like the healing potion.
 
 **In combat G follows the readouts at the mouse**, so a readout lighting
-up points at the slice that answers it. Put on Action Bar 6: your big
-cooldowns on slot 1 (east; they show ready right of the mouse), your big
-self-buff on slot 2 (north-east, where tracked buffs show), Mend Pet or
-Health Funnel on slot 6 (south-west, where the pet warning shows) and a
-heal or defensive on slot 8 (south-east, where your incoming damage
-shows). Ready cooldowns aren't lit: the column at the mouse shows them.
+up points at the slice that answers it. Each side has one theme: the top
+is timing (boss abilities, cooldowns back, buffs and totems running), the
+right your power, the bottom health (yours and your pet's, with the mana,
+healthstone and healing potion outside), the left debuffs. Put on Action
+Bar 6: your big cooldowns on slot 1 (east; they show ready right of the
+mouse), your big self-buff on slot 2 (north-east, where tracked buffs
+show), a mana spell on slot 6 (south-west: Evocation, Innervate, Life
+Tap), Mend Pet or Health Funnel on slot 7 (south, where the pet warning
+shows; without a pet a second heal or defensive) and a heal or defensive
+on slot 8 (south-east, where your incoming damage shows). Ready cooldowns aren't lit: the column at the mouse shows them.
 `{ pull = 6 }` lights an opener if you want one back.
 
 Other rules: `"proc"` (the spell's proc glow), `"ready"` (usable and off
@@ -1033,9 +1040,12 @@ is loaded.
 27. **G by context**: out of combat with no target, hold G: Action Bar 7.
     Target a mob, hold G: Action Bar 6. In combat: Action Bar 6.
     Nothing follows the mouse until a segment lights.
-28. **Lights**: put Mend Pet on Action Bar 6 slot 6. In combat, let your
-    pet drop under 35%: its icon shows lower left at the mouse, and its
-    slice glows when you hold G. Drop under 50% health with a healthstone
+28. **Lights**: put Mend Pet on Action Bar 6 slot 7. In combat, let your
+    pet drop under 35%: its icon shows below the mouse, and its
+    slice glows when you hold G. Dismiss the pet and drop under 50%
+    health: slot 7 lights for you instead. As a caster, drop under 25%
+    mana: slot 6 and the mana potion light south-west; as a warrior
+    slot 6 never lights. Drop under 50% health with a healthstone
     in your bags: it lights south on the outer ring; under 35% the healing
     potion south-east too. Take several quick hits: both light for 3 s. If
     neither ever lights, the health curve may need a different scale:
@@ -1060,12 +1070,13 @@ is loaded.
     is dimmed. With no enemy targeted out of combat, nothing shows.
 31. **Pet**: as a hunter or warlock, fight with your pet: nothing shows
     while it is fine. When it takes several hits quickly or a crit, its
-    portrait shows lower left of the pointer with a pulsing red ring for
+    portrait shows below the pointer with a pulsing red ring for
     3 seconds. Under 35% health it stays until healed. If it never shows
     at low health, send `/run print(UnitHealthPercent("pet"))`.
 32. **Debuffs and totems**: get a debuff (a mob's poison, or a curse):
     its icon shows left of the pointer with its time. As a shaman, drop
-    totems: their icons show below the pointer, draining. A new file:
+    totems: their icons show above right of the pointer, over the
+    tracked buffs, draining. A new file:
     restart the client first.
 33. **Boss**: in a boss fight where Blizzard's encounter timeline shows,
     each ability shows upper left of the pointer a few seconds before it

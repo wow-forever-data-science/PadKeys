@@ -1,4 +1,4 @@
--- Your pet in trouble, lower left of the pointer (Config.lua, readout.pet):
+-- Your pet in trouble, below the pointer (Config.lua, readout.pet):
 -- its portrait with a red ring that pulses, shown only
 -- - for a few seconds after it takes a lot of damage: a crit or crushing
 --   blow on it, or a burst of hits (pet.burst_hits within
@@ -28,7 +28,7 @@ local size = p.size or 30
 
 local frame = CreateFrame("Frame", "PadKeysReadoutPet", readout)
 frame:SetSize(size, size)
-frame:SetPoint("TOPRIGHT", readout, "CENTER", p.x or -90, p.y or -40)
+frame:SetPoint("TOPRIGHT", readout, "CENTER", p.x or 15, p.y or -88)
 frame:EnableMouse(false)
 frame:Hide()
 
