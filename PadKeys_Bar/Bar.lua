@@ -419,11 +419,15 @@ local function show_action(b, action)
 
   -- The global cooldown alone shows nothing. A spell out of charges is on
   -- cooldown; one recharging with charges left shows the recharge time but
-  -- stays solid, as it can still be cast.
+  -- stays solid, as it can still be cast. One on hold (its cooldown starts
+  -- when its buff ends, e.g. Rapid Fire) is see-through without a
+  -- countdown until then.
   local cd = ab.GetActionCooldown(action)
   local charges = ab.GetActionCharges and ab.GetActionCharges(action)
-  local cooling = cd and cd.isActive and not on_gcd[action] or false
-  if cooling then
+  local cooling = ns.cooling(cd, on_gcd[action])
+  if cooling and not cd.isActive then
+    set_cooldown(b, nil)
+  elseif cooling then
     set_cooldown(b, ab.GetActionCooldownDuration(action, true))
   elseif charges and charges.isActive then
     set_cooldown(b, ab.GetActionChargeDuration(action))

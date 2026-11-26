@@ -84,8 +84,14 @@ ns.config.readout = {
   -- cooldown of at least `min` seconds, learned as you use them and
   -- saved; `names` adds some before they were ever used. Each pops in as
   -- it comes back and goes as you use it; dimmed while you can't use it.
+  -- A cooldown that only starts when its buff ends (Rapid Fire) counts as
+  -- used from the press, so it goes at once.
   big = {
     enabled = true,
+    -- Your race's spells (Racial on their tooltip) always show here,
+    -- first in the row, whatever their cooldown: press them early in a
+    -- fight. They must be on an action bar, as the rest.
+    racials = true,
     min = 60,
     max = 4,              -- icons at most
     icon_size = 52,

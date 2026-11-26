@@ -11,6 +11,24 @@ function ns.say(msg)
   print(ns.paint("PadKeys", "white") .. ": " .. msg)
 end
 
+-- A cooldown "on hold": used, but its timer only starts later, when its
+-- buff ends (e.g. Rapid Fire). Blizzard reports it as isEnabled false,
+-- which also makes isActive false, and it has no time left to show yet.
+-- isEnabled is never secret. cd is a C_ActionBar.GetActionCooldown result.
+function ns.on_hold(cd)
+  return cd and cd.isEnabled == false or false
+end
+
+-- Cooling down for the PadKeys addons: running (not just the global
+-- cooldown; gcd is that slot's isOnGCD, kept from SPELL_UPDATE_COOLDOWN),
+-- or on hold.
+function ns.cooling(cd, gcd)
+  if not cd then
+    return false
+  end
+  return (cd.isActive and not gcd) or cd.isEnabled == false or false
+end
+
 local HELP = {
   "/padkeys preview - list the key changes /padkeys apply would make",
   "/padkeys apply - set the key layout from Config.lua",
