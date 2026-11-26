@@ -1,14 +1,18 @@
 -- The town page (Config.lua, radial.town): what G opens while you rest in
 -- an inn or a city, out of a fight. Fixed entries, east then
 -- counter-clockwise, for town errands: Consumabuddy, the minimap's town
--- tracking (repair, trainers, vendors...), and if you like your
--- professions' windows and Blizzard's main-menu windows. One ring: the
+-- tracking (repair, trainers, vendors...) in one segment, Blizzard's
+-- windows for what you do in town (Dungeon Finder, PvP, guild...), and
+-- if you like your professions' windows. One ring: the
 -- consumables stay off it (Ring.lua).
 --
 -- A segment is one of:
--- - { track = { "Repair" } }: switches that minimap tracking on or off
---   (the first name the minimap offers; names as its tracking menu shows
---   them, in your client's language). Off shows the icon grey.
+-- - { track_all = { "Repair", "Mailbox", ... } }: all of these minimap
+--   trackings at once: on if any is off, else all off (names as the
+--   minimap's tracking menu shows them, in your client's language; the
+--   ones it doesn't offer are skipped). Grey while all are off.
+-- - { track = { "Repair" } }: one tracking on or off (the first name the
+--   minimap offers). Off shows the icon grey.
 -- - { macro = "/cbuddy", label = ..., icon = ..., addon = "Consumabuddy" }:
 --   runs the macro; left out while that addon isn't loaded.
 -- - { menu = "bags" }: a main-menu entry (Menu.lua).
@@ -38,6 +42,27 @@ local function known(name)
     return nil
   end
   return info
+end
+
+-- Every minimap tracking entry with one of these names: { index, info }.
+local function find_all_tracking(names)
+  local found = {}
+  if not (C_Minimap and C_Minimap.GetNumTrackingTypes) then
+    return found
+  end
+  local wanted = {}
+  for _, name in ipairs(names) do
+    wanted[name] = true
+  end
+  pcall(function()
+    for i = 1, C_Minimap.GetNumTrackingTypes() do
+      local info = C_Minimap.GetTrackingInfo(i)
+      if info and wanted[info.name] then
+        found[#found + 1] = { index = i, info = info }
+      end
+    end
+  end)
+  return found
 end
 
 -- The minimap tracking entry with one of these names: its index and info.
@@ -75,6 +100,17 @@ local function tracker(i)
   if not trackers[i] then
     local b = CreateFrame("Button", "PadKeysTownTrack" .. i, UIParent)
     b:SetScript("OnClick", function(self)
+      if self.all then
+        local found = find_all_tracking(self.names or {})
+        local any_off = false
+        for _, t in ipairs(found) do
+          any_off = any_off or not t.info.active
+        end
+        for _, t in ipairs(found) do
+          C_Minimap.SetTracking(t.index, any_off)
+        end
+        return
+      end
       local index, info = find_tracking(self.names or {})
       if index then
         C_Minimap.SetTracking(index, not info.active)
@@ -102,6 +138,14 @@ local function resolve()
     local pick
     if type(segment) ~= "table" then
       pick = nil
+    elseif segment.track_all then
+      if #find_all_tracking(segment.track_all) > 0 then
+        local t = tracker(i)
+        t.names, t.all = segment.track_all, true
+        pick = { track_all = segment.track_all, label = segment.label,
+                 icon = segment.icon }
+        set_segment(i, "macro", "/click PadKeysTownTrack" .. i)
+      end
     elseif segment.track then
       if find_tracking(segment.track) then
         tracker(i).names = segment.track
@@ -139,7 +183,18 @@ end
 ns.ring_add_page("town", "Town", function()
   local entries = {}
   for i, pick in pairs(picks) do
-    if pick.track then
+    if pick.track_all then
+      local found = find_all_tracking(pick.track_all)
+      local on = 0
+      for _, t in ipairs(found) do
+        if t.info.active then
+          on = on + 1
+        end
+      end
+      entries[i] = { icon = pick.icon or (found[1] and found[1].info.texture),
+                     label = format("%s (%d/%d on)", pick.label or "Town tracking", on, #found),
+                     enabled = true, desaturate = on == 0 }
+    elseif pick.track then
       local _, info = find_tracking(pick.track)
       if info then
         entries[i] = { icon = info.texture, label = info.name, enabled = true,

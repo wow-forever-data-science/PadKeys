@@ -132,10 +132,12 @@ ns.config.radial = {
   -- The town page (Town.lua): G while resting, for town errands. Eight
   -- segments, east then counter-clockwise; false leaves one empty. Each
   -- is one of:
-  --   { track = { "Repair" } }  switch that minimap tracking on or off
-  --                             (names as the minimap's tracking menu
-  --                             shows them; the first it offers is used;
-  --                             grey while off)
+  --   { track_all = { "Repair", "Mailbox" }, label = ..., icon = ... }
+  --                             all those minimap trackings: on if any is
+  --                             off, else all off (names as the minimap's
+  --                             tracking menu shows them; missing ones
+  --                             are skipped; grey while all are off)
+  --   { track = { "Repair" } }  one tracking on or off
   --   { macro = "/cbuddy", label = "Consumabuddy", icon = ...,
   --     addon = "Consumabuddy" } run a macro, only with that addon loaded
   --   { menu = "professions" }  a main-menu entry (names under menu.pages)
@@ -146,13 +148,17 @@ ns.config.radial = {
   town = {
     { macro = "/cbuddy", label = "Consumabuddy", addon = "Consumabuddy",
       icon = "Interface\\Icons\\INV_Potion_93" },                 -- E
-    { track = { "Repair" } },                                       -- NE
-    { track = { "Class Trainer", "Trainer" } },                     -- N
-    { track = { "Profession Trainers", "Profession Trainer" } },    -- NW
-    { track = { "General Goods", "Food & Drink" } },                -- W
-    { track = { "Mailbox" } },                                      -- SW
-    { track = { "Banker" } },                                       -- S
-    { track = { "Auctioneer" } },                                   -- SE
+    -- NE: all town tracking on, or all off again.
+    { track_all = { "Repair", "Class Trainer", "Trainer", "Profession Trainers",
+                    "Profession Trainer", "General Goods", "Food & Drink",
+                    "Mailbox", "Banker", "Auctioneer" },
+      label = "Town tracking", icon = "Interface\\Icons\\INV_Misc_Map_01" },
+    { menu = "lfd" },                                               -- N: Dungeon Finder
+    { menu = "pvp" },                                               -- NW: battlegrounds
+    { menu = "guild" },                                             -- W
+    { menu = "calendar" },                                          -- SW
+    { menu = "professions" },                                       -- S
+    { menu = "collections" },                                       -- SE: mounts, pets
   },
   -- Your professions, if you want them there instead, e.g.
   --   { "Alchemy", "Blacksmithing", "Engineering", "Leatherworking",
