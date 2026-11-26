@@ -166,7 +166,7 @@ local function scan()
           state[key] = s
         end
         local cd = ab.GetActionCooldown(action)
-        local cooling = cd and cd.isActive and not on_gcd[action] or false
+        local cooling = ns.cooling(cd, on_gcd[action])
         local lname = name:lower()
 
         -- A cooldown that ends after lasting long enough.

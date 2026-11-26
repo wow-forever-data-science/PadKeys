@@ -238,6 +238,9 @@ local function slot_cooldown(slot)
   if cd and cd.isActive and not on_gcd[slot] then
     return ab.GetActionCooldownDuration(slot, true), true
   end
+  if ns.on_hold(cd) then
+    return nil, true -- its cooldown starts when its buff ends: dimmed only
+  end
   local charges = ab.GetActionCharges and ab.GetActionCharges(slot)
   if charges and charges.isActive then
     return ab.GetActionChargeDuration(slot), false

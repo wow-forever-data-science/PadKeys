@@ -505,6 +505,12 @@ the screen with the time left on it, then fades out over a second. Another
 press on cooldown, of the same key or another, replaces it at once. The
 global cooldown alone flashes nothing.
 
+A spell whose cooldown only starts when its buff ends (Rapid Fire) flashes
+too while the buff runs, but without a time: the game has none to give
+until the cooldown starts. The PadKeys bar and the G wheel show it
+see-through without a countdown in that time, and the big cooldowns
+beside the mouse drop it at once.
+
 It listens for the game's own "Spell is not ready yet." / "Item is not
 ready yet." errors and matches them to the key you just pressed. Size,
 position and timings are in `PadKeys_NotReady/Config.lua`.
@@ -560,7 +566,10 @@ wheel is open:
   comes back and goes as you use it; dimmed while you can't use it (no
   mana, no target). Only in combat or with an enemy targeted. Which
   cooldowns are big is learned as you use them (and saved), so a spell
-  shows once you've used it once; `big.names` adds some up front;
+  shows once you've used it once; `big.names` adds some up front. Your
+  race's spells ("Racial" on their tooltip) always show, first in the
+  row, whatever their cooldown: they are for pressing early in a fight
+  (`big.racials`). They too must be on an action bar;
 - **boss abilities** from Blizzard's encounter timeline, upper left:
   each one as the timeline highlights it (a few seconds before it lands),
   with its icon, countdown and name to its left, up to three at once,
@@ -1167,6 +1176,20 @@ is loaded.
     left on the bottom right and the stacks on the top right once it is
     on; yellow under 5 minutes. If nothing shows, send the line under
     `watch` in `PadKeys_Combat/Config.lua` with the buff on.
+41. **Racials at the mouse**: put your race's spells on any action bar
+    (a hidden one is fine), target a mob: they show first in the row
+    right of the pointer, before any other big cooldown, even one you
+    have never used. Use one: it goes, and pops back when it is ready.
+    If one never shows, send
+    `/run print(C_Spell.GetSpellSubtext(C_Spell.GetSpellIDForSpellIdentifier("NAME")))`
+    with its name.
+42. **Rapid Fire on hold**: as a hunter, use Rapid Fire, then press it
+    again while its buff runs: its icon flashes mid-screen (no time on
+    it), and the PadKeys bar shows it see-through. Once the buff ends the
+    countdown appears as usual, and pressing it then flashes with the
+    time. If nothing flashes during the buff, send
+    `/run local c=C_ActionBar.GetActionCooldown(SLOT) print(c.isEnabled, c.isActive)`
+    with its action slot.
 
 Known risks:
 - The buff reminder reads auras by name out of combat. If a list stays

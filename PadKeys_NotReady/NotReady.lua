@@ -106,7 +106,9 @@ local function read_gcd()
 end
 
 -- An action slot: flashes it if it is on a cooldown other than the global
--- one, or out of charges.
+-- one, out of charges, or on hold (used, its cooldown starting only when
+-- its buff ends, e.g. Rapid Fire: the icon without a countdown, as there
+-- is no time left to show yet).
 local function show_action(action)
   if not ab.HasAction(action) then
     return
@@ -117,6 +119,9 @@ local function show_action(action)
     flash(ab.GetActionTexture(action))
     cooldown:SetCooldownFromDurationObject(
       ab.GetActionCooldownDuration(action, c.ignore_gcd and true or false))
+  elseif ns.on_hold(cd) then
+    flash(ab.GetActionTexture(action))
+    cooldown:Clear()
   elseif charges and charges.isActive then
     flash(ab.GetActionTexture(action))
     cooldown:SetCooldownFromDurationObject(ab.GetActionChargeDuration(action))

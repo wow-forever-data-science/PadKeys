@@ -12,6 +12,11 @@
 -- learned is saved (PadKeysDB.big_cooldowns), so it is known after a
 -- /reload. big.names adds names before they were ever seen.
 --
+-- Racial spells (big.racials) always count, whatever their cooldown, and
+-- come first in the row: they are what to press first in a fight. A
+-- racial is told by the game's own subtext for it, "Racial"
+-- (C_Spell.GetSpellSubtext), so no names are listed for any race.
+--
 -- Running or not is Blizzard's plain isActive flag, the global cooldown
 -- told apart with isOnGCD (read during SPELL_UPDATE_COOLDOWN). Usable is
 -- the plain IsUsableAction: an icon you can't use now (no mana, no
@@ -134,6 +139,31 @@ local function fighting()
          (UnitExists("target") and UnitCanAttack("player", "target"))
 end
 
+-- The game's subtext for a racial is "Racial" ("Racial Passive" for one
+-- that is always on, which has nothing to press).
+local racial_cache = {}
+local function is_racial(kind, id)
+  if kind ~= "spell" or not b.racials then
+    return false
+  end
+  local known = racial_cache[id]
+  if known == nil then
+    local get = C_Spell and C_Spell.GetSpellSubtext or GetSpellSubtext
+    local ok, text = false, nil
+    if get then
+      ok, text = pcall(get, id)
+    end
+    if not ok or is_secret(text) or type(text) ~= "string" then
+      return false -- not cached: the subtext may come once the spell loads
+    end
+    text = text:lower()
+    known = text:find("racial", 1, true) ~= nil and
+            not text:find("passive", 1, true)
+    racial_cache[id] = known
+  end
+  return known
+end
+
 local function long_base(kind, id)
   if kind ~= "spell" or not GetSpellBaseCooldown then
     return false
@@ -170,7 +200,7 @@ local function scan()
       if key and not seen[key] then
         seen[key] = true
         local cd = ab.GetActionCooldown(action)
-        local cooling = cd and cd.isActive and not on_gcd[action] or false
+        local cooling = ns.cooling(cd, on_gcd[action])
         if cooling then
           since[key] = since[key] or now
           local d = cd.duration
@@ -187,12 +217,21 @@ local function scan()
         if not big[key] and (NAMES[lname] or long_base(kind, id)) then
           big[key] = true
         end
-        if want and big[key] and not cooling and not IGNORE[lname]
-            and #ready < #icons then
-          ready[#ready + 1] = { key = key, action = action }
+        local racial = is_racial(kind, id)
+        if want and (big[key] or racial) and not cooling and
+            not IGNORE[lname] then
+          ready[#ready + 1] = { key = key, action = action, racial = racial }
         end
       end
     end
+  end
+  -- Racials first, then action-bar order; as many as there are icons.
+  for i, r in ipairs(ready) do
+    r.order = (r.racial and 0 or MAX_ACTION_SLOT) + i
+  end
+  table.sort(ready, function(x, y) return x.order < y.order end)
+  for i = #ready, #icons + 1, -1 do
+    ready[i] = nil
   end
   place(#ready)
   local was = shown

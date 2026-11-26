@@ -152,7 +152,7 @@ local function ready(slot)
   end
   local usable = ab.IsUsableAction(slot)
   local cd = ab.GetActionCooldown(slot)
-  return usable and not (cd and cd.isActive and not cd.isOnGCD) and true or false
+  return usable and not ns.cooling(cd, cd and cd.isOnGCD) and true or false
 end
 
 local function combo(points)
