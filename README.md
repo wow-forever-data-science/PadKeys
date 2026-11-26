@@ -83,7 +83,7 @@ keyboard with each layer's keys. It's also published at
 | \` | Ally mode (F targets allies, Cmd+F inspects) | | |
 | Tab / Shift+Tab | Next / previous enemy | Ctrl+F | Last target |
 | Ctrl+Tab / Ctrl+Shift+Tab | Next / previous group member | Cmd+F | Last hostile target |
-| G (hold) | Action radial: Bar 6 in combat or with an enemy targeted, your professions while resting, Bar 7 otherwise, consumables on the outer ring; with Cmd: Bar 8, Shift: target markers, Ctrl: main menu | C | Target's next debuff tooltip |
+| G (hold) | Action radial: Bar 6 in combat or with an enemy targeted, town errands while resting, Bar 7 otherwise, consumables on the outer ring; with Cmd: Bar 8, Shift: target markers, Ctrl: main menu | C | Target's next debuff tooltip |
 | Z | Sheathe / draw weapon | Cmd / Shift / Ctrl+C | Target buff / your debuff / your buff |
 | Shift+\` | UI cursor | X | Sit / stand |
 | F1 | Key map | B | Bags, with the UI cursor inside |
@@ -606,7 +606,7 @@ about a third of its size. The modifier you press with G picks the radial:
 
 | Key | Radial | In combat |
 |---|---|---|
-| G | In combat or with an enemy targeted, Action Bar 6, slots 1-8: drag spells, items and macros there. Resting in an inn or a city, the town page: your professions. Otherwise Action Bar 7 (mount, food, buffs). Your consumables on a second ring outside (not on the town page): flick further to pick one | yes |
+| G | In combat or with an enemy targeted, Action Bar 6, slots 1-8: drag spells, items and macros there. Resting in an inn or a city, the town page: Consumabuddy and town tracking. Otherwise Action Bar 7 (mount, food, buffs). Your consumables on a second ring outside (not on the town page): flick further to pick one | yes |
 | Cmd+G | Action Bar 8, slots 1-8, the same way | yes |
 | Shift+G | Target markers on your target, skull at the top | yes |
 | Ctrl+G | Blizzard's main-menu entries, three pages | yes |
@@ -615,12 +615,13 @@ about a third of its size. The modifier you press with G picks the radial:
   read on press (`main_pick = "[combat][harm,nodead] actions; [resting]
   town; extra"` under `ring` in `PadKeys_Radial/Config.lua`). Any page
   works there.
-- **The town page** (resting, not fighting) is fixed entries, one ring:
-  your two crafting professions east and north-east, Cooking north, First
-  Aid north-west, Smelting or Poisons west, Disenchant or a campfire
-  south-west, the profession book south and your bags south-east. Each
-  profession segment takes the first spell of its list you know, so two
-  crafting professions fill both. Edit the lists under `town`.
+- **The town page** (resting, not fighting) is town errands, one ring
+  of fixed entries: Consumabuddy east (when it's loaded), then minimap
+  tracking you switch on or off: repair north-east, class trainer north,
+  profession trainers north-west, general goods west, mailbox south-west,
+  banker south, auctioneer south-east. Tracking that's off shows grey.
+  Edit `town`: segments can also be a macro, a main-menu entry or your
+  professions (examples in the comments).
   Only G changes; Cmd, Shift and Ctrl+G always open the same radial.
 - **Two rings on G**: the action page on the inner ring, the consumables
   on an outer ring. A short flick picks from the inner ring; past about
@@ -1098,8 +1099,12 @@ is loaded.
 
 34. **Town page**: a new file, so restart the client first. In a city or
     an inn, out of combat with no enemy targeted, hold G: one ring with
-    your professions (east, north-east), Cooking, First Aid and the rest;
-    no consumables outside. Flick to a profession: its window opens.
+    Consumabuddy east and town tracking around it, no consumables
+    outside. Flick east: Consumabuddy opens. Flick north-east: repairers
+    show on the minimap and the icon turns from grey to colour; again
+    turns it off. A missing segment means the minimap names it
+    differently: send
+    `/run for i=1,C_Minimap.GetNumTrackingTypes() do print(C_Minimap.GetTrackingInfo(i).name) end`.
     Leave the city: G opens Action Bar 7 with food outside again. If G
     still opens Bar 7 in a city, the client may not know `[resting]`:
     send `/run print(SecureCmdOptionParse("[resting] yes; no"))` in an
