@@ -1,7 +1,7 @@
--- Your totems below the pointer (Config.lua, readout.totems): one small
--- icon per totem that is down, side by side under the G radial, each
--- draining with its time left and the seconds on it. Gone when none are
--- down.
+-- Your totems above right of the pointer, over the tracked buffs
+-- (Config.lua, readout.totems): one small icon per totem that is down,
+-- side by side outside the G radial, each draining with its time left and
+-- the seconds on it. Gone when none are down.
 --
 -- The time comes as a duration object (GetTotemDuration) into a Cooldown
 -- frame's SetCooldownFromDurationObject, the icon from GetTotemInfo into
@@ -27,8 +27,9 @@ local function is_secret(v)
 end
 
 local row = CreateFrame("Frame", nil, readout)
+local point = t.point or "BOTTOMLEFT"
 row:SetSize(1, size)
-row:SetPoint("TOP", readout, "CENTER", t.x or 0, t.y or -88)
+row:SetPoint(point, readout, "CENTER", t.x or 62, t.y or 96)
 row:EnableMouse(false)
 
 local icons = {}
@@ -78,11 +79,18 @@ local function update()
       f.cooldown:Clear()
     end
   end
-  -- Centred under the pointer, in slot order (earth, fire, water, air).
+  -- In slot order (earth, fire, water, air), growing right from a LEFT
+  -- point, left from a RIGHT one, else centred on it.
   local width = #shown * size + math.max(#shown - 1, 0) * gap
+  local start = -width / 2
+  if point:find("LEFT") then
+    start = 0
+  elseif point:find("RIGHT") then
+    start = -width
+  end
   for i, f in ipairs(shown) do
     f:ClearAllPoints()
-    f:SetPoint("TOPLEFT", row, "TOP", -width / 2 + (i - 1) * (size + gap), 0)
+    f:SetPoint("TOPLEFT", row, "TOPLEFT", start + (i - 1) * (size + gap), 0)
   end
 end
 

@@ -142,7 +142,9 @@ ns.config.radial = {
   --                      it too for a few seconds after heavy damage (the
   --                      incoming-damage readout's crit or burst)
   --   { pet = 0.35 }     your pet's health under 35%, or a few seconds
-  --                      after it takes heavy damage (the pet readout)
+  --                      after it takes heavy damage (the pet readout);
+  --                      with health beside it ({ pet = 0.35, health =
+  --                      0.5 }) your own health while you have no pet
   --   { mana = 0.25 }    your mana under 25%
   --   { pull = 6 }       an enemy targeted before combat, and the first
   --                      6 seconds of combat
@@ -156,19 +158,26 @@ ns.config.radial = {
   --                      a defensive or a movement spell
   --
   -- In combat G's slices follow the readouts at the mouse, so a readout
-  -- lighting up points at the slice that answers it. Put on Action Bar 6:
+  -- lighting up points at the slice that answers it. Each side of the
+  -- wheel has one theme: the top is timing (boss abilities, cooldowns
+  -- back, buffs and totems running), the right your power, the bottom
+  -- health, the left debuffs. Put on Action Bar 6:
   --   slot 1 (east) and its neighbours: your big cooldowns (they show
   --     ready right of the mouse);
   --   slot 2 (north-east): your big self-buff (tracked buffs upper right);
-  --   slot 6 (south-west): heal your pet (Mend Pet, Health Funnel; the pet
-  --     warning shows lower left);
+  --   slot 6 (south-west): a mana spell (Evocation, Innervate, Life Tap),
+  --     lit under 25% mana, beside the mana potion;
+  --   slot 7 (south): heal your pet (Mend Pet, Health Funnel; the pet
+  --     warning shows below the mouse). No pet: a second heal or
+  --     defensive for you, lit by your own health instead;
   --   slot 8 (south-east): a heal or defensive for you (your incoming
   --     damage shows lower right); the healing potion and healthstone sit
   --     outside it on the consumables ring.
   -- Ready cooldowns aren't lit: the column right of the mouse shows them.
   lights = {
     actions = {
-      [6] = { pet = 0.35 },                 -- heal pet, south-west
+      [6] = { mana = 0.25 },                -- mana spell, south-west
+      [7] = { pet = 0.35, health = 0.5, hits = true }, -- heal pet, south
       [8] = { health = 0.35, hits = true }, -- your heal, south-east
     },
     items = {

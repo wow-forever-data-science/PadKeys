@@ -68,6 +68,12 @@ local function percent_alpha(kind, threshold, on, off)
     end
     ok, result = pcall(UnitHealthPercent, "pet", true, curve)
   else
+    -- No mana (a warrior, a rogue): never lit. The maximum is only read
+    -- when the client hands it over as a plain number.
+    local okm, max = pcall(UnitPowerMax, "player", MANA)
+    if okm and max ~= nil and not is_secret(max) and max == 0 then
+      return off
+    end
     ok, result = pcall(UnitPowerPercent, "player", MANA, false, curve)
   end
   if not ok or result == nil then
@@ -206,7 +212,10 @@ function ns.light_alpha(page, index, off, on)
   -- readouts at the mouse see it (PadKeys_CombatText for you,
   -- PadKeys_Readout for your pet). Plain times, so no secret is touched.
   local now = GetTime()
-  if type(rule) == "table" and rule.pet then
+  -- A pet rule with a health rule beside it: the pet's health while you
+  -- have a pet, your own without one, so the slot serves every class.
+  if type(rule) == "table" and rule.pet and
+     (not rule.health or UnitExists("pet")) then
     if rule.hits ~= false and (ns.pet_hit_until or 0) > now then
       return on
     end
