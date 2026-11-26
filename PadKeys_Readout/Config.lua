@@ -55,11 +55,31 @@ ns.config.readout = {
     hit_by_health = { { 0, 1 }, { 0.5, 1 }, { 0.8, 0 }, { 1, 0 } },
   },
 
-  -- Everything below sits outside the G radial (about 84 px from the
-  -- pointer at its scale 0.35), so holding G never covers it.
+  -- Your swing timer (Swing.lua): a thin ring just outside the cast ring
+  -- that fills from one auto attack to the next, white for melee, orange
+  -- for Auto Shot. Its faint track stays on all through combat
+  -- (track = "combat"; "swing" shows it only while it fills): it is the
+  -- line the icons below sit on.
+  swing = {
+    enabled = true,
+    size = 76,           -- pixels across; the cast ring is 56
+    alpha = 0.85,
+    track = "combat",
+    track_alpha = 0.2,
+    fill = true,         -- as the cast ring: true fills up, false drains
+    main_hand = true,
+    main_color = { 1, 1, 1 },
+    ranged = true,       -- Auto Shot, Shoot (wands)
+    ranged_color = { 1, 0.6, 0.15 },
+    off_hand = false,    -- true: a second ring just inside for the off hand
+    off_color = { 0.7, 0.7, 0.7 },
+  },
+
+  -- Everything below sits just outside the swing ring (about 44 px from
+  -- the pointer). Holding G covers it while the wheel is open.
 
   -- Your big cooldowns that are ready (Big.lua), right of the pointer: a
-  -- column of icons for self-buffs, trinkets and impactful spells on any
+  -- row of icons for self-buffs, trinkets and impactful spells on any
   -- action bar (hidden bars count; put trinkets on one). Big means a
   -- cooldown of at least `min` seconds, learned as you use them and
   -- saved; `names` adds some before they were ever used. Each pops in as
@@ -68,9 +88,10 @@ ns.config.readout = {
     enabled = true,
     min = 60,
     max = 4,              -- icons at most
-    icon_size = 26,
+    icon_size = 52,
     gap = 4,
-    x = 92,               -- left edge of the column, from the pointer
+    grow = "right",       -- a row growing right; "down": a column
+    x = 44,               -- left edge of the first icon, from the pointer
     y = 0,
     only_when_fighting = true,  -- in combat or with an enemy targeted
     names = {},           -- e.g. { "Recklessness", "Innervate" }
@@ -85,9 +106,9 @@ ns.config.readout = {
   -- Otherwise nothing. Out of combat the buff bar tells you it's missing.
   pet = {
     enabled = true,
-    size = 30,
-    x = 15,              -- its top right, from the pointer
-    y = -88,
+    size = 60,
+    x = 30,              -- its top right, from the pointer
+    y = -44,
     low = 0.35,
     burst_hits = 3,
     burst_window = 2,
@@ -103,9 +124,9 @@ ns.config.readout = {
   -- Mode still shows it where Blizzard keeps it.
   debuffs = true,
   debuffs_point = "RIGHT",
-  debuffs_x = -96,
+  debuffs_x = -44,
   debuffs_y = 0,
-  debuffs_scale = 0.7,
+  debuffs_scale = 1.4,
 
   -- Your totems above right of the pointer, over the tracked buffs
   -- (Totems.lua): timers running on you, like them. One icon per totem
@@ -114,13 +135,13 @@ ns.config.readout = {
   -- grows right from there, "TOP" centres the row under it.
   totems = {
     enabled = true,
-    icon_size = 22,
+    icon_size = 44,
     gap = 3,
     point = "BOTTOMLEFT",
-    x = 62,
-    y = 96,
+    x = 32,
+    y = 86,
     countdown = true,
-    countdown_size = 11,
+    countdown_size = 14,
   },
 
   -- Your target's cast or channel beside the mouse: its icon draining,
@@ -135,26 +156,26 @@ ns.config.readout = {
   -- Blizzard's own timeline stays where it is.
   boss = true,
   boss_rows = 3,
-  boss_x = -72,
-  boss_y = 44,
+  boss_x = -32,
+  boss_y = 32,
 
   -- Your tracked buffs (Blizzard's Cooldown Manager, "Tracked Buffs")
   -- beside the mouse, while they are on you, with their time left. Pick
   -- the buffs in the Cooldown Manager's options. buffs_point is the
   -- viewer's point placed at x, y from the pointer: "BOTTOMLEFT" puts it
-  -- above and to the right, outside the radial and above the big
+  -- above and to the right, on the swing ring and above the big
   -- cooldowns. buffs_scale shrinks it against its Edit Mode size while
   -- docked.
   buffs = true,
   buffs_point = "BOTTOMLEFT",
-  buffs_x = 62,
-  buffs_y = 62,
-  buffs_scale = 0.6,
+  buffs_x = 32,
+  buffs_y = 32,
+  buffs_scale = 1.2,
 
   -- Icon size and text size of the target cast and boss rows, and the
   -- target cast's place against the mouse pointer, in pixels (positive y
   -- is up).
-  icon_size = 28,
+  icon_size = 56,
   text_size = 13,
   x = 92,
   y = -80,

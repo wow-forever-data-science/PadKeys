@@ -187,6 +187,8 @@ local function buffs_of(unit)
         left = (expires and expires > 0) and (expires - now) or math.huge,
         source = aura.sourceUnit,
         spell = aura.spellId,
+        icon = aura.icon,
+        stacks = aura.applications,
       }
     end
   end)
@@ -644,12 +646,89 @@ local function supply_rows(rows, my_class)
   end
 end
 
+-- --- Watched buffs ----------------------------------------------------------
+
+local function max_level()
+  local ok, level = pcall(function()
+    return GetMaxPlayerLevel and GetMaxPlayerLevel() or MAX_PLAYER_LEVEL
+  end)
+  return ok and level or 60
+end
+
+-- Whether `name` holds any of `parts`, ignoring case.
+local function holds(name, parts)
+  if not name then
+    return false
+  end
+  name = name:lower()
+  for _, part in ipairs(parts or {}) do
+    if name:find(part:lower(), 1, true) then
+      return true
+    end
+  end
+  return false
+end
+
+-- The first item in your bags whose name holds any of `parts`: its name
+-- and icon.
+local function bag_item_holding(parts)
+  if not parts then
+    return nil
+  end
+  for bag = 0, NUM_BAG_SLOTS or 4 do
+    for slot = 1, C_Container.GetContainerNumSlots(bag) or 0 do
+      local id = C_Container.GetContainerItemID(bag, slot)
+      local name = id and item_name(id)
+      if holds(name, parts) then
+        return name, (item_icon_class(id))
+      end
+    end
+  end
+  return nil
+end
+
+-- Buffs you want to keep an eye on out of combat (cfg.watch), e.g. the
+-- sleeping bag's: its time left and stacks, also while resting. Shown
+-- while you carry the item or have the buff (and only while levelling,
+-- for leveling = true). Red while missing (click uses the item), yellow
+-- under warn_at, grey otherwise.
+local function watch_rows(rows)
+  local level = UnitLevel("player") or 0
+  for _, w in ipairs(cfg.watch or {}) do
+    if not w.leveling or level < max_level() then
+      local best
+      for _, aura in ipairs(buffs_of("player") or {}) do
+        if holds(aura.name, w.buff) and (not best or aura.left > best.left) then
+          best = aura
+        end
+      end
+      local item, item_icon = bag_item_holding(w.item)
+      if best or item then
+        local row = {
+          icon = best and best.icon or item_icon or w.icon,
+          label = w.label or (best and best.name) or item,
+          missing = best and {} or { "you" },
+          left = best and best.left or nil,
+          badge = best and best.stacks and best.stacks > 1 and
+            tostring(best.stacks) or nil,
+          click = item and { type = "item", item = item } or nil,
+        }
+        if best and best.left >= (w.warn_at or cfg.warn_at) then
+          row.supply = true
+        end
+        rows[#rows + 1] = row
+      end
+    end
+  end
+end
+
 -- Your most worn item, with its icon and durability, and your free bag
 -- slots: always out of combat (supplies.always), or only under their
 -- limits. Yellow under their limits, grey otherwise.
 local function fixed_rows()
   local s = cfg.supplies
   local rows = {}
+  pcall(watch_rows, rows)
   if not s then
     return rows
   end
@@ -676,9 +755,9 @@ local function fixed_rows()
     warn = free < (s.bag_free_low or 0),
   }
   if not s.always then
-    -- Only under their limits.
+    -- Only under their limits (watched buffs always stay).
     for i = #rows, 1, -1 do
-      if not rows[i].warn then
+      if rows[i].supply and not rows[i].warn and rows[i].count then
         table.remove(rows, i)
       end
     end
@@ -754,6 +833,9 @@ local function row_text(row)
       return text .. ns.paint("missing", "white")
     end
     return text .. ns.paint("missing: " .. who, "white")
+  end
+  if row.badge then
+    text = text .. ns.paint(row.badge .. " stacks", "white") .. "  "
   end
   if row.left == math.huge then
     return text
@@ -882,7 +964,8 @@ local function draw(rows)
     end
     b.text:SetText(text or "")
     local others = missing > 1 or (missing == 1 and row.missing[1] ~= "you")
-    b.badge:SetText(others and tostring(missing) or "")
+    -- A watched buff's stacks, or how many miss it.
+    b.badge:SetText(row.badge or (others and tostring(missing)) or "")
     set_click(b, row.click)
     b:Show()
   end

@@ -56,11 +56,12 @@ ns.config.combattext.incoming = {
   size = 13,
   lines = 5,
   direction = "down",
-  -- "cursor": lower right of the mouse pointer, outside the G radial,
-  -- offset by x, y (positive y is up). "center": under your character.
+  -- "cursor": lower right of the mouse pointer, just outside the swing
+  -- ring (PadKeys_Readout), offset by x, y (positive y is up). "center":
+  -- under your character.
   anchor = "cursor",
-  x = 110,
-  y = -100,
+  x = 84,
+  y = -72,
   -- Heavy damage shows it at full strength for heavy_hold seconds: a crit,
   -- a crushing blow, or burst_hits hits within burst_window seconds.
   burst_hits = 4,

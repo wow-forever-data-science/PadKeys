@@ -1,6 +1,6 @@
 -- Your totems above right of the pointer, over the tracked buffs
 -- (Config.lua, readout.totems): one small icon per totem that is down,
--- side by side outside the G radial, each draining with its time left and
+-- side by side outside the swing ring, each draining with its time left and
 -- the seconds on it. Gone when none are down.
 --
 -- The time comes as a duration object (GetTotemDuration) into a Cooldown
