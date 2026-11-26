@@ -623,12 +623,14 @@ about a third of its size. The modifier you press with G picks the radial:
   town; extra"` under `ring` in `PadKeys_Radial/Config.lua`). Any page
   works there.
 - **The town page** (resting, not fighting) is town errands, one ring
-  of fixed entries: Consumabuddy east (when it's loaded), then minimap
-  tracking you switch on or off: repair north-east, class trainer north,
-  profession trainers north-west, general goods west, mailbox south-west,
-  banker south, auctioneer south-east. Tracking that's off shows grey.
-  Edit `town`: segments can also be a macro, a main-menu entry or your
-  professions (examples in the comments).
+  of fixed entries: Consumabuddy east (when it's loaded); **town
+  tracking** north-east, one segment for all of it (repair, trainers,
+  general goods, mailbox, banker, auctioneer): on if any is off, else all
+  off, grey while off; Dungeon Finder north, PvP north-west, guild west,
+  calendar south-west, profession book south, collections (mounts, pets)
+  south-east. Edit `town`: segments can also be a single tracking, a
+  macro, another main-menu entry or your professions (examples in the
+  comments).
   Only G changes; Cmd, Shift and Ctrl+G always open the same radial.
 - **Two rings on G**: the action page on the inner ring, the consumables
   on an outer ring. A short flick picks from the inner ring; past about
@@ -1109,11 +1111,13 @@ is loaded.
 
 34. **Town page**: a new file, so restart the client first. In a city or
     an inn, out of combat with no enemy targeted, hold G: one ring with
-    Consumabuddy east and town tracking around it, no consumables
-    outside. Flick east: Consumabuddy opens. Flick north-east: repairers
-    show on the minimap and the icon turns from grey to colour; again
-    turns it off. A missing segment means the minimap names it
-    differently: send
+    Consumabuddy east, town tracking north-east and Blizzard windows
+    around it, no consumables outside. Flick east: Consumabuddy opens.
+    Flick north-east: repairers, trainers, vendors, mailboxes, bankers and
+    auctioneers show on the minimap, and the icon turns from grey to
+    colour; again turns them all off. Hover shows how many are on (e.g.
+    6/6). Flick north: the Dungeon Finder opens. If fewer trackings than
+    you expect come on, the minimap names them differently: send
     `/run for i=1,C_Minimap.GetNumTrackingTypes() do print(C_Minimap.GetTrackingInfo(i).name) end`.
     Leave the city: G opens Action Bar 7 with food outside again. If G
     still opens Bar 7 in a city, the client may not know `[resting]`:
