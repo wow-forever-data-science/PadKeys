@@ -22,6 +22,7 @@ ns.config.fade = {
   --     not_full     out of combat, your health or mana isn't full
   --     group_hurt   out of combat, someone in your party isn't at full health
   --     talents      you have talent points to spend
+  --     typing       a chat line is being typed
   -- - flash_on: game events that show it for flash_for seconds, then it
   --   fades again (e.g. PLAYER_XP_UPDATE as you gain experience).
   -- Hovering a group always shows it too.
@@ -72,6 +73,28 @@ ns.config.fade = {
       "SecondaryStatusTrackingBarContainer",
       flash_on = { "PLAYER_XP_UPDATE", "UPDATE_FACTION" },
       flash_for = 4,
+    },
+    -- Chat: shown out of combat and while you type; in combat it fades,
+    -- and comes back for flash_for seconds on whispers, party, raid and
+    -- instance chat, raid warnings and what bosses say, yell or emote.
+    -- Raid warnings and boss emotes also show in the middle of the
+    -- screen (Blizzard's own frames, never faded). Hover to read it.
+    chat = {
+      "ChatFrame1", "ChatFrame2", "ChatFrame3", "ChatFrame4", "ChatFrame5",
+      "ChatFrame6", "ChatFrame7", "ChatFrame8", "ChatFrame9", "ChatFrame10",
+      "GeneralDockManager", "ChatFrameMenuButton", "ChatFrameChannelButton",
+      "ChatFrameToggleVoiceDeafenButton", "ChatFrameToggleVoiceMuteButton",
+      "QuickJoinToastButton",
+      show_when = { "no_combat", "typing" },
+      flash_on = {
+        "CHAT_MSG_WHISPER", "CHAT_MSG_BN_WHISPER",
+        "CHAT_MSG_PARTY", "CHAT_MSG_PARTY_LEADER",
+        "CHAT_MSG_RAID", "CHAT_MSG_RAID_LEADER", "CHAT_MSG_RAID_WARNING",
+        "CHAT_MSG_INSTANCE_CHAT", "CHAT_MSG_INSTANCE_CHAT_LEADER",
+        "CHAT_MSG_RAID_BOSS_EMOTE", "CHAT_MSG_RAID_BOSS_WHISPER",
+        "CHAT_MSG_MONSTER_YELL", "CHAT_MSG_MONSTER_SAY",
+      },
+      flash_for = 8,
     },
     -- The quest tracker, for a few seconds as you take a quest or an
     -- objective moves.

@@ -2,9 +2,10 @@
 -- opens it (Config.lua):
 --
 -- * main (G): one of the pages below, picked by a macro condition
---   (main_pick: Action Bar 6 in combat, Action Bar 7 out of it), with the
---   consumables (items) as a second, outer ring (main_outer): flick
---   further to pick from it;
+--   (main_pick: Action Bar 6 in combat, the town page while resting,
+--   Action Bar 7 otherwise), with the consumables (items) as a second,
+--   outer ring (main_outer; not on the town page): flick further to pick
+--   from it;
 -- * actions: Action Bar 6, slots 1-8 (drag spells, items, macros there);
 -- * extra: Action Bar 7, slots 1-8, the same way;
 -- * third (Cmd+G): Action Bar 8, slots 1-8, the same way;
@@ -13,7 +14,8 @@
 --   turned with the mouse wheel while it is open;
 -- * items: consumables from your bags (Items.lua), one set in combat
 --   and another out of it, picked by a macro condition; G's outer ring,
---   or a page of its own on any key bound to it.
+--   or a page of its own on any key bound to it;
+-- * town: your professions and their windows (Town.lua), fixed entries.
 --
 -- Everything runs through the secure button, so it works in combat and
 -- nothing it opens is tainted. The pick happens in a restricted snippet: on
@@ -41,6 +43,7 @@ local TITLES = {
   markers = "Target markers",
   menu = FRAME_LABEL_MAIN_MENU or MAINMENU_BUTTON,
   items = "Items",
+  town = "Town",
 }
 
 -- Runs in the restricted environment: self = the ring button, owner = the
@@ -57,7 +60,8 @@ local ON_CLICK = [[
       main_page = SecureCmdOptionParse(self:GetAttribute("main-pick") or "") or ""
     end
     button = main_page or ""
-    outer = self:GetAttribute("main-outer") and true or false
+    -- The town page is one ring: nothing to drink or eat in a city.
+    outer = self:GetAttribute("main-outer") and button ~= "town" and true or false
   end
   if down then
     origin_x, origin_y = owner:GetMousePosition()
@@ -329,6 +333,12 @@ local ENTRIES = {
   end,
 }
 
+-- For Town.lua: a page of fixed entries, named by its key in main_pick.
+function ns.ring_add_page(name, title, entries)
+  ENTRIES[name] = entries
+  TITLES[name] = title
+end
+
 -- For Ghost.lua and Lights.lua: the page "main" stands for now, a page's
 -- entries, the action slot behind a segment, and the wheel.
 function ns.ring_page(page)
@@ -406,6 +416,7 @@ button:HookScript("OnClick", function(_, page, down)
   end
   local two_rings = page == "main" and ring_config().main_outer and true or false
   page = ns.ring_page(page)
+  two_rings = two_rings and page ~= "town"
   shown_page = page
   if page == "menu" then
     wheel:open(TITLES.menu)
@@ -431,6 +442,8 @@ button:HookScript("OnClick", function(_, page, down)
       wheel.label:SetText("Put spells, items or macros on Action Bar 8")
     elseif page == "items" then
       wheel.label:SetText("None of this set's items are in your bags")
+    elseif page == "town" then
+      wheel.label:SetText("No profession of the town list known")
     end
   end
 end)

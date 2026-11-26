@@ -65,22 +65,27 @@ local function icon_of(handler)
   return icons.up, false
 end
 
+-- The wheel entry for a menu name ("bags"), or nil.
+function ns.menu_entry(name)
+  local handlers = GamepadRadial and GamepadRadial.segmentOptions or {}
+  local handler = name and handlers[name]
+  if not (handler and ns.menu_macro(name)) then
+    return nil
+  end
+  local icon, desaturate = icon_of(handler)
+  return {
+    icon = icon,
+    desaturate = desaturate,
+    label = handler:GetLabel(),
+    enabled = handler:IsEnabled(),
+  }
+end
+
 -- Wheel entries for one menu page.
 function ns.menu_entries(page)
-  local handlers = GamepadRadial and GamepadRadial.segmentOptions or {}
   local entries = {}
   for i = 1, ns.wheel_segments do
-    local name = ns.config.radial.menu.pages[page][i]
-    local handler = name and handlers[name]
-    if handler and ns.menu_macro(name) then
-      local icon, desaturate = icon_of(handler)
-      entries[i] = {
-        icon = icon,
-        desaturate = desaturate,
-        label = handler:GetLabel(),
-        enabled = handler:IsEnabled(),
-      }
-    end
+    entries[i] = ns.menu_entry(ns.config.radial.menu.pages[page][i])
   end
   return entries
 end
