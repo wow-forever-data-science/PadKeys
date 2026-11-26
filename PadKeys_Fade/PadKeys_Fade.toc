@@ -1,6 +1,6 @@
 ## Interface: 11507, 16001
 ## Title: PadKeys - Fade
-## Notes: Fades Blizzard's bars, menus, unit frames, experience bar and quest tracker out until you need them (mouseover, combat, a target, loot, experience), with a label on each bar naming its PadKeys key. Needs PadKeys.
+## Notes: Fades Blizzard's bars, menus, unit frames, experience bar and quest tracker out until you need them (mouseover, combat, a target, loot, experience), with a label on each bar naming its PadKeys key; switches between your healer and other Edit Mode layouts by role. Needs PadKeys.
 ## Author: wow-forever-data-science
 ## Version: 0.1.0
 ## Dependencies: PadKeys
@@ -8,3 +8,4 @@
 
 Config.lua
 Fade.lua
+Roles.lua

@@ -12,5 +12,6 @@ Menu.lua
 Ring.lua
 Town.lua
 Items.lua
+QuestItems.lua
 Lights.lua
 Ghost.lua

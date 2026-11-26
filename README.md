@@ -326,6 +326,13 @@ PadKeys_Fade keeps Blizzard's frames and makes them invisible instead:
     emotes also show mid-screen as always;
   - your **buffs** only on mouseover (PadKeys_Portrait shows your stance,
     form, aspect or aura).
+- **Group frames by role**: make two Edit Mode layouts, `Healer` (party
+  and raid frames bottom centre) and `Damage` (at the left), and pick one
+  once. From then on the layout follows your role out of combat: the role
+  you hold in the group, else your talents (most points in Holy,
+  Discipline or Restoration is healing). A chat line says when it
+  switches. Any other layout, or one you pick by hand, is left alone
+  until your role changes. `roles` in `Config.lua`.
 - **Hold `\`** and everything fades in; let go and it fades out again.
 - **Edit Mode** shows everything, labels included.
 
@@ -651,7 +658,10 @@ in combat and another out of it:
   potion east, Limited Invulnerability Potion north-east, Swiftness
   Potion north, Free Action Potion north-west, bandage west, mana potion
   south-west, healthstone south, healing potion south-east.
-- **Out of combat**: drink, food, Hearthstone, bandage.
+- **Out of combat**: drink, food, Hearthstone, bandage, and west, while
+  you carry quest items with a Use:, **quest items**: it opens the bags
+  holding them (all of them with Combined Bags on). In any open bag
+  those items pulse with a gold border, however you opened it.
 
 Each segment takes the best one you carry: the first of its list in your
 bags (Major before Superior before Greater…), or for drink, food and
@@ -1112,6 +1122,16 @@ is loaded.
 35. **Chat**: start a fight: chat fades. Have someone whisper you or
     write in party or raid: chat shows for 8 seconds. Press Enter to type:
     it shows while you type. Leave combat: it stays.
+36. **Roles**: new files, so restart the client. Make Edit Mode layouts
+    `Healer` and `Damage` and pick one. As a healer (Holy, Discipline or
+    Restoration talents, or the healer role in a group) the layout turns
+    `Healer` within a second or two, with a chat line; respec or take the
+    damage role: `Damage`. If nothing happens, send
+    `/run local l=C_EditMode.GetLayouts() print(l.activeLayout, #l.layouts, l.layouts[1] and l.layouts[1].layoutName)`.
+37. **Quest items**: carry a quest item you can use (right-click to use).
+    Out of combat away from a city, hold G and flick far west: the bag
+    with it opens and the item pulses gold. Open your bags with B: it
+    pulses too. Without such an item the segment is empty.
 
 Known risks:
 - The buff reminder reads auras by name out of combat. If a list stays
