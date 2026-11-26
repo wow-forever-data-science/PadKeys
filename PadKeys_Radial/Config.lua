@@ -119,26 +119,35 @@ ns.config.radial = {
     },
   },
 
-  -- The town page (Town.lua): G while resting. Eight segments, east then
-  -- counter-clockwise; false leaves one empty. A segment is a list of
-  -- spell names, best first: the first you know that no earlier segment
-  -- took, cast to open its window. { menu = "bags" } opens a main-menu
-  -- entry instead (the names under menu.pages below). Mailboxes, banks
-  -- and auctioneers are people and objects you walk up to, so they aren't
-  -- here: PadKeys_Cursor handles their windows.
+  -- The town page (Town.lua): G while resting, for town errands. Eight
+  -- segments, east then counter-clockwise; false leaves one empty. Each
+  -- is one of:
+  --   { track = { "Repair" } }  switch that minimap tracking on or off
+  --                             (names as the minimap's tracking menu
+  --                             shows them; the first it offers is used;
+  --                             grey while off)
+  --   { macro = "/cbuddy", label = "Consumabuddy", icon = ...,
+  --     addon = "Consumabuddy" } run a macro, only with that addon loaded
+  --   { menu = "professions" }  a main-menu entry (names under menu.pages)
+  --   { "Tailoring", ... }      the first spell you know that no earlier
+  --                             segment took (a profession's window)
+  -- Mailboxes, banks and vendors are people and objects you walk up to;
+  -- tracking finds them, and PadKeys_Cursor handles their windows.
   town = {
-    -- E and NE: your two crafting professions.
-    { "Alchemy", "Blacksmithing", "Engineering", "Leatherworking",
-      "Tailoring", "Enchanting", "Jewelcrafting" },
-    { "Alchemy", "Blacksmithing", "Engineering", "Leatherworking",
-      "Tailoring", "Enchanting", "Jewelcrafting" },
-    { "Cooking" },                         -- N
-    { "First Aid" },                       -- NW
-    { "Smelting", "Poisons" },             -- W
-    { "Disenchant", "Basic Campfire" },    -- SW
-    { menu = "professions" },              -- S: the profession book
-    { menu = "bags" },                     -- SE
+    { macro = "/cbuddy", label = "Consumabuddy", addon = "Consumabuddy",
+      icon = "Interface\\Icons\\INV_Potion_93" },                 -- E
+    { track = { "Repair" } },                                       -- NE
+    { track = { "Class Trainer", "Trainer" } },                     -- N
+    { track = { "Profession Trainers", "Profession Trainer" } },    -- NW
+    { track = { "General Goods", "Food & Drink" } },                -- W
+    { track = { "Mailbox" } },                                      -- SW
+    { track = { "Banker" } },                                       -- S
+    { track = { "Auctioneer" } },                                   -- SE
   },
+  -- Your professions, if you want them there instead, e.g.
+  --   { "Alchemy", "Blacksmithing", "Engineering", "Leatherworking",
+  --     "Tailoring", "Enchanting" }, { "Cooking" }, { "First Aid" },
+  --   { menu = "professions" }
 
   -- A faint copy of the wheels that follows the mouse (Ghost.lua): each
   -- page in `rings` as a ring of small icons around the cursor, the first

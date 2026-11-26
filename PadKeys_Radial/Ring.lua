@@ -15,7 +15,8 @@
 -- * items: consumables from your bags (Items.lua), one set in combat
 --   and another out of it, picked by a macro condition; G's outer ring,
 --   or a page of its own on any key bound to it;
--- * town: your professions and their windows (Town.lua), fixed entries.
+-- * town: town errands (Town.lua), fixed entries: Consumabuddy, minimap
+--   town tracking, professions.
 --
 -- Everything runs through the secure button, so it works in combat and
 -- nothing it opens is tainted. The pick happens in a restricted snippet: on
@@ -443,7 +444,7 @@ button:HookScript("OnClick", function(_, page, down)
     elseif page == "items" then
       wheel.label:SetText("None of this set's items are in your bags")
     elseif page == "town" then
-      wheel.label:SetText("No profession of the town list known")
+      wheel.label:SetText("None of the town list is here (tracking names?)")
     end
   end
 end)
