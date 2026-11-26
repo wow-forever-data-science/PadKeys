@@ -4,13 +4,14 @@ local ns = PadKeys
 
 ns.config.ready = {
   -- Where it flashes. "cursor": above the mouse pointer, just outside
-  -- the G radial (its icon's centre x, y from the pointer, positive y is
-  -- up; the name above it). "center": x, y from the middle of the screen
-  -- (PadKeys_NotReady flashes at the middle itself), e.g. y = 70.
+  -- the swing ring (PadKeys_Readout; its icon's centre x, y from the
+  -- pointer, positive y is up; the name above it). "center": x, y from
+  -- the middle of the screen (PadKeys_NotReady flashes at the middle
+  -- itself), e.g. y = 70.
   anchor = "cursor",
-  size = 36,
+  size = 72,
   x = 0,
-  y = 108,
+  y = 82,
   -- Seconds the icon stays at full strength, then seconds to fade out.
   hold = 0.5,
   fade_out = 0.8,

@@ -62,6 +62,22 @@ ns.config.combat.buffs = {
   -- so it shows the short ones (LongBuffs.lua).
   hide_long_in_combat = true,
 
+  -- Buffs to keep an eye on: always on the bar out of combat (also while
+  -- resting) with their time left on the bottom right and stacks on the
+  -- top right, while you carry the item or have the buff. Red when the
+  -- buff is missing (click to use the item), yellow under warn_at.
+  -- `buff` and `item` are parts of names, any case. leveling = true: only
+  -- below the level cap.
+  -- The sleeping bag's names are guesses until checked in game: with the
+  -- buff on, this prints your buffs' names, spell IDs and stacks:
+  -- /run for i=1,40 do local a=C_UnitAuras.GetAuraDataByIndex("player",i)
+  --   if a then print(a.name,a.spellId,a.applications) end end
+  -- (one line in the chat box).
+  watch = {
+    { label = "Sleeping bag", buff = { "Sleeping Bag", "Well Rested", "Cozy" },
+      item = { "Sleeping Bag" }, leveling = true },
+  },
+
   -- Supplies, as grey icons with a count, out of combat.
   supplies = {
     ammo_low = 200,        -- arrows or bullets in the ammo slot; 0 is off

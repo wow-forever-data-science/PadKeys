@@ -1,6 +1,6 @@
 ## Interface: 11507, 16001
 ## Title: PadKeys - Readout
-## Notes: Beside the mouse: a ring for your cast (green for heals, yellow while a listed buff outlasts it) and the global cooldown, your big cooldowns that are ready, your pet when it is in trouble, boss abilities from Blizzard's encounter timeline as they come close, your tracked buffs from the Cooldown Manager, your debuffs and your totems. Needs PadKeys.
+## Notes: Beside the mouse: a ring for your cast (green for heals, yellow while a listed buff outlasts it) and the global cooldown, a swing timer ring around it, your big cooldowns that are ready, your pet when it is in trouble, boss abilities from Blizzard's encounter timeline as they come close, your tracked buffs from the Cooldown Manager, your debuffs and your totems. Needs PadKeys.
 ## Author: wow-forever-data-science
 ## Version: 0.1.0
 ## Dependencies: PadKeys
@@ -9,6 +9,7 @@
 Config.lua
 Readout.lua
 Ring.lua
+Swing.lua
 Big.lua
 Pet.lua
 Dock.lua

@@ -1,5 +1,5 @@
 -- The opposite of PadKeys_NotReady: a spell flashes above the mouse
--- pointer (outside the G radial; or above the middle of the screen) as it
+-- pointer (just outside the swing ring; or above the middle of the screen) as it
 -- becomes ready, so you see it at the moment you can use it.
 --
 -- - Reactive abilities (Config.lua: Overpower, Revenge, Execute, ...)

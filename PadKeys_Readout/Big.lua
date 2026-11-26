@@ -1,5 +1,5 @@
 -- Your big cooldowns that are ready, right of the pointer (Config.lua,
--- readout.big): self-buffs, trinkets, impactful spells. A column of icons,
+-- readout.big): self-buffs, trinkets, impactful spells. A row of icons,
 -- one per spell or item on your action bars (hidden bars count) whose
 -- cooldown is long and isn't running. Each pops in as it comes back and
 -- goes as you use it. Only while fighting, by default.
@@ -92,12 +92,17 @@ for i = 1, b.max or 4 do
   icons[i] = f
 end
 
--- Centred on the pointer's height, top to bottom in action-bar order.
+-- In action-bar order: a row growing right from x, y (b.grow "right"),
+-- or a column centred on the pointer's height, top to bottom.
 local function place(count)
   local height = count * size + math.max(count - 1, 0) * gap
   for i, f in ipairs(icons) do
     f:ClearAllPoints()
-    f:SetPoint("TOPLEFT", column, "LEFT", 0, height / 2 - (i - 1) * (size + gap))
+    if b.grow == "down" then
+      f:SetPoint("TOPLEFT", column, "LEFT", 0, height / 2 - (i - 1) * (size + gap))
+    else
+      f:SetPoint("LEFT", column, "LEFT", (i - 1) * (size + gap), 0)
+    end
   end
 end
 

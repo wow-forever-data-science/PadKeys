@@ -46,7 +46,7 @@ error points at one part:
 | **PadKeys_Combat** | "Combat" / "Out of Combat" fades in the middle of the screen as you enter and leave combat, in white; out of combat, a list of missing or expiring long buffs for your class and group | PadKeys |
 | **PadKeys_CombatText** | Small combat text: your hits scroll beside the target's nameplate with the spell's icon; the hits you take show lower right of the mouse, fading in as your health drops (earlier as a tank) and fully on heavy damage | PadKeys |
 | **PadKeys_Ready** | A spell flashes above the mouse as it becomes ready: reactive abilities (Overpower, Revenge, Execute, Riposte, ...) as they light up, and long cooldowns (30 s or more) as they come back, in combat | PadKeys |
-| **PadKeys_Readout** | Beside the mouse: a ring that fills with your cast (blue, green for heals, or glowing yellow while a listed buff outlasts it) and the global cooldown, your big cooldowns that are ready, your debuffs, your totems, and boss abilities from Blizzard's encounter timeline as they come close | PadKeys |
+| **PadKeys_Readout** | Beside the mouse: a ring that fills with your cast (blue, green for heals, or glowing yellow while a listed buff outlasts it) and the global cooldown, a swing timer ring around it, your big cooldowns that are ready, your debuffs, your totems, and boss abilities from Blizzard's encounter timeline as they come close | PadKeys |
 | **PadKeys_NotReady** | Pressing a key or using an item that is still on cooldown flashes its icon and the time left in the middle of the screen, fading out over a second | PadKeys |
 | **PadKeys_Cooldowns** | Blizzard's Cooldown Manager (cooldowns, buff icons, buff bars) in the PadKeys look: black borders, grey tints, the countdown without a swipe | PadKeys |
 | **PadKeys_Totems** | Blizzard's totem bar in the PadKeys look: black borders, no gold or element frames | PadKeys |
@@ -432,6 +432,11 @@ combat (`fade_in`).
   worn item, with its own icon and its durability %, and your free bag
   slots; yellow under 30% and under 3 slots (`supplies.always = false`
   shows them only then). Limits and lists are under `supplies`.
+- **Watched buffs**, also always (and in inns and cities): the sleeping
+  bag's buff while you carry the bag or have the buff, below the level
+  cap: its time left bottom right, its stacks top right; red while
+  missing (click to use the bag), yellow under 5 minutes. Add others
+  under `watch`.
   Your pet in trouble in combat shows at the mouse (PadKeys_Readout).
 
 What it lists depends on your class and who is in your party or raid:
@@ -507,7 +512,7 @@ position and timings are in `PadKeys_NotReady/Config.lua`.
 ## Ready flash (PadKeys_Ready)
 
 The opposite of the not-ready flash: a spell's icon and name pop up above
-the mouse pointer, just outside the G radial, as it becomes ready, then
+the mouse pointer, just outside the swing ring, as it becomes ready, then
 fade out. `anchor = "center"` puts it above the middle of the screen.
 
 - **Reactive abilities** flash as they light up: Overpower after a dodge,
@@ -539,10 +544,16 @@ What changes fast, beside the mouse pointer, only while it matters:
   - out of a cast, the **global cooldown** fills it faintly, in combat;
   - hits you take no longer flash it red: they show lower right of the
     mouse (PadKeys_CombatText). `ring.hits = true` brings the flash back;
-Everything else sits outside the G radial (about 84 px from the
-pointer), so holding G never covers it:
+- a **swing ring** just outside it: a thin ring that fills from one auto
+  attack to the next, white for melee, orange for Auto Shot (the client's
+  own swing timer, `PLAYER_SWING`). Its faint track stays on all through
+  combat and is the line everything else sits on.
 
-- your **big cooldowns that are ready**, to the right: a column of icons
+Everything else sits right outside the swing ring (about 44 px from the
+pointer), at about twice its old size; holding G covers it while the
+wheel is open:
+
+- your **big cooldowns that are ready**, to the right: a row of icons
   for self-buffs, trinkets and impactful spells, one per spell or item
   on any action bar (hidden bars count, so put trinkets on one) whose
   cooldown is a minute or longer and isn't running. Each pops in as it
@@ -570,7 +581,7 @@ pointer), so holding G never covers it:
 - your **totems**, above right over the tracked buffs (timers running on
   you, like them): one small icon per totem that is down, draining
   with its time left and the seconds on it; gone when none are down;
-- your **tracked buffs**, above right, a bit smaller: Blizzard's Cooldown Manager buff
+- your **tracked buffs**, above right: Blizzard's Cooldown Manager buff
   icons ("Tracked Buffs") follow the pointer, each while the buff is on
   you, with its time left. Pick them in the Cooldown Manager's options
   (e.g. Rapid Fire and Quick Shots for a hunter). Blizzard reads the
@@ -1089,7 +1100,7 @@ is loaded.
     with the buff's ID.
 30. **Big cooldowns**: put a spell with a cooldown of a minute or more
     (and a trinket you can use) on any bar. Use each once, then target a
-    mob: their icons show in a column right of the pointer. Use one: it
+    mob: their icons show in a row right of the pointer. Use one: it
     goes, and pops back in when its cooldown ends. Out of mana, its icon
     is dimmed. With no enemy targeted out of combat, nothing shows.
 31. **Pet**: as a hunter or warlock, fight with your pet: nothing shows
@@ -1136,6 +1147,26 @@ is loaded.
     Out of combat away from a city, hold G and flick far west: the bag
     with it opens and the item pulses gold. Open your bags with B: it
     pulses too. Without such an item the segment is empty.
+
+**Stage 17: cursor readout closer, swing timer, sleeping bag**
+
+38. **Swing ring**: new files, so restart the client first. In combat a
+    faint thin circle sits just outside the cast ring all the time. Melee
+    a mob: a white ring fills around it from one swing to the next. As a
+    hunter, Auto Shot fills it orange. If it never fills, send
+    `/run print(C_SwingTimer and "yes" or "no")`.
+39. **Closer, bigger icons**: in combat, the big cooldowns (a row to the
+    right), tracked buffs and totems (upper right), boss rows (upper
+    left), debuffs (left) and the pet (below) sit right against the swing
+    ring, about twice as big as before. Holding G covers them. If they
+    overlap each other, say which ones; the places are in
+    `PadKeys_Readout/Config.lua`.
+40. **Sleeping bag**: on a character below the level cap carrying the
+    sleeping bag, out of combat: the buff bar always shows its icon, red
+    while the buff is missing (click it to use the bag), with the time
+    left on the bottom right and the stacks on the top right once it is
+    on; yellow under 5 minutes. If nothing shows, send the line under
+    `watch` in `PadKeys_Combat/Config.lua` with the buff on.
 
 Known risks:
 - The buff reminder reads auras by name out of combat. If a list stays
