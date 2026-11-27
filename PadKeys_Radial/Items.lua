@@ -16,7 +16,10 @@
 --
 -- Item counts and cooldowns are only read for display; a secret one is
 -- never compared (the cooldown goes to SetCooldown in a pcall, the count
--- to SetText).
+-- to SetText). A bag item's cooldown numbers are secret in combat and
+-- have no duration object, so an item that is also on an action bar
+-- (a hidden one is fine) takes that slot's duration object, which shows
+-- in combat too. Whether it is cooling is the plain isActive flag.
 
 local ns = PadKeys
 local button = ns.ring_button
@@ -183,17 +186,54 @@ end
 
 -- --- The wheel --------------------------------------------------------------
 
+local ab = C_ActionBar
+local MAX_ACTION_SLOT = 180
+
+-- The action slot holding each item, found once and kept until the bars
+-- change; false for none.
+local slot_of = {}
+local function action_slot(id)
+  if slot_of[id] == nil then
+    slot_of[id] = false
+    for slot = 1, MAX_ACTION_SLOT do
+      local ok, kind, action_id = pcall(GetActionInfo, slot)
+      if ok and kind == "item" and action_id == id then
+        slot_of[id] = slot
+        break
+      end
+    end
+  end
+  return slot_of[id]
+end
+
+-- The cooldown to draw and whether the item is cooling: the action
+-- slot's duration object, else the bag item's numbers (refused by the
+-- widget in combat) with C_Spell.GetItemCooldown's isActive.
+local function item_cooldown(id)
+  local slot = action_slot(id)
+  if slot then
+    local cd = ab.GetActionCooldown(slot)
+    local cooling = ns.cooling(cd) and true or false
+    return cooling and ab.GetActionCooldownDuration(slot, true) or nil, cooling
+  end
+  local start, duration = C_Container.GetItemCooldown(id)
+  local ok, info = pcall(C_Spell.GetItemCooldown, id)
+  local cooling = false
+  if ok and info then
+    cooling = info.isActive and true or false
+  elseif duration and not is_secret(duration) and not is_secret(start) then
+    cooling = duration > 1.5
+  end
+  return { start, duration }, cooling
+end
+
 local function entry(item)
   if item.quest then
     return { icon = GetItemIcon(item.id), label = item.name, enabled = true,
              count = item.quest }
   end
   local count = GetItemCount(item.id)
-  local start, duration = C_Container.GetItemCooldown(item.id)
-  local cooling = false
-  if duration and not is_secret(duration) and not is_secret(start) then
-    cooling = duration > 1.5
-  end
+  local cooldown, cooling = item_cooldown(item.id)
   local usable, no_mana = IsUsableItem(item.id)
   local tint = 1
   if is_secret(usable) then
@@ -205,7 +245,7 @@ local function entry(item)
     icon = GetItemIcon(item.id),
     label = item.name,
     enabled = true,
-    cooldown = { start, duration },
+    cooldown = cooldown,
     cooling = cooling,
     tint = tint,
     count = count,
@@ -227,11 +267,15 @@ end
 local events = CreateFrame("Frame")
 for _, event in ipairs({ "PLAYER_LOGIN", "BAG_UPDATE_DELAYED",
                          "PLAYER_LEVEL_UP", "PLAYER_REGEN_ENABLED",
-                         "GET_ITEM_INFO_RECEIVED" }) do
+                         "GET_ITEM_INFO_RECEIVED", "ACTIONBAR_SLOT_CHANGED" }) do
   events:RegisterEvent(event)
 end
 local pending = false
 events:SetScript("OnEvent", function(self, event)
+  if event == "ACTIONBAR_SLOT_CHANGED" then
+    wipe(slot_of)
+    return
+  end
   if (event == "PLAYER_REGEN_ENABLED" and not dirty) or
      (event == "GET_ITEM_INFO_RECEIVED" and not incomplete) then
     return

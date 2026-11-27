@@ -726,14 +726,17 @@ A segment **lights up** when its moment comes: on the faint copy it shows
 at full strength with a white frame, and on the open wheel its slice
 glows. By default:
 
-- the **healing potion** (south-east) under 35% health and the
+- the **healing potion** (south-east) under 60% health and the
   **healthstone** (south) under 50%, and both for 3 seconds after heavy
-  damage; the **mana potion** (south-west) under 25% mana;
+  damage; the **mana potion** (south-west) under 25% mana. A lit item
+  shows on cooldown too, greyed with a dark swipe and the seconds left;
+  in combat the seconds need the item on an action bar as well (a hidden
+  one is fine), as a bag item's cooldown is secret there;
 - on Action Bar 6: **slot 6** (south-west, a mana spell) under 25% mana;
   **slot 7** (south, heal your pet) while your pet is under 35% or just
   took heavy damage, or with no pet out like the healthstone, for a
   second heal or defensive of your own; and **slot 8** (south-east, your
-  own heal or defensive) like the healing potion.
+  own heal or defensive) under 35% health or after heavy damage.
 
 **In combat G follows the readouts at the mouse**, so a readout lighting
 up points at the slice that answers it. Each side has one theme: the top
@@ -1248,6 +1251,11 @@ is loaded.
     ring, about 22 px from the pointer. With no tracked buff on, the
     totems sit at the ring's upper right; when a tracked buff shows they
     move up above it. If two groups overlap, say which.
+52. **Potion at 60%, on cooldown too**: in combat, drop under 60%
+    health: the healing potion shows lower right of the mouse. Drink it,
+    stay under 60%: it stays, greyed with a dark swipe. With the potion
+    also on an action bar (a hidden one), the seconds left show on it in
+    combat; without, only out of combat.
 
 Known risks:
 - The buff reminder reads auras by name out of combat. If a list stays
