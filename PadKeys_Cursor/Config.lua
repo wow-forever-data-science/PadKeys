@@ -111,4 +111,7 @@ ns.config.quest = {
   -- The quest you just accepted goes to the top of the quest tracker
   -- (Quests.lua); the rest keep their order. Not the quest log window.
   newest_first = true,
+  -- So does a quest whose objective just moved (a looted quest item, a
+  -- kill), tracked if it wasn't.
+  progress_first = true,
 }
