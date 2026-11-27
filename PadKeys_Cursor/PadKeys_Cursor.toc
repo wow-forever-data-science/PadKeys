@@ -12,3 +12,4 @@ Dialogs.lua
 Services.lua
 Professions.lua
 Auctions.lua
+Quests.lua

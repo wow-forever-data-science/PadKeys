@@ -108,4 +108,7 @@ ns.config.quest = {
   -- click the entry under the cursor, or Accept / Continue / Complete.
   -- Same key as Interact.
   step = { "F" },
+  -- The quest you just accepted goes to the top of the quest tracker
+  -- (Quests.lua); the rest keep their order. Not the quest log window.
+  newest_first = true,
 }

@@ -322,7 +322,8 @@ PadKeys_Fade keeps Blizzard's frames and makes them invisible instead:
     combat, or while someone is hurt;
   - the **experience and reputation bars** for 4 seconds as they change;
   - the **quest tracker** for 5 seconds as you take a quest or an
-    objective moves;
+    objective moves. The quest you just took goes to its top
+    (PadKeys_Cursor, `quest.newest_first`);
   - **chat** out of combat and while you type. In combat it fades, and
     comes back for 8 seconds on a whisper, party, raid or instance chat, a
     raid warning, or a boss's emote, yell or speech. Raid warnings and boss
@@ -1312,6 +1313,11 @@ is loaded.
     doesn't start, and Space (jump) or F does nothing to the popup; click
     Accept yourself. Delete an item: the popup still takes the cursor on
     its text field.
+62. **Newest quest on top**: accept a quest: it shows first in the quest
+    tracker, the others below in their old order. If it lands elsewhere,
+    or the tracker flickers or errors, say what you see;
+    `quest.newest_first = false` in `PadKeys_Cursor/Config.lua` turns it
+    off.
 
 Known risks:
 - The buff reminder reads auras by name out of combat. If a list stays
