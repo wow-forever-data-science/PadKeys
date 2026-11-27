@@ -6,7 +6,7 @@ ns.config.readout = {
   -- A ring around the mouse pointer (Ring.lua), empty most of the time.
   ring = {
     enabled = true,
-    size = 56,           -- pixels across
+    size = 28,           -- pixels across
     track_alpha = 0.25,  -- the grey track under the fill, while it fills
     -- true: the colour grows round the ring as time passes (fills up);
     -- false: it shrinks (drains).
@@ -62,7 +62,7 @@ ns.config.readout = {
   -- line the icons below sit on.
   swing = {
     enabled = true,
-    size = 76,           -- pixels across; the cast ring is 56
+    size = 76,           -- pixels across; the cast ring is 28
     alpha = 0.85,
     track = "combat",
     track_alpha = 0.2,
