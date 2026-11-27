@@ -592,6 +592,16 @@ function ns.bag_item_named(part)
 end
 
 local AMMO_SLOT = 0
+-- Classes that can fire a bow, gun or crossbow.
+local AMMO_CLASSES = { HUNTER = true, ROGUE = true, WARRIOR = true }
+
+-- The ammo you have equipped, or nil: slot 0 is checked for an ammo
+-- item, as the slot is not ammo for every class on this client.
+local function equipped_ammo()
+  local id = GetInventoryItemID("player", AMMO_SLOT)
+  local _, _, _, equip_loc = C_Item.GetItemInfoInstant(id or 0)
+  return equip_loc == "INVTYPE_AMMO" and id or nil
+end
 local CALL_PET, REVIVE_PET = 883, 982
 
 -- Ammo, reagents, durability, bag space and your pet: out of combat only.
@@ -603,9 +613,8 @@ local function supply_rows(rows, my_class)
   local counts = bag_counts()
 
   -- Ammo: what is in the ammo slot, counted across your bags.
-  if s.ammo_low and s.ammo_low > 0 then
-    local ammo = GetInventoryItemID("player", AMMO_SLOT)
-    if ammo then
+  if s.ammo_low and s.ammo_low > 0 and AMMO_CLASSES[my_class] then
+    if equipped_ammo() then
       local n = GetInventoryItemCount("player", AMMO_SLOT) or 0
       if n < s.ammo_low then
         rows[#rows + 1] = { icon = GetInventoryItemTexture("player", AMMO_SLOT),
@@ -916,7 +925,9 @@ local function button(i)
   local b = CreateFrame("Button", "PadKeysBuffReminderButton" .. i, bar,
                         "SecureActionButtonTemplate")
   b:SetSize(ICON, ICON)
-  b:RegisterForClicks("LeftButtonUp")
+  -- Down and up: the secure template acts on the one ActionButtonUseKeyDown
+  -- picks, so an up-only click does nothing while that is on.
+  b:RegisterForClicks("LeftButtonDown", "LeftButtonUp")
   b.edge = b:CreateTexture(nil, "BACKGROUND")
   b.edge:SetPoint("TOPLEFT", -2, 2)
   b.edge:SetPoint("BOTTOMRIGHT", 2, -2)
