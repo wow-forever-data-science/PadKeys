@@ -506,7 +506,7 @@ the health points of both curves and `tank = true / false` are in
 
 Press a key whose spell or item is still on cooldown (or out of charges),
 or use such an item from your bags, and its icon flashes above your
-the screen with the time left on it, then fades out over a second. Another
+character (under the combat banner) with the time left on it, then fades out over a second. Another
 press on cooldown, of the same key or another, replaces it at once. The
 global cooldown alone flashes nothing.
 
