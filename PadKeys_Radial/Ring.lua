@@ -147,8 +147,24 @@ local wheel = ns.create_wheel("PadKeysRingRadial")
 -- For Items.lua, which sets the items page's segments.
 ns.ring_button = button
 
+-- Blizzard's action bar that starts at each first slot, as Edit Mode
+-- names it.
+local BAR_NAMES = {
+  [1] = "Action Bar 1", [61] = "Action Bar 2", [49] = "Action Bar 3",
+  [25] = "Action Bar 4", [37] = "Action Bar 5", [145] = "Action Bar 6",
+  [157] = "Action Bar 7", [169] = "Action Bar 8",
+}
+
 local function ring_config()
   return ns.config.radial.ring
+end
+
+-- The action bar a page shows, or nil for a page that isn't one.
+local function bar_name(page)
+  local config = ring_config()
+  local first = ({ actions = config.first_slot, extra = config.extra_first_slot,
+                   third = config.third_first_slot })[page]
+  return first and (BAR_NAMES[first] or format("slots %d-%d", first, first + 11))
 end
 
 -- What each segment does, as attributes of its button name ("markers1").
@@ -432,18 +448,15 @@ button:HookScript("OnClick", function(_, page, down)
   if not entries then
     return
   end
-  wheel:open(TITLES[page])
+  local bar = bar_name(page)
+  wheel:open(bar and format("%s \194\183 %s", TITLES[page], bar) or TITLES[page])
   wheel.two_rings = two_rings and page ~= "items"
   wheel:set_entries(entries_for(page))
   wheel:set_page(1, 1)
   show_lights(page)
   if not next(wheel.entries) then
-    if page == "actions" then
-      wheel.label:SetText("Put spells, items or macros on Action Bar 6")
-    elseif page == "extra" then
-      wheel.label:SetText("Put spells, items or macros on Action Bar 7")
-    elseif page == "third" then
-      wheel.label:SetText("Put spells, items or macros on Action Bar 8")
+    if bar then
+      wheel.label:SetText("Put spells, items or macros on " .. bar)
     elseif page == "items" then
       wheel.label:SetText("None of this set's items are in your bags")
     elseif page == "town" then

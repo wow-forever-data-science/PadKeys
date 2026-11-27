@@ -646,6 +646,9 @@ about a third of its size. The modifier you press with G picks the radial:
 | Shift+G | Target markers on your target, skull at the top | yes |
 | Ctrl+G | Blizzard's main-menu entries, three pages | yes |
 
+- **The title names the bar**: an action page's title says which bar to
+  fill, e.g. "Actions · Action Bar 6", "More actions · Action Bar 7",
+  "Even more actions · Action Bar 8" (from the first slots in `ring`).
 - **G follows the fight**: which page it opens is a macro condition,
   read on press (`main_pick = "[combat][harm,nodead] actions; [resting]
   town; extra"` under `ring` in `PadKeys_Radial/Config.lua`). Any page
@@ -1228,6 +1231,10 @@ is loaded.
     on cooldown flashes nothing, send
     `/run local c=C_ActionBar.GetActionCooldown(SLOT) print(c.isActive, c.isEnabled, c.isOnGCD)`
     with its action slot.
+49. **Bar in the radial title**: hold G out of combat: the title reads
+    "More actions · Action Bar 7"; target an enemy: "Actions · Action Bar
+    6"; Cmd+G: "Even more actions · Action Bar 8". The town page,
+    markers and main menu keep their plain titles.
 
 Known risks:
 - The buff reminder reads auras by name out of combat. If a list stays
