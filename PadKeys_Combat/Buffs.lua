@@ -592,6 +592,10 @@ function ns.bag_item_named(part)
   return fallback
 end
 
+local function is_secret(v)
+  return issecretvalue and issecretvalue(v)
+end
+
 local AMMO_SLOT = 0
 -- Classes that can fire a bow, gun or crossbow.
 local AMMO_CLASSES = { HUNTER = true, ROGUE = true, WARRIOR = true }
@@ -663,6 +667,25 @@ local function supply_rows(rows, my_class)
                             label = dead and "Pet dead" or "No pet",
                             missing = { "you" }, click = click }
       end
+    end
+  end
+
+  -- Your pet under full health: its percent on your pet heal's icon,
+  -- click to heal it (Mend Pet, Health Funnel). Health is plain out of
+  -- combat, when this bar shows; a secret one is skipped.
+  local heal = (s.pet_heal or {})[my_class]
+  if heal and knows(heal) and UnitExists("pet") and not UnitIsDead("pet") then
+    local ok, cur, max = pcall(function()
+      return UnitHealth("pet"), UnitHealthMax("pet")
+    end)
+    if ok and cur and max and not is_secret(cur) and not is_secret(max) and
+       max > 0 and cur < max then
+      rows[#rows + 1] = {
+        icon = spell_icon(heal), label = "Pet health",
+        count = format("%d%%", cur / max * 100), supply = true, warn = true,
+        missing = {},
+        click = { type = "spell", spell = spell_name(heal), unit = "pet" },
+      }
     end
   end
 end

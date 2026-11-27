@@ -425,12 +425,13 @@ combat (`fade_in`).
 - **Click** an icon to fix it: a group buff you cast goes on whoever needs
   it first (click again for the next), your own buff on you, a consumable
   is used, a sharpening stone or oil goes on your main hand, a rogue's
-  poison on its weapon (`poison_main`, `poison_off`), the pet is called or
-  revived. Hover for its name and who is missing it.
+  poison on its weapon (`poison_main`, `poison_off`), the pet is called,
+  revived or healed. Hover for its name and who is missing it.
 - **Supplies**: ammo under 200, reagents for spells you know (soul shards,
   poisons and Flash Powder, Sacred Candles, Arcane Powder and Runes of
   Teleportation, Wild Thornroot, Symbols of Kings, an Ankh), and for hunters and
-  warlocks no pet or a dead one.
+  warlocks no pet or a dead one, or a pet under full health: its percent
+  on Mend Pet's (Health Funnel's) icon, click to heal it (`pet_heal`).
 - **Always**, at the end of the bar (also in inns and cities): your most
   worn item, with its own icon and its durability %, and your free bag
   slots; yellow under 30% and under 3 slots (`supplies.always = false`
@@ -1280,6 +1281,10 @@ is loaded.
     once it is above 35%, also while Mend Pet still heals. Kill a mob and
     keep it targeted, out of combat: the big cooldowns right of the
     mouse go.
+57. **Pet health on the buff bar**: as a hunter out of combat in the
+    wild, with your pet under full health: a yellow Mend Pet icon with
+    its health (e.g. 62%); click it: Mend Pet casts on the pet, and the
+    icon goes at full health. Not in an inn or a city.
 
 Known risks:
 - The buff reminder reads auras by name out of combat. If a list stays
