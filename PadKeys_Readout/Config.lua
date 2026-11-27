@@ -220,4 +220,10 @@ ns.config.readout = {
   y = -80,
   -- Slightly rounded corners, as on the PadKeys bar; false for square.
   rounded = true,
+
+  -- Hide the mouse pointer over the open world, so the ring is your
+  -- pointer. The game takes the pointer back all the time, so it is set
+  -- blank again every frame and may flicker; over a window, a mob or NPC,
+  -- dragging or targeting a spell, the game's own pointer shows. Try it.
+  hide_cursor = true,
 }
