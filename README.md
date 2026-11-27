@@ -1190,6 +1190,12 @@ is loaded.
     time. If nothing flashes during the buff, send
     `/run local c=C_ActionBar.GetActionCooldown(SLOT) print(c.isEnabled, c.isActive)`
     with its action slot.
+43. **Buff bar click, no ammo for casters**: as a shaman without
+    Lightning Shield, out of combat: click its icon on the buff bar, it
+    casts and the icon goes. If nothing casts, hover it and send
+    `/run local b=GetMouseFoci()[1] print(b:GetName(), b:GetAttribute("type"), b:GetAttribute("spell"), GetCVar("ActionButtonUseKeyDown"))`.
+    No ammo icon shows on a shaman, mage, priest, warlock, druid or
+    paladin; a hunter with under 200 arrows still sees one.
 
 Known risks:
 - The buff reminder reads auras by name out of combat. If a list stays
