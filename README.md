@@ -322,8 +322,9 @@ PadKeys_Fade keeps Blizzard's frames and makes them invisible instead:
     combat, or while someone is hurt;
   - the **experience and reputation bars** for 4 seconds as they change;
   - the **quest tracker** for 5 seconds as you take a quest or an
-    objective moves. The quest you just took goes to its top
-    (PadKeys_Cursor, `quest.newest_first`);
+    objective moves. The quest you just took, or whose objective just
+    moved, goes to its top, tracked if it wasn't (PadKeys_Cursor,
+    `quest.newest_first`, `quest.progress_first`);
   - **chat** out of combat and while you type. In combat it fades, and
     comes back for 8 seconds on a whisper, party, raid or instance chat, a
     raid warning, or a boss's emote, yell or speech. Raid warnings and boss
@@ -1324,6 +1325,10 @@ is loaded.
     under 35% (or take a crit): no portrait below the mouse; the Mend Pet
     icon there shows with a pulsing red frame instead. Heal it above 35%:
     it goes.
+64. **Progressed quest on top**: loot a quest item for a quest lower in
+    the tracker (or untracked): the tracker flashes with that quest
+    first. If the tracker flickers on every update or errors, say what
+    you see; `quest.progress_first = false` turns it off.
 
 Known risks:
 - The buff reminder reads auras by name out of combat. If a list stays
