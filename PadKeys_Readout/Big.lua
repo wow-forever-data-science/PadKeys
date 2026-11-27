@@ -12,9 +12,10 @@
 -- learned is saved (PadKeysDB.big_cooldowns), so it is known after a
 -- /reload. big.names adds names before they were ever seen.
 --
--- Consumables (potions, healthstones, food) never count, though their
--- cooldown is long: the G ring's copy at the mouse lights them when they
--- matter (PadKeys_Radial). Trinkets and other worn items still do.
+-- Items count only while you wear them (trinkets): items in your bags
+-- with a long cooldown (potions, a sleeping bag) never do, and the G
+-- ring's copy at the mouse lights the potions when they matter
+-- (PadKeys_Radial).
 --
 -- Racial spells (big.racials) always count, whatever their cooldown, and
 -- come first in the row: they are what to press first in a fight. A
@@ -117,8 +118,6 @@ end
 
 -- --- What is on the bars ----------------------------------------------------
 
-local CONSUMABLE = Enum and Enum.ItemClass and Enum.ItemClass.Consumable or 0
-
 local function what(action)
   local ok, kind, id = pcall(GetActionInfo, action)
   if not ok or is_secret(kind) or is_secret(id) or not id then
@@ -129,9 +128,8 @@ local function what(action)
     name = C_Spell and C_Spell.GetSpellName and C_Spell.GetSpellName(id) or
            (GetSpellInfo and GetSpellInfo(id))
   elseif kind == "item" then
-    local get_info = C_Item and C_Item.GetItemInfoInstant or GetItemInfoInstant
-    local class_id = get_info and select(6, get_info(id))
-    if class_id == CONSUMABLE and not b.consumables then
+    local worn = C_Item and C_Item.IsEquippedItem or IsEquippedItem
+    if not b.bag_items and worn and not worn(id) then
       return nil
     end
     name = C_Item and C_Item.GetItemNameByID and C_Item.GetItemNameByID(id) or
