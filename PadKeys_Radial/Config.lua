@@ -179,10 +179,11 @@ ns.config.radial = {
     show = "lit",
     alpha = 1,          -- the whole copy
     idle_alpha = 0.25,  -- an icon that isn't lit
-    icon_scale = 0.8,   -- against the wheel's icons; outer rings are
+    icon_scale = 1.6,   -- against the wheel's icons (about 32 px, as big
+                        -- as the readout's icons); outer rings are
                         -- spaced by outer_spacing above, as on the wheel
     fade = 0.2,         -- seconds to fade in or out
-    countdown_size = 11, -- seconds left on an icon on cooldown
+    countdown_size = 13, -- seconds left on an icon on cooldown
   },
 
   -- Lit segments, on the wheels and their faint copy, per page and
