@@ -101,10 +101,10 @@ ns.config.readout = {
     y = 0,
     only_when_fighting = true,  -- in combat or with an enemy targeted
     names = {},           -- e.g. { "Recklessness", "Innervate" }
-    -- Potions, healthstones and other consumables are left out: the G
-    -- ring's copy at the mouse lights them by health and mana. true
-    -- counts them again.
-    consumables = false,
+    -- Items only while worn (trinkets): potions, a sleeping bag and other
+    -- items in your bags are left out (the G ring's copy at the mouse
+    -- lights the potions by health). true counts bag items again.
+    bag_items = false,
     -- Never shown, racials too (full names, any case): no use in a fight.
     ignore = {
       "Hearthstone",
