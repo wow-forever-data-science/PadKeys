@@ -578,7 +578,9 @@ while the wheel is open:
   row, whatever their cooldown: they are for pressing early in a fight
   (`big.racials`). They too must be on an action bar. Racials of no use
   in a fight (Find Treasure, Find Ley Line, Walk on Air) and Hearthstone
-  never show (`big.ignore`);
+  never show (`big.ignore`), nor do potions and other consumables: the
+  lit consumables ring shows them when your health or mana is low
+  (`big.consumables`);
 - **boss abilities** from Blizzard's encounter timeline, upper left:
   each one as the timeline highlights it (a few seconds before it lands),
   with its icon, countdown and name to its left, up to three at once,
@@ -1256,6 +1258,9 @@ is loaded.
     stay under 60%: it stays, greyed with a dark swipe. With the potion
     also on an action bar (a hidden one), the seconds left show on it in
     combat; without, only out of combat.
+53. **No potions in the big cooldowns**: with healing and mana potions
+    on an action bar, target an enemy out of combat at full health and
+    mana: no potion shows right of the mouse. Trinkets still do.
 
 Known risks:
 - The buff reminder reads auras by name out of combat. If a list stays
