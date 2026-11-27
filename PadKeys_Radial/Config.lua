@@ -179,9 +179,11 @@ ns.config.radial = {
     show = "lit",
     alpha = 1,          -- the whole copy
     idle_alpha = 0.25,  -- an icon that isn't lit
-    icon_scale = 1.6,   -- against the wheel's icons (about 32 px, as big
-                        -- as the readout's icons); outer rings are
-                        -- spaced by outer_spacing above, as on the wheel
+    icon_scale = 1.4,   -- against the wheel's icons (about 28 px; with
+                        -- the 2 px white frame of a lit icon, neighbours
+                        -- on the inner ring, 35 px apart, stay clear);
+                        -- outer rings are spaced by outer_spacing above,
+                        -- as on the wheel
     fade = 0.2,         -- seconds to fade in or out
     countdown_size = 13, -- seconds left on an icon on cooldown
   },
