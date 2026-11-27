@@ -605,11 +605,14 @@ while the wheel is open:
 - your **totems**, above right over the tracked buffs (timers running on
   you, like them): one small icon per totem that is down, draining
   with its time left and the seconds on it; gone when none are down.
-  With no tracked buff showing they take the buffs' corner on the ring;
+  They join the tracked buffs' line, right after the last one showing
+  (or take the buffs' corner on the ring while none shows);
 - your **tracked buffs**, above right: Blizzard's Cooldown Manager buff
   icons ("Tracked Buffs") follow the pointer, each while the buff is on
   you, with its time left. Pick them in the Cooldown Manager's options
-  (e.g. Rapid Fire and Quick Shots for a hunter). Blizzard reads the
+  (e.g. Rapid Fire and Quick Shots for a hunter). For one line growing
+  right, set Tracked Buffs to horizontal with enough icons per row in
+  Edit Mode (the layout belongs to `wow-settings`). Blizzard reads the
   buffs, so this works in combat; PadKeys only moves the icons, and Edit
   Mode still shows them where Blizzard keeps them.
 
@@ -1256,7 +1259,8 @@ is loaded.
     ready and a totem down: every group sits right outside the swing
     ring, about 22 px from the pointer. With no tracked buff on, the
     totems sit at the ring's upper right; when a tracked buff shows they
-    move up above it. If two groups overlap, say which.
+    move to its right, on the same line. If two groups overlap, say
+    which.
 52. **Potion at 60%, on cooldown too**: in combat, drop under 60%
     health: the healing potion shows lower right of the mouse. Drink it,
     stay under 60%: it stays, greyed with a dark swipe. With the potion

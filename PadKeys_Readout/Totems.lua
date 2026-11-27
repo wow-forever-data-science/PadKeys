@@ -1,10 +1,11 @@
 -- Your totems above right of the pointer, over the tracked buffs
 -- (Config.lua, readout.totems): one small icon per totem that is down,
 -- side by side outside the swing ring, each draining with its time left and
--- the seconds on it. Gone when none are down. With no tracked buff
--- showing they take the buffs' corner on the swing ring instead of
--- floating above it (above_buffs): the tracked buffs' top is read from
--- their frame, a plain value.
+-- the seconds on it. Gone when none are down. They join the tracked
+-- buffs' line (beside_buffs): right after the last tracked buff showing,
+-- on its bottom edge, or at the buffs' corner on the swing ring while
+-- none shows. The buff icons' edges are read from their frames, plain
+-- values.
 --
 -- The time comes as a duration object (GetTotemDuration) into a Cooldown
 -- frame's SetCooldownFromDurationObject, the icon from GetTotemInfo into
@@ -104,31 +105,35 @@ local function update()
   end
 end
 
--- Whether a frame has a shown descendant within `depth` levels: an empty
+-- The right and bottom edges of the tracked buff icons showing, around
+-- the readout's centre in its scale; nil while none shows. An empty
 -- Cooldown Manager viewer stays shown with its icons hidden.
-local function any_shown(frame, depth)
-  for _, child in ipairs({ frame:GetChildren() }) do
-    if child:IsShown() and (depth <= 1 or child:GetNumChildren() == 0 or
-                            any_shown(child, depth - 1)) then
-      return true
+local function buffs_edge(viewer)
+  local right, bottom
+  local s = viewer:GetEffectiveScale() / readout:GetEffectiveScale()
+  local cx, cy = readout:GetCenter()
+  for _, icon in ipairs({ viewer:GetChildren() }) do
+    if icon:IsShown() and icon:GetRight() then
+      local r, b = icon:GetRight() * s - cx, icon:GetBottom() * s - cy
+      right = math.max(right or r, r)
+      bottom = math.min(bottom or b, b)
     end
   end
-  return false
+  return right, bottom
 end
 
--- Just above the tracked buffs while one shows, else at x, y.
-local viewer = c.buffs and t.above_buffs and BuffIconCooldownViewer
+-- Right after the last tracked buff while one shows, else at x, y.
+local viewer = c.buffs and t.beside_buffs and BuffIconCooldownViewer
 local function place()
-  local y = t.y or 96
-  if viewer and viewer:IsVisible() and any_shown(viewer, 2) then
-    local top = viewer:GetTop()
-    local _, cy = readout:GetCenter()
-    if top and cy then
-      y = top * viewer:GetEffectiveScale() / readout:GetEffectiveScale() - cy + gap
+  local x, y = t.x or 62, t.y or 96
+  if viewer and viewer:IsVisible() then
+    local right, bottom = buffs_edge(viewer)
+    if right then
+      x, y = right + gap, bottom
     end
   end
   row:ClearAllPoints()
-  row:SetPoint(point, readout, "CENTER", t.x or 62, y)
+  row:SetPoint(point, readout, "CENTER", x, y)
 end
 
 -- Placed again while a totem shows: the tracked buffs come and go on
