@@ -458,7 +458,7 @@ What it lists depends on your class and who is in your party or raid:
   left. Members who are offline, dead or out of sight are skipped. For
   blessings it counts only yours.
 - **Your own buffs**: mage armor, warlock armor, Inner Fire, Omen of
-  Clarity, Trueshot Aura, and poisons on a rogue's weapons, once you know
+  Clarity, Trueshot Aura, Aspect of the Hawk, and poisons on a rogue's weapons, once you know
   the spell.
 
 In combat, the reminder turns on Blizzard's buff consolidation
@@ -607,6 +607,12 @@ while the wheel is open:
   with its time left and the seconds on it; gone when none are down.
   They join the tracked buffs' line, right after the last one showing
   (or take the buffs' corner on the ring while none shows);
+- a **buff you need that is missing**, in combat, just above the
+  pointer: its icon with a red frame, e.g. Aspect of the Hawk for a
+  hunter (`missing`). Buffs are secret in combat, so what is on you is
+  read as combat starts and followed by your own casts (casting another
+  aspect replaces the hawk); out of combat the buff bar shows it, click
+  to cast;
 - your **tracked buffs**, above right: Blizzard's Cooldown Manager buff
   icons ("Tracked Buffs") follow the pointer, each while the buff is on
   you, with its time left. Pick them in the Cooldown Manager's options
@@ -1289,6 +1295,11 @@ is loaded.
     wild, with your pet under full health: a yellow Mend Pet icon with
     its health (e.g. 62%); click it: Mend Pet casts on the pet, and the
     icon goes at full health. Not in an inn or a city.
+58. **Aspect of the Hawk missing**: as a hunter out of combat without
+    the hawk: a red Aspect of the Hawk icon on the buff bar; click it:
+    it casts, the icon goes. In combat, cast Aspect of the Cheetah: a
+    red-framed hawk icon shows just above the mouse; cast the hawk: it
+    goes.
 
 Known risks:
 - The buff reminder reads auras by name out of combat. If a list stays

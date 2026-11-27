@@ -12,7 +12,7 @@
 -- - if you can cast one yourself, every member in the group who is missing
 --   it (or has under 5 minutes left), by name;
 -- - your own class buffs (mage and warlock armor, Inner Fire, Omen of
---   Clarity, Trueshot Aura, Lightning Shield) and, for rogues and shamans,
+--   Clarity, Trueshot Aura, Aspect of the Hawk, Lightning Shield) and, for rogues and shamans,
 --   poisons or an imbue on your weapons;
 -- - consumables in your bags whose buff you don't have: elixirs, flasks,
 --   scrolls, food that makes you Well Fed, and sharpening stones or oils
@@ -59,6 +59,7 @@ local BUFFS = {
   { key = "inner_fire", class = "PRIEST", spells = { 588 } },
   { key = "omen", class = "DRUID", spells = { 16864 } },
   { key = "trueshot", class = "HUNTER", spells = { 19506 } },
+  { key = "aspect_hawk", class = "HUNTER", spells = { 13165 } },
   { key = "poisons", class = "ROGUE", weapon = true, spells = { 2842 } },
   { key = "lightning_shield", class = "SHAMAN", spells = { 324 } },
   -- Rockbiter lasts 5 minutes, so it warns under 1 minute.

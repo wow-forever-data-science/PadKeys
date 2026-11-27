@@ -163,6 +163,26 @@ ns.config.readout = {
     countdown_size = 12,
   },
 
+  -- A buff you need that is missing, in combat, just above the pointer
+  -- (Missing.lua): its icon with a red frame. Per class: `spell` the buff
+  -- to have, `group` the buffs that replace each other (any rank). Buffs
+  -- are secret in combat: what is on you is read as combat starts and
+  -- followed by your own casts. Out of combat the buff bar shows it.
+  missing = {
+    enabled = true,
+    size = 29,
+    point = "BOTTOM",    -- the icon's point placed at x, y from the pointer
+    x = 0,
+    y = 22,
+    buffs = {
+      HUNTER = {
+        spell = 13165,   -- Aspect of the Hawk
+        group = { 13165, 13163, 5118, 13159, 20043, 13161 },  -- Hawk, Monkey,
+                         -- Cheetah, Pack, Wild, Beast
+      },
+    },
+  },
+
   -- Your target's cast or channel beside the mouse: its icon draining,
   -- and its name. Off: the big cooldowns took its place, and nameplates
   -- show casts too. true shows it above right of the pointer again.
