@@ -178,40 +178,11 @@ end
 
 -- --- Driver -----------------------------------------------------------------
 
--- The mouse pointer hidden over the open world (c.hide_cursor), so the
--- ring is the pointer: a blank image through SetCursor, set again every
--- frame as the game takes the pointer back. Over a window, a mob or NPC,
--- with something on the cursor or a spell waiting for a target, the
--- game's own pointer stays, with what it tells you (attack, loot, talk).
-local BLANK = "Interface\\AddOns\\PadKeys_Readout\\Media\\Blank"
-local blanked = false
-
-local function over_world()
-  local focus = GetMouseFoci and GetMouseFoci()[1] or
-                (GetMouseFocus and GetMouseFocus())
-  return focus == WorldFrame or focus == nil
-end
-
-local function update_cursor()
-  local hide = over_world() and not UnitExists("mouseover") and
-               not GetCursorInfo() and not SpellIsTargeting()
-  if hide then
-    SetCursor(BLANK)
-    blanked = true
-  elseif blanked then
-    SetCursor(nil)
-    blanked = false
-  end
-end
-
 -- Follows the mouse; while you turn with the mouse the pointer is hidden,
 -- so it stays where the pointer was.
 frame:SetScript("OnUpdate", function(self)
   if IsMouselooking and IsMouselooking() then
     return
-  end
-  if c.hide_cursor then
-    pcall(update_cursor)
   end
   local x, y = GetCursorPosition()
   local scale = UIParent:GetEffectiveScale()

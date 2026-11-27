@@ -623,10 +623,7 @@ while the wheel is open:
   Mode still shows them where Blizzard keeps them.
 
 While you turn with the right mouse button the pointer is hidden, so the
-readout stays where it was. `hide_cursor` (on, to try) hides the pointer over
-the open world so the ring is your pointer; over a window, a mob or NPC,
-while dragging or targeting a spell, the game's pointer shows as usual.
-It may flicker, as the game keeps taking the pointer back. Times, names and icons are secret in combat
+readout stays where it was. Times, names and icons are secret in combat
 and during encounters; they go straight from Blizzard's duration objects
 and info into the widgets, never compared. Whether Classic raids and
 dungeons on Forever fill Blizzard's encounter timeline isn't known yet:
@@ -1308,10 +1305,6 @@ is loaded.
     durability and bag space, grey over 200, yellow under. If it never
     shows, send
     `/run local id=GetInventoryItemID("player",0) print(id, id and select(4,C_Item.GetItemInfoInstant(id)))`.
-60. **Hidden pointer**: move the mouse over the ground: no arrow, only
-    the ring. Point at a mob: the attack pointer shows; at a window: the
-    normal arrow; drag a spell: it shows. If the arrow flickers or a
-    pointer goes missing, say where; `hide_cursor = false` turns it off.
 
 Known risks:
 - The buff reminder reads auras by name out of combat. If a list stays
