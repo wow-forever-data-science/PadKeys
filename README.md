@@ -437,8 +437,9 @@ combat (`fade_in`).
 - **Watched buffs**, also always (and in inns and cities): the sleeping
   bag's buff while you carry the bag or have the buff, below the level
   cap: its time left bottom right (45m, then 30s), its stacks top right; red while
-  missing (click to use the bag), yellow under 5 minutes. Add others
-  under `watch`.
+  missing (click to use the bag), yellow under 5 minutes; and the
+  campfire's Cozy Fire while you know Basic Campfire (click lights one).
+  Add others under `watch`.
   Your pet in trouble in combat shows at the mouse (PadKeys_Readout).
 
 What it lists depends on your class and who is in your party or raid:
@@ -1206,6 +1207,10 @@ is loaded.
     empties. If a line points at nothing or misses a group, say which;
     if no line ever shows, send
     `/run print(PadKeysReadout.CreateLine ~= nil, PadKeysReadoutBig ~= nil)`.
+46. **Campfire**: out of combat in the wild, with Basic Campfire known:
+    a red campfire icon on the buff bar; click it (with Simple Wood and
+    Flint and Tinder) and stand by the fire: it turns grey. If it stays red by the fire, send the `watch` line in
+    `PadKeys_Combat/Config.lua` with the buff on.
 44. **No bars while resting**: walk into an inn or a city: the PadKeys
     bar and the totem bar fade out; hover where they are and they come
     back; walk out and they fade in. If one stays, send

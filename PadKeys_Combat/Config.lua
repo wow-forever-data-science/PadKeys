@@ -67,8 +67,9 @@ ns.config.combat.buffs = {
   -- resting) with their time left on the bottom right and stacks on the
   -- top right, while you carry the item or have the buff. Red when the
   -- buff is missing (click to use the item), yellow under warn_at.
-  -- `buff` and `item` are parts of names, any case. leveling = true: only
-  -- below the level cap.
+  -- `buff` and `item` are parts of names, any case; `spell` a spell ID,
+  -- shown while you know it (click casts it). leveling = true: only below
+  -- the level cap.
   -- The sleeping bag's buff is "Well-Rested" (checked in game). To check
   -- another buff's name, with it on, this prints your buffs' names, spell
   -- IDs and stacks:
@@ -78,6 +79,8 @@ ns.config.combat.buffs = {
   watch = {
     { label = "Sleeping bag", buff = { "Well-Rested" },
       item = { "Sleeping Bag" }, leveling = true },
+    -- Basic Campfire (cooking) and its Cozy Fire buff.
+    { label = "Campfire", buff = { "Cozy Fire" }, spell = 818 },
   },
 
   -- Supplies, as grey icons with a count, out of combat.
