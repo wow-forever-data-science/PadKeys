@@ -434,7 +434,7 @@ combat (`fade_in`).
   shows them only then). Limits and lists are under `supplies`.
 - **Watched buffs**, also always (and in inns and cities): the sleeping
   bag's buff while you carry the bag or have the buff, below the level
-  cap: its time left bottom right, its stacks top right; red while
+  cap: its time left bottom right (45m, then 30s), its stacks top right; red while
   missing (click to use the bag), yellow under 5 minutes. Add others
   under `watch`.
   Your pet in trouble in combat shows at the mouse (PadKeys_Readout).

@@ -24,7 +24,8 @@ ns.config.combat = {
 -- is missing, yellow with a time is running out, grey with a number is a
 -- supply. Click an icon to fix it: the buff is cast on whoever needs it
 -- first, the consumable used, poison put on the weapon, the pet called.
--- Hover for its name and who is missing it (the number on its top right).
+-- Times on an icon are in one unit (2h, 45m, 30s); hover for its name,
+-- the exact time and who is missing it (the number on its top right).
 -- Combat hides it at once; it fades back in as you leave (fade_in).
 ns.config.combat.buffs = {
   enabled = true,

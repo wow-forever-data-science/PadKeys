@@ -225,6 +225,17 @@ local function clock(seconds)
   return format("%d:%02d", math.floor(seconds / 60), seconds % 60)
 end
 
+-- Time left in one unit, short enough for an icon: 2h, 45m, 30s.
+local function short_clock(seconds)
+  seconds = math.max(0, math.floor(seconds))
+  if seconds >= 3600 then
+    return format("%dh", math.floor(seconds / 3600))
+  elseif seconds >= 60 then
+    return format("%dm", math.floor(seconds / 60))
+  end
+  return format("%ds", seconds)
+end
+
 -- --- Rows -------------------------------------------------------------------
 
 -- Each row: { icon, label, missing = { names }, left = seconds, who = name }.
@@ -918,6 +929,11 @@ local function button(i)
   b.text:SetPoint("BOTTOMRIGHT", -1, 2)
   b.badge = ns.text(b, cfg.size - 2, "white", "OVERLAY", "NumberFontNormal")
   b.badge:SetPoint("TOPRIGHT", -1, -2)
+  -- A black outline: the shadow alone is lost on a light icon.
+  for _, fs in ipairs({ b.text, b.badge }) do
+    local font, size = fs:GetFont()
+    fs:SetFont(font, size, "OUTLINE")
+  end
   b:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square", "ADD")
   b:SetScript("OnEnter", on_enter)
   b:SetScript("OnLeave", GameTooltip_Hide)
@@ -960,7 +976,7 @@ local function draw(rows)
     -- Bottom right: a count, or the time left; top right: how many miss it.
     local text = row.count
     if not text and row.left and row.left ~= math.huge then
-      text = clock(row.left)
+      text = short_clock(row.left)
     end
     b.text:SetText(text or "")
     local others = missing > 1 or (missing == 1 and row.missing[1] ~= "you")
