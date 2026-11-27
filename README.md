@@ -831,7 +831,10 @@ it is already on. Where it lands depends on the window:
 - trainer: the next skill you can learn;
 - professions: the first profession tab on the right, to pick one with
   W/S and F; the cursor then moves to its first recipe;
-- popup: its text field or accept button.
+- popup: its text field or accept button. Popups the game raises on its
+  own (a resurrect offer, release spirit, an invite, a duel, a summon, a
+  trade) never take the cursor, so a jump or an interact can't accept
+  them (`popupIgnore`); click them, or Tab to them with the cursor on.
 
 On a recipe, the first F selects it and the second crafts it (the amount
 in Blizzard's box); F on Create / Create All runs them. **Cmd+F** does
@@ -1305,6 +1308,10 @@ is loaded.
     durability and bag space, grey over 200, yellow under. If it never
     shows, send
     `/run local id=GetInventoryItemID("player",0) print(id, id and select(4,C_Item.GetItemInfoInstant(id)))`.
+61. **No accidental res**: die, get a resurrect offer: the cursor
+    doesn't start, and Space (jump) or F does nothing to the popup; click
+    Accept yourself. Delete an item: the popup still takes the cursor on
+    its text field.
 
 Known risks:
 - The buff reminder reads auras by name out of combat. If a list stays
