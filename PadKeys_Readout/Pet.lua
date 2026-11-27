@@ -98,7 +98,7 @@ end
 
 local function update_low()
   if low_curve then
-    local ok, alpha = pcall(UnitHealthPercent, "pet", true, low_curve)
+    local ok, alpha = pcall(UnitHealthPercent, "pet", false, low_curve)
     if ok and pcall(low.SetAlpha, low, alpha) then
       return
     end

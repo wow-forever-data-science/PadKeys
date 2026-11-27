@@ -1275,6 +1275,11 @@ is loaded.
     wild with everyone at full health: the party frames show. Walk into
     a city: they fade out, and come back in combat or when someone is
     hurt.
+56. **Mend Pet and dead mobs**: as a hunter, let your pet drop under
+    35%, Mend Pet it back to full: the Mend Pet slice at the mouse goes
+    once it is above 35%, also while Mend Pet still heals. Kill a mob and
+    keep it targeted, out of combat: the big cooldowns right of the
+    mouse go.
 
 Known risks:
 - The buff reminder reads auras by name out of combat. If a list stays

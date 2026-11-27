@@ -54,6 +54,9 @@ local function step_curve(threshold, on, off)
   return curves[key] or nil
 end
 
+-- Health is read as it is (usePredicted false): a heal on its way
+-- (Mend Pet) pushes the predicted percent over 100%, which the 0-100 half
+-- of the curve would read as under 35% and light the slice.
 local function percent_alpha(kind, threshold, on, off)
   local curve = step_curve(threshold, on, off)
   if not curve then
@@ -61,12 +64,12 @@ local function percent_alpha(kind, threshold, on, off)
   end
   local ok, result
   if kind == "health" then
-    ok, result = pcall(UnitHealthPercent, "player", true, curve)
+    ok, result = pcall(UnitHealthPercent, "player", false, curve)
   elseif kind == "pet" then
     if not UnitExists("pet") or UnitIsDead("pet") then
       return off
     end
-    ok, result = pcall(UnitHealthPercent, "pet", true, curve)
+    ok, result = pcall(UnitHealthPercent, "pet", false, curve)
   else
     -- No mana (a warrior, a rogue): never lit. The maximum is only read
     -- when the client hands it over as a plain number.

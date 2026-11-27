@@ -345,7 +345,7 @@ end
 
 local function update_health_alpha()
   if health_curve and UnitHealthPercent then
-    local ok, alpha = pcall(UnitHealthPercent, "player", true, health_curve)
+    local ok, alpha = pcall(UnitHealthPercent, "player", false, health_curve)
     if ok and pcall(by_health.SetAlpha, by_health, alpha) then
       return
     end
