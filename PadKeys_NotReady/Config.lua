@@ -5,7 +5,7 @@ local ns = PadKeys
 ns.config.not_ready = {
   -- Icon size in pixels, and its offset from the centre of the screen
   -- (positive y is up).
-  size = 64,
+  size = 32,
   x = 0,
   y = 0,
   -- Seconds the icon stays at full strength, then seconds to fade out.
@@ -14,7 +14,7 @@ ns.config.not_ready = {
   fade_out = 1,
   -- The countdown on the icon, and its size.
   countdown = true,
-  countdown_size = 24,
+  countdown_size = 14,
   -- A dark clock-hand shadow over the icon for the time left.
   swipe = true,
   -- Slightly rounded corners, as on the PadKeys bar; false for square.
