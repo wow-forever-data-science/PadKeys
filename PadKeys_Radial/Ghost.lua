@@ -8,7 +8,10 @@
 --
 -- In "lit" mode the copy is always up and each icon's alpha is its light:
 -- a health or mana light is a secret alpha, which SetAlpha takes, so a
--- low-health potion shows by itself in combat too.
+-- low-health potion shows by itself in combat too. A lit icon shows
+-- whether or not it is on cooldown: then greyed, with a dark swipe and
+-- the seconds left (a duration object, or numbers the widget may refuse
+-- in combat, as on the wheel).
 --
 -- It only draws: no mouse, nothing secure. It hides while you turn with
 -- the mouse (the cursor is hidden then) and while a wheel is open.
@@ -50,7 +53,34 @@ local function make_icon(radius_scale, index)
     ns.round(holder, icon, 1)
   end
   ns.icon(icon)
-  return { holder = holder, icon = icon, glow = glow }
+  local cooldown = CreateFrame("Cooldown", nil, holder, "CooldownFrameTemplate")
+  cooldown:SetPoint("TOPLEFT", 1, -1)
+  cooldown:SetPoint("BOTTOMRIGHT", -1, 1)
+  cooldown:SetDrawEdge(false)
+  cooldown:SetDrawBling(false)
+  cooldown:SetSwipeColor(0, 0, 0, 0.6)
+  cooldown:SetHideCountdownNumbers(false)
+  local countdown = cooldown.GetCountdownFontString and
+    cooldown:GetCountdownFontString()
+  if countdown then
+    ns.style(countdown, c.countdown_size or 11)
+  end
+  return { holder = holder, icon = icon, glow = glow, cooldown = cooldown }
+end
+
+-- A duration object, { start, duration } or nil, as Wheel.lua takes it.
+local function set_cooldown(cooldown, duration, cooling)
+  if not cooling then
+    cooldown:Clear()
+  elseif type(duration) == "table" then
+    if not pcall(cooldown.SetCooldown, cooldown, duration[1], duration[2]) then
+      cooldown:Clear()
+    end
+  elseif duration then
+    cooldown:SetCooldownFromDurationObject(duration)
+  else
+    cooldown:Clear()
+  end
 end
 
 for r, page in ipairs(c.rings or { "actions" }) do
@@ -108,6 +138,8 @@ local function update_icons()
         item.icon:SetDesaturated(entry.cooling or ns.config.theme.grey_icons or false)
         item.icon:SetAlpha(ns.light_alpha(ring.page, i, idle, 1))
         item.glow:SetAlpha(ns.light_alpha(ring.page, i, 0, 0.9))
+        set_cooldown(item.cooldown, entry.cooldown, entry.cooling)
+        item.cooldown:SetAlpha(ns.light_alpha(ring.page, i, idle, 1))
         item.holder:Show()
       else
         item.holder:Hide()

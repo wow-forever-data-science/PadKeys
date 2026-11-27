@@ -182,6 +182,7 @@ ns.config.radial = {
     icon_scale = 0.8,   -- against the wheel's icons; outer rings are
                         -- spaced by outer_spacing above, as on the wheel
     fade = 0.2,         -- seconds to fade in or out
+    countdown_size = 11, -- seconds left on an icon on cooldown
   },
 
   -- Lit segments, on the wheels and their faint copy, per page and
@@ -233,7 +234,7 @@ ns.config.radial = {
       fight = {
         [6] = { mana = 0.25 },                -- mana potion, south-west
         [7] = { health = 0.5, hits = true },  -- healthstone, south
-        [8] = { health = 0.35, hits = true }, -- healing potion, south-east
+        [8] = { health = 0.6, hits = true },  -- healing potion, south-east
       },
     },
   },
