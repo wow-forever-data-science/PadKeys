@@ -993,15 +993,27 @@ ns.cursor_take = take_cursor
 -- (professions) belong to Blizzard addons that load later, so this runs
 -- again on every ADDON_LOADED; such a window can already be open by then
 -- (the first visit loads it while it opens), so take the cursor now.
+--
+-- A popup the game raises on its own (popupIgnore: a resurrect offer,
+-- release spirit, an invite) never takes the cursor: it would land on
+-- Accept, and Space or F for a jump or an interact would click it.
 local hooked = {}
+local function take_unless_ignored(frame)
+  local which = frame.which
+  if which and tContains(ns.config.cursor.popupIgnore or {}, which) then
+    return
+  end
+  take_cursor(frame)
+end
+
 local function hook_auto_frames()
   for _, name in ipairs(ns.config.cursor.autoFrames or {}) do
     local frame = _G[name]
     if frame and frame.HookScript and not hooked[frame] then
       hooked[frame] = true
-      frame:HookScript("OnShow", take_cursor)
+      frame:HookScript("OnShow", take_unless_ignored)
       if frame:IsVisible() then
-        take_cursor(frame)
+        take_unless_ignored(frame)
       end
     end
   end

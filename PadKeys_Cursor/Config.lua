@@ -72,6 +72,15 @@ ns.config.cursor = {
   -- lands on Search, and its sell tab on Create Auction, or on the item
   -- slot while there is nothing to post (Auctions.lua). A greyed-out button
   -- is skipped.
+  -- Popups the game raises on its own never take the cursor, as it would
+  -- land on Accept (or Release Spirit) and Space or F, pressed to jump or
+  -- interact, would click it. Names are Blizzard's StaticPopup keys.
+  popupIgnore = {
+    "RESURRECT", "RESURRECT_NO_SICKNESS", "RESURRECT_NO_TIMER",
+    "DEATH", "RECOVER_CORPSE", "RECOVER_CORPSE_INSTANCE", "AREA_SPIRIT_HEAL",
+    "PARTY_INVITE", "PARTY_INVITE_XREALM", "GUILD_INVITE", "DUEL_REQUESTED",
+    "CONFIRM_SUMMON", "TRADE",
+  },
   autoFocus = {
     AuctionHouseFrame = { "ItemSellFrame.PostButton",
                           "CommoditiesSellFrame.PostButton",
