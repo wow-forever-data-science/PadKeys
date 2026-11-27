@@ -41,7 +41,7 @@ error points at one part:
 | **PadKeys_Targeting** | Party/raid cycling (Ctrl+Tab), F that attacks in combat, and ally mode (\`) where F targets the ally you face, or in a raid picks a raid frame with the mouse | PadKeys |
 | **PadKeys_Radial** | Radials: actions with consumables on an outer ring (G, by combat), Bar 8 (Cmd+G), markers (Shift+G), main menu (Ctrl+G) | PadKeys |
 | **PadKeys_Bar** | One bar that shows the layer you hold (Cmd, Shift, Option, Ctrl) | PadKeys (SpellActivationOverlay optional, for its proc glows) |
-| **PadKeys_Fade** | Blizzard's action bars, micro menu, bags, player, pet and party frames, experience and reputation bars, quest tracker and chat fade out until you need them (mouseover, a dragged spell, combat, a target, regenerating, talent points, loot, experience gained; chat fades in combat but comes back for whispers, group and raid chat and boss text); each bar is labelled with its PadKeys key (Cmd, Shift, G wheel) | PadKeys |
+| **PadKeys_Fade** | Blizzard's action bars, micro menu, the PadKeys and totem bars (hidden while resting), bags, player, pet and party frames, experience and reputation bars, quest tracker and chat fade out until you need them (mouseover, a dragged spell, combat, a target, regenerating, talent points, loot, experience gained; chat fades in combat but comes back for whispers, group and raid chat and boss text); each bar is labelled with its PadKeys key (Cmd, Shift, G wheel) | PadKeys |
 | **PadKeys_Look** | Every font in the game in the theme font (Roboto Condensed), and chat windows on a black background | PadKeys |
 | **PadKeys_Combat** | "Combat" / "Out of Combat" fades in the middle of the screen as you enter and leave combat, in white; out of combat, a list of missing or expiring long buffs for your class and group | PadKeys |
 | **PadKeys_CombatText** | Small combat text: your hits scroll beside the target's nameplate with the spell's icon; the hits you take show lower right of the mouse, fading in as your health drops (earlier as a tank) and fully on heavy damage | PadKeys |
@@ -312,6 +312,8 @@ PadKeys_Fade keeps Blizzard's frames and makes them invisible instead:
   drop it.
 - Other frames show by themselves when they matter (`show_when` and
   `flash_on` in `Config.lua`), and on mouseover:
+  - the **PadKeys bar and the totem bar** everywhere but in an inn or a
+    city (in combat there too);
   - the **micro menu** while you have talent points to spend;
   - the **bags** for 3 seconds as loot goes into them;
   - your **player and pet frames** in combat, with a target, or out of
@@ -1196,6 +1198,10 @@ is loaded.
     `/run local b=GetMouseFoci()[1] print(b:GetName(), b:GetAttribute("type"), b:GetAttribute("spell"), GetCVar("ActionButtonUseKeyDown"))`.
     No ammo icon shows on a shaman, mage, priest, warlock, druid or
     paladin; a hunter with under 200 arrows still sees one.
+44. **No bars while resting**: walk into an inn or a city: the PadKeys
+    bar and the totem bar fade out; hover where they are and they come
+    back; walk out and they fade in. If one stays, send
+    `/run print(IsResting(), PadKeysBar:GetAlpha(), MultiCastActionBarFrame and MultiCastActionBarFrame:GetAlpha())`.
 
 Known risks:
 - The buff reminder reads auras by name out of combat. If a list stays

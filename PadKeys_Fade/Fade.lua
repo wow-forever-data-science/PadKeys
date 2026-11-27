@@ -325,6 +325,7 @@ local CONDITIONS = {
   pet = function() return UnitExists("pet") end,
   group = function() return IsInGroup() end,
   resting = function() return IsResting() end,
+  not_resting = function() return not IsResting() end,
   mounted = function() return IsMounted() end,
   not_full = function() return not_full("player", true) end,
   group_hurt = group_hurt,

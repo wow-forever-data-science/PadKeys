@@ -18,6 +18,7 @@ ns.config.fade = {
   --     pet          you have a pet out
   --     group        you are in a party or raid
   --     resting      in an inn or a city
+  --     not_resting  out of an inn or a city
   --     mounted      you are mounted
   --     not_full     out of combat, your health or mana isn't full
   --     group_hurt   out of combat, someone in your party isn't at full health
@@ -38,6 +39,13 @@ ns.config.fade = {
       "MultiBar7",            -- Action Bar 8
       "PetActionBar",
       "StanceBar",
+    },
+    -- The PadKeys bar and the totem bar: hidden while resting in an inn
+    -- or a city (unless you are in combat), shown everywhere else.
+    hud = {
+      "PadKeysBar",
+      "MultiCastActionBarFrame",
+      show_when = { "not_resting", "combat" },
     },
     -- The micro menu, while you have talent points to spend.
     menu = {
