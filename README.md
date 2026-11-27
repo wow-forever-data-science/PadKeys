@@ -438,7 +438,8 @@ combat (`fade_in`).
   bag's buff while you carry the bag or have the buff, below the level
   cap: its time left bottom right (45m, then 30s), its stacks top right; red while
   missing (click to use the bag), yellow under 5 minutes; and the
-  campfire's Cozy Fire while you know Basic Campfire (click lights one).
+  campfire's Cozy Fire while you know Basic Campfire (click lights one);
+  and Well Fed's time left while it is on.
   Add others under `watch`.
   Your pet in trouble in combat shows at the mouse (PadKeys_Readout).
 
@@ -1199,6 +1200,10 @@ is loaded.
     `/run local b=GetMouseFoci()[1] print(b:GetName(), b:GetAttribute("type"), b:GetAttribute("spell"), GetCVar("ActionButtonUseKeyDown"))`.
     No ammo icon shows on a shaman, mage, priest, warlock, druid or
     paladin; a hunter with under 200 arrows still sees one.
+44. **No bars while resting**: walk into an inn or a city: the PadKeys
+    bar and the totem bar fade out; hover where they are and they come
+    back; walk out and they fade in. If one stays, send
+    `/run print(IsResting(), PadKeysBar:GetAlpha(), MultiCastActionBarFrame and MultiCastActionBarFrame:GetAlpha())`.
 45. **Smaller readout, lines**: target a mob with a big cooldown ready,
     a tracked buff on and a debuff on you: the icons at the mouse are
     about two thirds of their old size, and a thin white line runs from
@@ -1209,12 +1214,12 @@ is loaded.
     `/run print(PadKeysReadout.CreateLine ~= nil, PadKeysReadoutBig ~= nil)`.
 46. **Campfire**: out of combat in the wild, with Basic Campfire known:
     a red campfire icon on the buff bar; click it (with Simple Wood and
-    Flint and Tinder) and stand by the fire: it turns grey. If it stays red by the fire, send the `watch` line in
+    Flint and Tinder) and stand by the fire: it turns grey. If it stays
+    red by the fire, send the `watch` line in
     `PadKeys_Combat/Config.lua` with the buff on.
-44. **No bars while resting**: walk into an inn or a city: the PadKeys
-    bar and the totem bar fade out; hover where they are and they come
-    back; walk out and they fade in. If one stays, send
-    `/run print(IsResting(), PadKeysBar:GetAlpha(), MultiCastActionBarFrame and MultiCastActionBarFrame:GetAlpha())`.
+47. **Well Fed timer**: eat buff food, out of combat: the buff bar shows
+    Well Fed's icon with its time left (e.g. 14m), yellow under 5
+    minutes. Once it runs out, the food in your bags shows red instead.
 
 Known risks:
 - The buff reminder reads auras by name out of combat. If a list stays
