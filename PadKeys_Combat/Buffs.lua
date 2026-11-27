@@ -750,6 +750,28 @@ local function aura_description(aura)
   return text
 end
 
+-- `text` without its sentences that hold any of `parts` (any case), line
+-- by line; nil if nothing is left.
+local function without_sentences(text, parts)
+  if not text or not parts then
+    return text
+  end
+  local lines = {}
+  for line in text:gmatch("[^\n]+") do
+    local kept = {}
+    for sentence in line:gmatch("[^%.]+%.?") do
+      sentence = sentence:match("^%s*(.-)%s*$")
+      if sentence ~= "" and not holds(sentence, parts) then
+        kept[#kept + 1] = sentence
+      end
+    end
+    if kept[1] then
+      lines[#lines + 1] = table.concat(kept, " ")
+    end
+  end
+  return lines[1] and table.concat(lines, "\n") or nil
+end
+
 -- Buffs you want to keep an eye on out of combat (cfg.watch), e.g. the
 -- sleeping bag's: its time left and stacks, also while resting. Shown
 -- while you carry the item, know the spell or have the buff (and only
@@ -761,8 +783,7 @@ local function watch_rows(rows)
     if not w.leveling or level < max_level() then
       local best
       for _, aura in ipairs(buffs_of("player") or {}) do
-        if holds(aura.name, w.buff) and (not best or aura.left > best.left) and
-           not (w.skip and holds(aura_description(aura), w.skip)) then
+        if holds(aura.name, w.buff) and (not best or aura.left > best.left) then
           best = aura
         end
       end
@@ -780,7 +801,8 @@ local function watch_rows(rows)
           badge = best and best.stacks and best.stacks > 1 and
             tostring(best.stacks) or nil,
           click = click,
-          detail = w.describe and best and aura_description(best) or nil,
+          detail = w.describe and best and
+            without_sentences(aura_description(best), w.drop) or nil,
         }
         if best and best.left >= (w.warn_at or cfg.warn_at) then
           row.supply = true
