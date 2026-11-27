@@ -515,9 +515,11 @@ until the cooldown starts. The PadKeys bar and the G wheel show it
 see-through without a countdown in that time, and the big cooldowns
 beside the mouse drop it at once.
 
-It listens for the game's own "Spell is not ready yet." / "Item is not
-ready yet." errors and matches them to the key you just pressed. Size,
-position and timings are in `PadKeys_NotReady/Config.lua`.
+The Forever client sends no "Spell is not ready yet." error for a key on
+cooldown, so a key flashes when its action was cooling just before the
+press (and still is). Items from your bags or worn wait for the game's
+"Item is not ready yet." error. Size, position and timings are in
+`PadKeys_NotReady/Config.lua`.
 
 ## Ready flash (PadKeys_Ready)
 
@@ -1219,6 +1221,13 @@ is loaded.
 47. **Well Fed timer**: eat buff food, out of combat: the buff bar shows
     Well Fed's icon with its time left (e.g. 14m), yellow under 5
     minutes. Once it runs out, the food in your bags shows red instead.
+48. **Not ready, without the error**: as a dwarf, use Stoneform, then
+    press it again: its icon flashes mid-screen with the time left. A
+    ready key and the global cooldown flash nothing. As a hunter, Rapid
+    Fire pressed again during its buff flashes without a time. If a key
+    on cooldown flashes nothing, send
+    `/run local c=C_ActionBar.GetActionCooldown(SLOT) print(c.isActive, c.isEnabled, c.isOnGCD)`
+    with its action slot.
 
 Known risks:
 - The buff reminder reads auras by name out of combat. If a list stays
@@ -1242,9 +1251,10 @@ Known risks:
   short list of names. A window it misses can be added to `EXTRA_ROOTS` in
   `PadKeys_Cursor/Cursor.lua`.
 - Long scroll lists aren't scrolled by the cursor yet; use the mouse wheel.
-- PadKeys_NotReady needs the game's "not ready yet" error to fire. If a
-  press on cooldown never flashes, or a spell queued in the spell queue
-  window gives no error, send what you see.
+- PadKeys_NotReady flashes keys from their cooldown state before the
+  press, not from an error. If a key flashes on a good press (just as its
+  cooldown ended), or an item on cooldown never flashes, send what you
+  see.
 
 ## Related branch
 

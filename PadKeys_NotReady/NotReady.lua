@@ -3,13 +3,20 @@
 -- (Config.lua: one second). Another such press, of the same key or
 -- another, replaces it at once and starts the fade again.
 --
--- How a press "on cooldown" is told apart: the game answers it with a UI
--- error ("Spell is not ready yet.", "Item is not ready yet."), as
--- UI_ERROR_MESSAGE with a plain error type. Which action it was comes from
--- post-hooks on the functions every press goes through: UseAction (action
--- bars, PadKeys_Bar and the radials all call it via SecureActionButton),
--- C_Container.UseContainerItem (bags) and UseInventoryItem (worn items).
--- hooksecurefunc runs after Blizzard's call and leaves it untainted.
+-- Which press it was comes from post-hooks on the functions every press
+-- goes through: UseAction (action bars, PadKeys_Bar and the radials all
+-- call it via SecureActionButton), C_Container.UseContainerItem (bags)
+-- and UseInventoryItem (worn items). hooksecurefunc runs after Blizzard's
+-- call and leaves it untainted.
+--
+-- How an action press "on cooldown" is told apart: the Forever client
+-- sends no "Spell is not ready yet." error for it, so the slot's state from
+-- just before the press decides. Each slot's state is kept from the
+-- cooldown events; a press's own cooldown only arrives in a later event,
+-- so at the press the kept state is the one from before it. The flash
+-- also needs the slot to be cooling right after the press, so a cooldown
+-- that ended without an event flashes nothing. Items still wait for the
+-- game's "Item is not ready yet." error (UI_ERROR_MESSAGE).
 --
 -- Cooldown numbers are secret in combat, so the countdown goes through a
 -- duration object (C_ActionBar.GetActionCooldownDuration) and
@@ -93,15 +100,19 @@ end
 
 -- --- What was pressed -------------------------------------------------------
 
--- Which action slots are only on the global cooldown. Blizzard's isOnGCD
--- is only right while handling SPELL_UPDATE_COOLDOWN, so it is read then
--- for every slot and kept (as on PadKeys_Bar).
+-- Which action slots are only on the global cooldown, and which are
+-- cooling (ns.cooling: running past the global cooldown, or on hold).
+-- Blizzard's isOnGCD is only right while handling SPELL_UPDATE_COOLDOWN,
+-- so it is read then for every slot and kept (as on PadKeys_Bar).
 local MAX_ACTION_SLOT = 180
-local on_gcd = {}
-local function read_gcd()
+local on_gcd, cooling = {}, {}
+local function read_cooldowns(with_gcd)
   for action = 1, MAX_ACTION_SLOT do
     local cd = ab.HasAction(action) and ab.GetActionCooldown(action)
-    on_gcd[action] = cd and cd.isOnGCD or nil
+    if with_gcd then
+      on_gcd[action] = cd and cd.isOnGCD or nil
+    end
+    cooling[action] = ns.cooling(cd, c.ignore_gcd and on_gcd[action]) or nil
   end
 end
 
@@ -145,9 +156,7 @@ local function show_item(texture, start, duration)
 end
 
 local function show(press)
-  if press.kind == "action" then
-    show_action(press.a)
-  elseif press.kind == "bag" then
+  if press.kind == "bag" then
     local info = C_Container.GetContainerItemInfo(press.a, press.b)
     show_item(info and info.iconFileID,
               C_Container.GetContainerItemCooldown(press.a, press.b))
@@ -180,9 +189,11 @@ local function pressed(kind, a, b)
   try_match()
 end
 
+-- An action pressed while it was cooling: flashed at once, no error
+-- needed.
 hooksecurefunc("UseAction", function(action)
-  if type(action) == "number" then
-    pressed("action", action)
+  if type(action) == "number" and cooling[action] then
+    show_action(action)
   end
 end)
 if C_Container and C_Container.UseContainerItem then
@@ -201,6 +212,8 @@ end
 local events = CreateFrame("Frame")
 events:RegisterEvent("UI_ERROR_MESSAGE")
 events:RegisterEvent("SPELL_UPDATE_COOLDOWN")
+events:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN")
+events:RegisterEvent("ACTIONBAR_SLOT_CHANGED")
 events:RegisterEvent("PLAYER_ENTERING_WORLD")
 events:SetScript("OnEvent", function(_, event, error_type)
   if event == "UI_ERROR_MESSAGE" then
@@ -209,6 +222,7 @@ events:SetScript("OnEvent", function(_, event, error_type)
       try_match()
     end
   else
-    read_gcd()
+    read_cooldowns(event ~= "ACTIONBAR_UPDATE_COOLDOWN" and
+                   event ~= "ACTIONBAR_SLOT_CHANGED")
   end
 end)
