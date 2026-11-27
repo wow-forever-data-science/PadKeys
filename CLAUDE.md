@@ -31,7 +31,7 @@ what is untested.
 - Check an API in Gethe's `Blizzard_APIDocumentationGenerated` (branch `forever`) - `SecretArguments = "AllowedWhenUntainted"` means addon code can't pass secrets
 - Decide with the plain flags Blizzard returns (`isActive`, `isEnabled`), as Blizzard's own code does
 - Taint - calling Blizzard UI functions that open windows from addon code taints them, and tainted Blizzard code then errors on secret values; open windows by `/click`ing Blizzard's button through a secure button instead
-- Secret values may go to `SetAlpha` - health and mana thresholds go through a curve (`UnitHealthPercent(unit, true, curve)`) straight into an alpha (PadKeys_Radial `Lights.lua`)
+- Secret values may go to `SetAlpha` - health and mana thresholds go through a curve (`UnitHealthPercent(unit, false, curve)`) straight into an alpha (PadKeys_Radial `Lights.lua`)
 - Auras in combat - let Blizzard read them and move its frames: the Cooldown Manager's Tracked Buffs (`BuffIconCooldownViewer`) is docked at the mouse (PadKeys_Readout `Dock.lua`, also Blizzard's `DebuffFrame`)
 - Managed frames - an Edit Mode system in its default place is re-anchored by `BottomManagedFrameContainer` on every `Layout`; re-dock in a post-hook on the container's `Layout`
 - Edit Mode systems replace `SetScale` - call the widget's own: `getmetatable(frame).__index.SetScale`
