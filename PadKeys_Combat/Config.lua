@@ -106,6 +106,9 @@ ns.config.combat.buffs = {
     durability_low = 0.3,  -- your most worn item under 30%
     bag_free_low = 3,      -- free bag slots under this
     pet = true,            -- hunter and warlock: no pet, or a dead one
+    -- Your pet under full health: its percent on this spell's icon, click
+    -- to cast it on the pet (Mend Pet, Health Funnel).
+    pet_heal = { HUNTER = 136, WARLOCK = 755 },
     -- Warlocks: the demon a click on the pet icon summons (nil: no click).
     warlock_pet = nil,     -- e.g. "Summon Voidwalker"
     -- Reagents per class, once you know the spell that uses them: shown
