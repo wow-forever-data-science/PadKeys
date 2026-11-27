@@ -707,6 +707,20 @@ local function bag_item_holding(parts)
   return nil
 end
 
+-- An aura's own description, its numbers filled in ("Stamina and Spirit
+-- increased by 12."), or nil until the client has it.
+local function aura_description(spell)
+  local describe = C_Spell and C_Spell.GetSpellDescription or GetSpellDescription
+  local text = spell and describe and describe(spell)
+  if not text or text == "" then
+    if spell and C_Spell and C_Spell.RequestLoadSpellData then
+      C_Spell.RequestLoadSpellData(spell)
+    end
+    return nil
+  end
+  return text
+end
+
 -- Buffs you want to keep an eye on out of combat (cfg.watch), e.g. the
 -- sleeping bag's: its time left and stacks, also while resting. Shown
 -- while you carry the item, know the spell or have the buff (and only
@@ -718,7 +732,8 @@ local function watch_rows(rows)
     if not w.leveling or level < max_level() then
       local best
       for _, aura in ipairs(buffs_of("player") or {}) do
-        if holds(aura.name, w.buff) and (not best or aura.left > best.left) then
+        if holds(aura.name, w.buff) and (not best or aura.left > best.left) and
+           not (w.skip and holds(aura_description(aura.spell), w.skip)) then
           best = aura
         end
       end
@@ -736,6 +751,7 @@ local function watch_rows(rows)
           badge = best and best.stacks and best.stacks > 1 and
             tostring(best.stacks) or nil,
           click = click,
+          detail = w.describe and best and aura_description(best.spell) or nil,
         }
         if best and best.left >= (w.warn_at or cfg.warn_at) then
           row.supply = true
@@ -840,6 +856,12 @@ end
 -- white.
 local function row_text(row)
   local text = ns.paint(row.label, "light") .. "  "
+  if row.detail then
+    -- What the buff gives, on a line of its own below.
+    return row_text({ label = row.label, left = row.left, badge = row.badge,
+                      missing = row.missing, who = row.who }) ..
+      "\n" .. ns.paint(row.detail, "white")
+  end
   if row.count then
     return text .. ns.paint(row.count, "white")
   end

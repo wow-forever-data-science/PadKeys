@@ -439,7 +439,8 @@ combat (`fade_in`).
   cap: its time left bottom right (45m, then 30s), its stacks top right; red while
   missing (click to use the bag), yellow under 5 minutes; and the
   campfire's Cozy Fire while you know Basic Campfire (click lights one);
-  and Well Fed's time left while it is on.
+  and Well Fed's time left while it is on (the stat or damage one, not an
+  experience one; hover for its bonus).
   Add others under `watch`.
   Your pet in trouble in combat shows at the mouse (PadKeys_Readout).
 
@@ -1235,6 +1236,12 @@ is loaded.
     "More actions · Action Bar 7"; target an enemy: "Actions · Action Bar
     6"; Cmd+G: "Even more actions · Action Bar 8". The town page,
     markers and main menu keep their plain titles.
+50. **Well Fed bonus**: with Well Fed on, hover its icon on the buff bar:
+    under its name and time, what it gives (e.g. "Stamina and Spirit
+    increased by 12."), never an experience bonus. If only the name
+    shows, hover again a second later; if it shows the experience one or
+    nothing, send
+    `/run for i=1,40 do local a=C_UnitAuras.GetAuraDataByIndex("player",i) if a and a.name:find("Fed") then print(a.spellId,C_Spell.GetSpellDescription(a.spellId)) end end`.
 
 Known risks:
 - The buff reminder reads auras by name out of combat. If a list stays
