@@ -868,7 +868,7 @@ combat, so it switches off when combat starts.
 
 A label names the highlighted aura and its place ("Debuff 2/5"): above
 your target's nameplate (under the target frame without one), or under
-your debuff's icon, which also gets a white frame. The highlight stays 6 s
+your debuff's icon, which also gets a white frame. The highlight stays 12 s
 after the last press (with its tooltip; `tooltip_on_step = false` shows
 the tooltip only on Shift+C) and the tooltip 2 s after you let go of
 Shift+C; then
