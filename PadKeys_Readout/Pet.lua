@@ -5,7 +5,9 @@
 --   pet.burst_window seconds);
 -- - for as long as its health is low (under pet.low).
 -- Otherwise nothing shows. Out of combat the buff bar (PadKeys_Combat)
--- tells you a pet is missing or dead.
+-- tells you a pet is missing or dead. pet.portrait = false hides the
+-- portrait but keeps reading the hits, which light the G wheel's pet heal
+-- slice at the mouse (ns.pet_hit_until), pulsing red there instead.
 --
 -- The hits come from UNIT_COMBAT on the pet: their amounts are secret and
 -- never read; crits, crushing blows and how many hits came are plain.
@@ -115,6 +117,10 @@ end
 local hit_until = 0
 
 local function update()
+  if p.portrait == false then
+    frame:Hide()
+    return
+  end
   local on = UnitExists("pet") and not UnitIsDead("pet")
     and (in_combat() or not p.combat_only)
   frame:SetShown(on and true or false)

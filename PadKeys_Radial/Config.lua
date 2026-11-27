@@ -186,11 +186,14 @@ ns.config.radial = {
                         -- as on the wheel
     fade = 0.2,         -- seconds to fade in or out
     countdown_size = 13, -- seconds left on an icon on cooldown
+    pulse = 0.7,        -- seconds per pulse of a pulsing frame
   },
 
   -- Lit segments, on the wheels and their faint copy, per page and
   -- segment (1 = east, counter-clockwise). For the items page, per set.
   -- Lighting only changes the look; the segment does what it always does.
+  -- Any rule can add color = { r, g, b } for its frame on the copy at the
+  -- mouse (white otherwise) and pulse = true to make that frame pulse.
   --   { health = 0.35 }  your health under 35%; add hits = true to light
   --                      it too for a few seconds after heavy damage (the
   --                      incoming-damage readout's crit or burst)
@@ -230,7 +233,8 @@ ns.config.radial = {
   lights = {
     actions = {
       [6] = { mana = 0.25 },                -- mana spell, south-west
-      [7] = { pet = 0.35, health = 0.5, hits = true }, -- heal pet, south
+      [7] = { pet = 0.35, health = 0.5, hits = true, -- heal pet, south:
+              color = { 1, 0.1, 0.1 }, pulse = true },  -- a red frame, pulsing
       [8] = { health = 0.35, hits = true }, -- your heal, south-east
     },
     items = {

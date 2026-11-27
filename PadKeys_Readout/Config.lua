@@ -121,6 +121,9 @@ ns.config.readout = {
   -- Otherwise nothing. Out of combat the buff bar tells you it's missing.
   pet = {
     enabled = true,
+    -- false: no portrait; the hits are still read, and the G wheel's pet
+    -- heal slice at the mouse pulses red instead (PadKeys_Radial lights).
+    portrait = false,
     size = 40,
     x = 20,              -- its top right, from the pointer
     y = -22,

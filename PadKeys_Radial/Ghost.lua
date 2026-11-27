@@ -6,6 +6,9 @@
 -- at full strength with a white frame; the rest stay faint, or with
 -- show = "lit" (the default) don't show at all.
 --
+-- A rule may give its frame a colour and a pulse (Lights.lua,
+-- ns.light_style): the pet heal pulses red.
+--
 -- In "lit" mode the copy is always up and each icon's alpha is its light:
 -- a health or mana light is a secret alpha, which SetAlpha takes, so a
 -- low-health potion shows by itself in combat too. A lit icon shows
@@ -31,6 +34,7 @@ frame:SetAlpha(0)
 
 -- rings[r] = { page = "actions", icons = { [i] = { holder, icon, frame } } }
 local rings = {}
+local WHITE = { 1, 1, 1 }
 
 local function make_icon(radius_scale, index)
   local x, y, size = ns.wheel_icon_place(index)
@@ -138,6 +142,12 @@ local function update_icons()
         item.icon:SetDesaturated(entry.cooling or ns.config.theme.grey_icons or false)
         item.icon:SetAlpha(ns.light_alpha(ring.page, i, idle, 1))
         item.glow:SetAlpha(ns.light_alpha(ring.page, i, 0, 0.9))
+        local color, pulse = ns.light_style(ring.page, i)
+        item.color = color or WHITE
+        item.pulse = pulse and true or false
+        if not item.pulse then
+          item.glow:SetVertexColor(item.color[1], item.color[2], item.color[3], 1)
+        end
         set_cooldown(item.cooldown, entry.cooldown, entry.cooling)
         item.cooldown:SetAlpha(ns.light_alpha(ring.page, i, idle, 1))
         item.holder:Show()
@@ -149,6 +159,20 @@ local function update_icons()
 end
 
 -- --- Driver -----------------------------------------------------------------
+
+-- A pulsing frame (a rule's pulse) fades its vertex alpha up and down; its
+-- texture alpha stays the light, which may be secret.
+local PULSE_PERIOD = c.pulse or 0.7
+local function pulse_frames()
+  local v = 0.55 + 0.45 * math.sin(GetTime() * 2 * math.pi / PULSE_PERIOD)
+  for _, ring in ipairs(rings) do
+    for _, item in ipairs(ring.icons) do
+      if item.pulse then
+        item.glow:SetVertexColor(item.color[1], item.color[2], item.color[3], v)
+      end
+    end
+  end
+end
 
 local shown = false
 local since_icons = 1
@@ -167,6 +191,10 @@ frame:SetScript("OnUpdate", function(self, elapsed)
     if shown then
       update_icons()
     end
+  end
+
+  if shown then
+    pulse_frames()
   end
 
   local target = shown and (c.alpha or 1) or 0
