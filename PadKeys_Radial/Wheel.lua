@@ -103,7 +103,9 @@ function ns.create_wheel(name)
   local w = setmetatable({}, Wheel)
 
   local frame = CreateFrame("Frame", name, UIParent)
-  frame:SetFrameStrata("DIALOG")
+  -- A strata over the readout and the lit copy at the mouse (DIALOG), so
+  -- the open wheel covers them.
+  frame:SetFrameStrata("FULLSCREEN_DIALOG")
   frame:SetSize(WHEEL_SIZE, WHEEL_SIZE)
   frame:SetClampedToScreen(true)
   frame:Hide()
