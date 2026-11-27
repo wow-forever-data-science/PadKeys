@@ -39,6 +39,7 @@ what is untested.
 - No custom cursor - `SetCursor` with an addon's own image leaves the arrow as it is, also after a restart; the pointer can't be hidden
 - Health curves - pass `usePredicted = false` to `UnitHealthPercent`; a heal on its way pushes the predicted percent over 100%
 - Item cooldowns - a bag item's numbers are secret in combat and have no duration object; an action slot holding the item gives one
+- Texture colour sets alpha - `SetVertexColor` after `SetAlpha` undoes the alpha (unlit frames showed as white squares); set the colour first, and pulse on a frame of its own
 - Blizzard source - Gethe's `wow-ui-source`, branch `forever`: `gh api "repos/Gethe/wow-ui-source/contents/<path>?ref=forever" -q .content | base64 -d`
 
 ## Ownership with wow-settings

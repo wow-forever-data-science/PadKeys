@@ -42,14 +42,21 @@ local function make_icon(radius_scale, index)
   local holder = CreateFrame("Frame", nil, frame)
   holder:SetSize(size, size)
   holder:SetPoint("CENTER", frame, "CENTER", x * radius_scale, y * radius_scale)
-  -- The white frame of a lit icon, behind it.
-  local glow = holder:CreateTexture(nil, "BACKGROUND")
+  holder:SetFrameLevel(frame:GetFrameLevel() + 2)
+  -- The frame of a lit icon, behind it, on a frame of its own: the
+  -- texture's alpha is the light (maybe secret), the frame's the pulse.
+  -- A texture's colour is set before its alpha: setting the colour sets
+  -- the alpha too.
+  local glow_frame = CreateFrame("Frame", nil, frame)
+  glow_frame:SetAllPoints(holder)
+  glow_frame:SetFrameLevel(frame:GetFrameLevel() + 1)
+  local glow = glow_frame:CreateTexture(nil, "BACKGROUND")
   glow:SetPoint("TOPLEFT", -2, 2)
   glow:SetPoint("BOTTOMRIGHT", 2, -2)
   glow:SetColorTexture(1, 1, 1, 1)
   glow:SetAlpha(0)
   if c.rounded ~= false then
-    ns.round(holder, glow, -2)
+    ns.round(glow_frame, glow, -2)
   end
   local icon = holder:CreateTexture(nil, "ARTWORK")
   ns.fit_icon(holder, icon)
@@ -69,7 +76,8 @@ local function make_icon(radius_scale, index)
   if countdown then
     ns.style(countdown, c.countdown_size or 11)
   end
-  return { holder = holder, icon = icon, glow = glow, cooldown = cooldown }
+  return { holder = holder, icon = icon, glow = glow, glow_frame = glow_frame,
+           cooldown = cooldown }
 end
 
 -- A duration object, { start, duration } or nil, as Wheel.lua takes it.
@@ -141,18 +149,21 @@ local function update_icons()
         item.icon:SetVertexColor(v, v, v)
         item.icon:SetDesaturated(entry.cooling or ns.config.theme.grey_icons or false)
         item.icon:SetAlpha(ns.light_alpha(ring.page, i, idle, 1))
-        item.glow:SetAlpha(ns.light_alpha(ring.page, i, 0, 0.9))
         local color, pulse = ns.light_style(ring.page, i)
-        item.color = color or WHITE
+        color = color or WHITE
+        item.glow:SetVertexColor(color[1], color[2], color[3])
+        item.glow:SetAlpha(ns.light_alpha(ring.page, i, 0, 0.9))
         item.pulse = pulse and true or false
         if not item.pulse then
-          item.glow:SetVertexColor(item.color[1], item.color[2], item.color[3], 1)
+          item.glow_frame:SetAlpha(1)
         end
         set_cooldown(item.cooldown, entry.cooldown, entry.cooling)
         item.cooldown:SetAlpha(ns.light_alpha(ring.page, i, idle, 1))
         item.holder:Show()
+        item.glow_frame:Show()
       else
         item.holder:Hide()
+        item.glow_frame:Hide()
       end
     end
   end
@@ -160,15 +171,15 @@ end
 
 -- --- Driver -----------------------------------------------------------------
 
--- A pulsing frame (a rule's pulse) fades its vertex alpha up and down; its
--- texture alpha stays the light, which may be secret.
+-- A pulsing frame (a rule's pulse) fades its own frame up and down; the
+-- texture's alpha stays the light, which may be secret.
 local PULSE_PERIOD = c.pulse or 0.7
 local function pulse_frames()
   local v = 0.55 + 0.45 * math.sin(GetTime() * 2 * math.pi / PULSE_PERIOD)
   for _, ring in ipairs(rings) do
     for _, item in ipairs(ring.icons) do
       if item.pulse then
-        item.glow:SetVertexColor(item.color[1], item.color[2], item.color[3], v)
+        item.glow_frame:SetAlpha(v)
       end
     end
   end
