@@ -440,8 +440,8 @@ combat (`fade_in`).
   cap: its time left bottom right (45m, then 30s), its stacks top right; red while
   missing (click to use the bag), yellow under 5 minutes; and the
   campfire's Cozy Fire while you know Basic Campfire (click lights one);
-  and Well Fed's time left while it is on (the stat or damage one, not an
-  experience one; hover for its bonus); and Camp Benefits' time left,
+  and Well Fed's time left while it is on (hover for its stat or damage
+  bonus, without its experience bonus); and Camp Benefits' time left,
   hover for what it gives now.
   Add others under `watch`.
   Your pet in trouble in combat shows at the mouse (PadKeys_Readout).
@@ -1246,11 +1246,11 @@ is loaded.
     6"; Cmd+G: "Even more actions · Action Bar 8". The town page,
     markers and main menu keep their plain titles.
 50. **Well Fed bonus**: with Well Fed on, hover its icon on the buff bar:
-    under its name and time, what it gives (e.g. "Stamina and Spirit
-    increased by 12."), never an experience bonus. If only the name
-    shows, hover again a second later; if it shows the experience one or
-    nothing, send
-    `/run for i=1,40 do local a=C_UnitAuras.GetAuraDataByIndex("player",i) if a and a.name:find("Fed") then print(a.spellId,C_Spell.GetSpellDescription(a.spellId)) end end`.
+    under its name and time, its stat or damage bonus (e.g. "Your
+    Agility is increased by 10."), without the experience sentence. If
+    only the name shows, hover again a second later; if the icon is gone
+    with the buff on, send
+    `/run for i=1,40 do local a=C_UnitAuras.GetAuraDataByIndex("player",i) if a and a.name:find("Fed") then local t=C_TooltipInfo.GetUnitBuffByAuraInstanceID("player",a.auraInstanceID) print(a.spellId,t and t.lines[2] and t.lines[2].leftText) end end`.
 51. **Readout on the small rings**: target a mob with a big cooldown
     ready and a totem down: every group sits right outside the swing
     ring, about 22 px from the pointer. With no tracked buff on, the
