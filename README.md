@@ -427,7 +427,7 @@ combat (`fade_in`).
   is used, a sharpening stone or oil goes on your main hand, a rogue's
   poison on its weapon (`poison_main`, `poison_off`), the pet is called,
   revived or healed. Hover for its name and who is missing it.
-- **Supplies**: ammo under 200, reagents for spells you know (soul shards,
+- **Supplies**: ammo (always with `supplies.always`, yellow under 200), reagents for spells you know (soul shards,
   poisons and Flash Powder, Sacred Candles, Arcane Powder and Runes of
   Teleportation, Wild Thornroot, Symbols of Kings, an Ankh), and for hunters and
   warlocks no pet or a dead one, or a pet under full health: its percent
@@ -1300,6 +1300,11 @@ is loaded.
     it casts, the icon goes. In combat, cast Aspect of the Cheetah: a
     red-framed hawk icon shows just above the mouse; cast the hawk: it
     goes.
+59. **Ammo always on the bar**: as a hunter out of combat with arrows in
+    the ammo slot: the buff bar shows them with their count next to
+    durability and bag space, grey over 200, yellow under. If it never
+    shows, send
+    `/run local id=GetInventoryItemID("player",0) print(id, id and select(4,C_Item.GetItemInfoInstant(id)))`.
 
 Known risks:
 - The buff reminder reads auras by name out of combat. If a list stays

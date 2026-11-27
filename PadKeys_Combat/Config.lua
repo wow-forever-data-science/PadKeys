@@ -98,7 +98,8 @@ ns.config.combat.buffs = {
   -- Supplies, as grey icons with a count, out of combat.
   supplies = {
     ammo_low = 200,        -- arrows or bullets in the ammo slot (hunters,
-                           -- rogues, warriors); 0 is off
+                           -- rogues, warriors): yellow under this, and
+                           -- shown always with `always`; 0 is off
     -- Always show your most worn item (its icon and %) and your free bag
     -- slots, at the end of the bar, also while resting; they turn yellow
     -- under the two limits below. false shows them only under the limits.
