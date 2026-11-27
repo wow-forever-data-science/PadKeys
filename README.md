@@ -318,7 +318,8 @@ PadKeys_Fade keeps Blizzard's frames and makes them invisible instead:
   - the **bags** for 3 seconds as loot goes into them;
   - your **player and pet frames** in combat, with a target, or out of
     combat while your health or mana isn't full;
-  - the **party frames** in combat, or out of combat while someone is hurt;
+  - the **party frames** everywhere but in an inn or a city; there in
+    combat, or while someone is hurt;
   - the **experience and reputation bars** for 4 seconds as they change;
   - the **quest tracker** for 5 seconds as you take a quest or an
     objective moves;
@@ -1270,6 +1271,10 @@ is loaded.
     time, the benefits it gives now, as its own tooltip lists them. If
     nothing shows with the buff on, send
     `/run for i=1,40 do local a=C_UnitAuras.GetAuraDataByIndex("player",i) if a and a.name:find("Camp") then print(a.name,a.spellId,a.duration) end end`.
+55. **Party frames outside cities**: in a party, out of combat in the
+    wild with everyone at full health: the party frames show. Walk into
+    a city: they fade out, and come back in combat or when someone is
+    hurt.
 
 Known risks:
 - The buff reminder reads auras by name out of combat. If a list stays
