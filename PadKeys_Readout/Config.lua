@@ -62,7 +62,7 @@ ns.config.readout = {
   -- line the icons below sit on.
   swing = {
     enabled = true,
-    size = 76,           -- pixels across; the cast ring is 28
+    size = 35,           -- pixels across: 25% over the cast ring (28)
     alpha = 0.85,
     track = "combat",
     track_alpha = 0.2,
