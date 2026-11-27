@@ -440,7 +440,8 @@ combat (`fade_in`).
   missing (click to use the bag), yellow under 5 minutes; and the
   campfire's Cozy Fire while you know Basic Campfire (click lights one);
   and Well Fed's time left while it is on (the stat or damage one, not an
-  experience one; hover for its bonus).
+  experience one; hover for its bonus); and Camp Benefits' time left,
+  hover for what it gives now.
   Add others under `watch`.
   Your pet in trouble in combat shows at the mouse (PadKeys_Readout).
 
@@ -1261,6 +1262,11 @@ is loaded.
 53. **No potions in the big cooldowns**: with healing and mana potions
     on an action bar, target an enemy out of combat at full health and
     mana: no potion shows right of the mouse. Trinkets still do.
+54. **Camp Benefits**: with Camp Benefits on, out of combat: the buff
+    bar shows its icon with the time left; hover it: under its name and
+    time, the benefits it gives now, as its own tooltip lists them. If
+    nothing shows with the buff on, send
+    `/run for i=1,40 do local a=C_UnitAuras.GetAuraDataByIndex("player",i) if a and a.name:find("Camp") then print(a.name,a.spellId,a.duration) end end`.
 
 Known risks:
 - The buff reminder reads auras by name out of combat. If a list stays
