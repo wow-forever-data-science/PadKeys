@@ -69,7 +69,9 @@ ns.config.combat.buffs = {
   -- buff is missing (click to use the item), yellow under warn_at.
   -- `buff` and `item` are parts of names, any case; `spell` a spell ID,
   -- shown while you know it (click casts it). leveling = true: only below
-  -- the level cap.
+  -- the level cap. describe = true: hover shows what the buff gives.
+  -- `skip`: parts of a description whose buff doesn't count, though its
+  -- name matches.
   -- The sleeping bag's buff is "Well-Rested" (checked in game). To check
   -- another buff's name, with it on, this prints your buffs' names, spell
   -- IDs and stacks:
@@ -81,9 +83,11 @@ ns.config.combat.buffs = {
       item = { "Sleeping Bag" }, leveling = true },
     -- Basic Campfire (cooking) and its Cozy Fire buff.
     { label = "Campfire", buff = { "Cozy Fire" }, spell = 818 },
-    -- Well Fed's time left while it is on; once it is gone, food in your
-    -- bags shows as a consumable instead (click to eat).
-    { label = "Well Fed", buff = { "Well Fed" } },
+    -- Well Fed's time left while it is on, and on hover its bonus; once
+    -- it is gone, food in your bags shows as a consumable (click to eat).
+    -- The stat or damage one: an experience Well Fed is skipped.
+    { label = "Well Fed", buff = { "Well Fed" }, describe = true,
+      skip = { "experience" } },
   },
 
   -- Supplies, as grey icons with a count, out of combat.
