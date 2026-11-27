@@ -29,11 +29,17 @@ local function watched()
   return ids
 end
 
+-- Until when watch events are our own: putting watches back may fire
+-- QUEST_WATCH_UPDATE for each, which must not move them in turn.
+local ours_until = 0
+local OURS = 0.5
+
 local function to_top(quest_id)
   local ids = watched()
   if ids[1] == quest_id then
     return
   end
+  ours_until = GetTime() + OURS
   for _, id in ipairs(ids) do
     log.RemoveQuestWatch(id)
   end
@@ -45,8 +51,6 @@ local function to_top(quest_id)
   end
 end
 
--- Our own watch changes fire QUEST_WATCH_UPDATE too; a quest already on
--- top is left alone, so they end there.
 local events = CreateFrame("Frame")
 if c.newest_first then
   events:RegisterEvent("QUEST_ACCEPTED")
@@ -54,12 +58,16 @@ end
 if c.progress_first then
   events:RegisterEvent("QUEST_WATCH_UPDATE")
 end
-events:SetScript("OnEvent", function(_, _, quest_id)
-  if type(quest_id) ~= "number" then
+events:SetScript("OnEvent", function(_, event, quest_id)
+  if type(quest_id) ~= "number" or
+     (event == "QUEST_WATCH_UPDATE" and GetTime() < ours_until) then
     return
   end
   -- After Blizzard's own handler has added or updated the watch.
   C_Timer.After(0.2, function()
+    if event == "QUEST_WATCH_UPDATE" and GetTime() < ours_until then
+      return
+    end
     pcall(to_top, quest_id)
   end)
 end)
