@@ -1,7 +1,10 @@
 -- Your totems above right of the pointer, over the tracked buffs
 -- (Config.lua, readout.totems): one small icon per totem that is down,
 -- side by side outside the swing ring, each draining with its time left and
--- the seconds on it. Gone when none are down.
+-- the seconds on it. Gone when none are down. With no tracked buff
+-- showing they take the buffs' corner on the swing ring instead of
+-- floating above it (above_buffs): the tracked buffs' top is read from
+-- their frame, a plain value.
 --
 -- The time comes as a duration object (GetTotemDuration) into a Cooldown
 -- frame's SetCooldownFromDurationObject, the icon from GetTotemInfo into
@@ -93,6 +96,45 @@ local function update()
     f:SetPoint("TOPLEFT", row, "TOPLEFT", start + (i - 1) * (size + gap), 0)
   end
 end
+
+-- Whether a frame has a shown descendant within `depth` levels: an empty
+-- Cooldown Manager viewer stays shown with its icons hidden.
+local function any_shown(frame, depth)
+  for _, child in ipairs({ frame:GetChildren() }) do
+    if child:IsShown() and (depth <= 1 or child:GetNumChildren() == 0 or
+                            any_shown(child, depth - 1)) then
+      return true
+    end
+  end
+  return false
+end
+
+-- Just above the tracked buffs while one shows, else at x, y.
+local viewer = c.buffs and t.above_buffs and BuffIconCooldownViewer
+local function place()
+  local y = t.y or 96
+  if viewer and viewer:IsVisible() and any_shown(viewer, 2) then
+    local top = viewer:GetTop()
+    local _, cy = readout:GetCenter()
+    if top and cy then
+      y = top * viewer:GetEffectiveScale() / readout:GetEffectiveScale() - cy + gap
+    end
+  end
+  row:ClearAllPoints()
+  row:SetPoint(point, readout, "CENTER", t.x or 62, y)
+end
+
+-- Placed again while a totem shows: the tracked buffs come and go on
+-- their own.
+local PLACE_INTERVAL = 0.1
+local since = 0
+row:SetScript("OnUpdate", function(_, elapsed)
+  since = since + elapsed
+  if since >= PLACE_INTERVAL then
+    since = 0
+    pcall(place)
+  end
+end)
 
 local events = CreateFrame("Frame")
 for _, event in ipairs({ "PLAYER_TOTEM_UPDATE", "PLAYER_ENTERING_WORLD" }) do
