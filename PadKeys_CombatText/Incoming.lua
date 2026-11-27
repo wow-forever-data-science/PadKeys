@@ -113,7 +113,7 @@ local function update_alpha()
   end
   local curve = tank and curves.tank or curves.normal
   if curve and UnitHealthPercent then
-    local ok, alpha = pcall(UnitHealthPercent, "player", true, curve)
+    local ok, alpha = pcall(UnitHealthPercent, "player", false, curve)
     -- The alpha is secret: not even compared with nil here.
     if ok and pcall(frame.SetAlpha, frame, alpha) then
       return

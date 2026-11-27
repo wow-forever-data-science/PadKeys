@@ -145,7 +145,8 @@ end
 
 local function fighting()
   return InCombatLockdown() or UnitAffectingCombat("player") or
-         (UnitExists("target") and UnitCanAttack("player", "target"))
+         (UnitExists("target") and UnitCanAttack("player", "target") and
+          not UnitIsDead("target"))
 end
 
 -- The game's subtext for a racial is "Racial" ("Racial Passive" for one

@@ -130,7 +130,8 @@ end
 
 local function fighting()
   return InCombatLockdown() or UnitAffectingCombat("player") or
-         (UnitExists("target") and UnitCanAttack("player", "target"))
+         (UnitExists("target") and UnitCanAttack("player", "target") and
+          not UnitIsDead("target"))
 end
 
 -- --- State ------------------------------------------------------------------
