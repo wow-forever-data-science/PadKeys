@@ -67,7 +67,7 @@ end
 
 -- --- Icons ------------------------------------------------------------------
 
-local column = CreateFrame("Frame", "PadKeysReadoutBig", readout)
+local column = CreateFrame("Frame", nil, readout)
 column:SetSize(size, size)
 column:SetPoint("LEFT", readout, "CENTER", b.x or 92, b.y or 0)
 column:EnableMouse(false)

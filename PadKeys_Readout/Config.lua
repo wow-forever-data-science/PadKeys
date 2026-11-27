@@ -192,15 +192,4 @@ ns.config.readout = {
   y = -80,
   -- Slightly rounded corners, as on the PadKeys bar; false for square.
   rounded = true,
-
-  -- A thin white line from the cast ring to each group above while it
-  -- shows (Lines.lua): big cooldowns, tracked buffs, totems, debuffs,
-  -- your pet and boss rows. It runs from the ring's edge (plus `gap`) to
-  -- the group's nearest point.
-  lines = {
-    enabled = true,
-    thickness = 1,
-    alpha = 0.6,
-    gap = 2,             -- pixels left free at each end
-  },
 }

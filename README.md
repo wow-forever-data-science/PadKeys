@@ -46,7 +46,7 @@ error points at one part:
 | **PadKeys_Combat** | "Combat" / "Out of Combat" fades in the middle of the screen as you enter and leave combat, in white; out of combat, a list of missing or expiring long buffs for your class and group | PadKeys |
 | **PadKeys_CombatText** | Small combat text: your hits scroll beside the target's nameplate with the spell's icon; the hits you take show lower right of the mouse, fading in as your health drops (earlier as a tank) and fully on heavy damage | PadKeys |
 | **PadKeys_Ready** | A spell flashes above the mouse as it becomes ready: reactive abilities (Overpower, Revenge, Execute, Riposte, ...) as they light up, and long cooldowns (30 s or more) as they come back, in combat | PadKeys |
-| **PadKeys_Readout** | Beside the mouse: a ring that fills with your cast (blue, green for heals, or glowing yellow while a listed buff outlasts it) and the global cooldown, a swing timer ring around it, your big cooldowns that are ready, your debuffs, your totems, and boss abilities from Blizzard's encounter timeline as they come close, each group joined to the cast ring by a thin line | PadKeys |
+| **PadKeys_Readout** | Beside the mouse: a ring that fills with your cast (blue, green for heals, or glowing yellow while a listed buff outlasts it) and the global cooldown, a swing timer ring around it, your big cooldowns that are ready, your debuffs, your totems, and boss abilities from Blizzard's encounter timeline as they come close | PadKeys |
 | **PadKeys_NotReady** | Pressing a key or using an item that is still on cooldown flashes its icon and the time left in the middle of the screen, fading out over a second | PadKeys |
 | **PadKeys_Cooldowns** | Blizzard's Cooldown Manager (cooldowns, buff icons, buff bars) in the PadKeys look: black borders, grey tints, the countdown without a swipe | PadKeys |
 | **PadKeys_Totems** | Blizzard's totem bar in the PadKeys look: black borders, no gold or element frames | PadKeys |
@@ -560,8 +560,8 @@ What changes fast, beside the mouse pointer, only while it matters:
   combat and is the line everything else sits on.
 
 Everything else sits right outside the swing ring (about 44 px from the
-pointer), each group joined to the cast ring by a thin white line while
-it shows (`lines`); holding G covers it while the wheel is open:
+pointer), at about two thirds of the size it had; holding G covers it
+while the wheel is open:
 
 - your **big cooldowns that are ready**, to the right: a row of icons
   for self-buffs, trinkets and impactful spells, one per spell or item
@@ -1206,14 +1206,11 @@ is loaded.
     bar and the totem bar fade out; hover where they are and they come
     back; walk out and they fade in. If one stays, send
     `/run print(IsResting(), PadKeysBar:GetAlpha(), MultiCastActionBarFrame and MultiCastActionBarFrame:GetAlpha())`.
-45. **Smaller readout, lines**: target a mob with a big cooldown ready,
-    a tracked buff on and a debuff on you: the icons at the mouse are
-    about two thirds of their old size, and a thin white line runs from
-    the cast ring out to each group (big cooldowns right, buffs upper
-    right, debuffs left, totems above). A line goes when its group
-    empties. If a line points at nothing or misses a group, say which;
-    if no line ever shows, send
-    `/run print(PadKeysReadout.CreateLine ~= nil, PadKeysReadoutBig ~= nil)`.
+45. **Smaller readout**: target a mob with a big cooldown ready, a
+    tracked buff on and a debuff on you: the icons at the mouse are about
+    two thirds of their old size, still just outside the swing ring, the
+    totems just above the tracked buffs. If two groups overlap, say
+    which.
 46. **Campfire**: out of combat in the wild, with Basic Campfire known:
     a red campfire icon on the buff bar; click it (with Simple Wood and
     Flint and Tinder) and stand by the fire: it turns grey. If it stays
