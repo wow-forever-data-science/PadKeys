@@ -81,6 +81,9 @@ ns.config.combat.buffs = {
       item = { "Sleeping Bag" }, leveling = true },
     -- Basic Campfire (cooking) and its Cozy Fire buff.
     { label = "Campfire", buff = { "Cozy Fire" }, spell = 818 },
+    -- Well Fed's time left while it is on; once it is gone, food in your
+    -- bags shows as a consumable instead (click to eat).
+    { label = "Well Fed", buff = { "Well Fed" } },
   },
 
   -- Supplies, as grey icons with a count, out of combat.
