@@ -573,7 +573,9 @@ it shows (`lines`); holding G covers it while the wheel is open:
   shows once you've used it once; `big.names` adds some up front. Your
   race's spells ("Racial" on their tooltip) always show, first in the
   row, whatever their cooldown: they are for pressing early in a fight
-  (`big.racials`). They too must be on an action bar;
+  (`big.racials`). They too must be on an action bar. Racials of no use
+  in a fight (Find Treasure, Find Ley Line, Walk on Air) and Hearthstone
+  never show (`big.ignore`);
 - **boss abilities** from Blizzard's encounter timeline, upper left:
   each one as the timeline highlights it (a few seconds before it lands),
   with its icon, countdown and name to its left, up to three at once,

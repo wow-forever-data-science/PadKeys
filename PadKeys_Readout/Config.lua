@@ -101,7 +101,12 @@ ns.config.readout = {
     y = 0,
     only_when_fighting = true,  -- in combat or with an enemy targeted
     names = {},           -- e.g. { "Recklessness", "Innervate" }
-    ignore = { "Hearthstone" },
+    -- Never shown, racials too (full names, any case): no use in a fight.
+    ignore = {
+      "Hearthstone",
+      "Track Treasure", "Find Treasure",  -- dwarf
+      "Find Ley Line", "Walk on Air",     -- sky elf
+    },
   },
 
   -- Your pet in trouble (Pet.lua), below the pointer (the bottom of the
