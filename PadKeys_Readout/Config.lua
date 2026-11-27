@@ -94,8 +94,8 @@ ns.config.readout = {
     racials = true,
     min = 60,
     max = 4,              -- icons at most
-    icon_size = 52,
-    gap = 4,
+    icon_size = 34,
+    gap = 3,
     grow = "right",       -- a row growing right; "down": a column
     x = 44,               -- left edge of the first icon, from the pointer
     y = 0,
@@ -112,7 +112,7 @@ ns.config.readout = {
   -- Otherwise nothing. Out of combat the buff bar tells you it's missing.
   pet = {
     enabled = true,
-    size = 60,
+    size = 40,
     x = 30,              -- its top right, from the pointer
     y = -44,
     low = 0.35,
@@ -132,7 +132,7 @@ ns.config.readout = {
   debuffs_point = "RIGHT",
   debuffs_x = -44,
   debuffs_y = 0,
-  debuffs_scale = 1.4,
+  debuffs_scale = 0.92,
 
   -- Your totems above right of the pointer, over the tracked buffs
   -- (Totems.lua): timers running on you, like them. One icon per totem
@@ -141,13 +141,13 @@ ns.config.readout = {
   -- grows right from there, "TOP" centres the row under it.
   totems = {
     enabled = true,
-    icon_size = 44,
+    icon_size = 29,
     gap = 3,
     point = "BOTTOMLEFT",
     x = 32,
-    y = 86,
+    y = 70,
     countdown = true,
-    countdown_size = 14,
+    countdown_size = 12,
   },
 
   -- Your target's cast or channel beside the mouse: its icon draining,
@@ -176,15 +176,26 @@ ns.config.readout = {
   buffs_point = "BOTTOMLEFT",
   buffs_x = 32,
   buffs_y = 32,
-  buffs_scale = 1.2,
+  buffs_scale = 0.8,
 
   -- Icon size and text size of the target cast and boss rows, and the
   -- target cast's place against the mouse pointer, in pixels (positive y
   -- is up).
-  icon_size = 56,
+  icon_size = 37,
   text_size = 13,
   x = 92,
   y = -80,
   -- Slightly rounded corners, as on the PadKeys bar; false for square.
   rounded = true,
+
+  -- A thin white line from the cast ring to each group above while it
+  -- shows (Lines.lua): big cooldowns, tracked buffs, totems, debuffs,
+  -- your pet and boss rows. It runs from the ring's edge (plus `gap`) to
+  -- the group's nearest point.
+  lines = {
+    enabled = true,
+    thickness = 1,
+    alpha = 0.6,
+    gap = 2,             -- pixels left free at each end
+  },
 }

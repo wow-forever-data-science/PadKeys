@@ -52,9 +52,9 @@ end
 -- --- Rows (target cast, boss abilities) ---------------------------------------
 
 -- side "left": the label left of the icon, for rows left of the pointer.
-local function make_row(side)
+local function make_row(side, name)
   local size = c.icon_size or 28
-  local row = CreateFrame("Frame", nil, frame)
+  local row = CreateFrame("Frame", name, frame)
   row:SetSize(size, size)
   ns.box(row, 0, c.rounded)
   row.icon = row:CreateTexture(nil, "ARTWORK")
@@ -123,7 +123,7 @@ end
 -- rows[i].event = the timeline event ID.
 local boss_rows = {}
 for i = 1, c.boss_rows or 3 do
-  local row = make_row("left")
+  local row = make_row("left", "PadKeysReadoutBoss" .. i)
   row:SetPoint("BOTTOMRIGHT", frame, "CENTER", c.boss_x or -72,
                (c.boss_y or 44) + (i - 1) * ((c.icon_size or 28) + 4))
   row.cooldown:SetHideCountdownNumbers(false)

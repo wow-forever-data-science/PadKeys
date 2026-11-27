@@ -26,7 +26,7 @@ local function is_secret(v)
   return issecretvalue and issecretvalue(v)
 end
 
-local row = CreateFrame("Frame", nil, readout)
+local row = CreateFrame("Frame", "PadKeysReadoutTotems", readout)
 local point = t.point or "BOTTOMLEFT"
 row:SetSize(1, size)
 row:SetPoint(point, readout, "CENTER", t.x or 62, t.y or 96)
