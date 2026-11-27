@@ -579,7 +579,7 @@ while the wheel is open:
   race's spells ("Racial" on their tooltip) always show, first in the
   row, whatever their cooldown: they are for pressing early in a fight
   (`big.racials`). They too must be on an action bar. Racials of no use
-  in a fight (Find Treasure, Find Ley Line, Walk on Air) and Hearthstone
+  in a fight (Find Treasure, Read Leyline, Walk on Air) and Hearthstone
   never show (`big.ignore`), nor do items you aren't wearing (potions, a
   sleeping bag): only worn ones such as trinkets. The lit consumables
   ring shows the potions when your health or mana is low

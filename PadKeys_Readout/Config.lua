@@ -109,7 +109,7 @@ ns.config.readout = {
     ignore = {
       "Hearthstone",
       "Track Treasure", "Find Treasure",  -- dwarf
-      "Find Ley Line", "Walk on Air",     -- sky elf
+      "Read Leyline", "Walk on Air",      -- sky elf
     },
   },
 
