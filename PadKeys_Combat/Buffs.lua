@@ -709,9 +709,9 @@ end
 
 -- Buffs you want to keep an eye on out of combat (cfg.watch), e.g. the
 -- sleeping bag's: its time left and stacks, also while resting. Shown
--- while you carry the item or have the buff (and only while levelling,
--- for leveling = true). Red while missing (click uses the item), yellow
--- under warn_at, grey otherwise.
+-- while you carry the item, know the spell or have the buff (and only
+-- while levelling, for leveling = true). Red while missing (click uses
+-- the item, else casts the spell), yellow under warn_at, grey otherwise.
 local function watch_rows(rows)
   local level = UnitLevel("player") or 0
   for _, w in ipairs(cfg.watch or {}) do
@@ -723,15 +723,19 @@ local function watch_rows(rows)
         end
       end
       local item, item_icon = bag_item_holding(w.item)
-      if best or item then
+      local spell = w.spell and knows(w.spell) and spell_name(w.spell)
+      if best or item or spell then
+        local click = item and { type = "item", item = item } or
+                      spell and { type = "spell", spell = spell, unit = "player" } or nil
         local row = {
-          icon = best and best.icon or item_icon or w.icon,
+          icon = best and best.icon or item_icon or
+                 (spell and spell_icon(w.spell)) or w.icon,
           label = w.label or (best and best.name) or item,
           missing = best and {} or { "you" },
           left = best and best.left or nil,
           badge = best and best.stacks and best.stacks > 1 and
             tostring(best.stacks) or nil,
-          click = item and { type = "item", item = item } or nil,
+          click = click,
         }
         if best and best.left >= (w.warn_at or cfg.warn_at) then
           row.supply = true
