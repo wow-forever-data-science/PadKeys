@@ -618,14 +618,16 @@ local function supply_rows(rows, my_class)
   end
   local counts = bag_counts()
 
-  -- Ammo: what is in the ammo slot, counted across your bags.
+  -- Ammo: what is in the ammo slot, counted across your bags. Always
+  -- shown with s.always (as durability and bag space), yellow under
+  -- ammo_low; else only under it.
   if s.ammo_low and s.ammo_low > 0 and AMMO_CLASSES[my_class] then
     if equipped_ammo() then
       local n = GetInventoryItemCount("player", AMMO_SLOT) or 0
-      if n < s.ammo_low then
+      if s.always or n < s.ammo_low then
         rows[#rows + 1] = { icon = GetInventoryItemTexture("player", AMMO_SLOT),
                             label = "Ammo", count = tostring(n), supply = true,
-                            missing = {} }
+                            missing = {}, warn = n < s.ammo_low }
       end
     elseif my_class == "HUNTER" then
       rows[#rows + 1] = { icon = "Interface\\Icons\\INV_Ammo_Arrow_02", label = "No ammo", missing = { "you" },
