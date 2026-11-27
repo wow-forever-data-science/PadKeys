@@ -235,6 +235,15 @@ function ns.light_alpha(page, index, off, on)
   return plain(rule, page, index) and on or off
 end
 
+-- How a lit segment looks, from its rule: a frame colour ({ r, g, b })
+-- and whether it pulses; nil for the plain white frame.
+function ns.light_style(page, index)
+  local rule = rule_for(page, index)
+  if type(rule) == "table" then
+    return rule.color, rule.pulse
+  end
+end
+
 -- Whether a plain rule lights anything on `page` now (health and mana
 -- rules can't be asked: their answer is secret).
 function ns.page_lit(page)

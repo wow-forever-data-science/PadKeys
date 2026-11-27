@@ -594,11 +594,13 @@ while the wheel is open:
 - your **target's cast** (to interrupt) is off: the big cooldowns took
   its place and nameplates show casts. `target_cast = true` brings it
   back, lower right;
-- your **pet in trouble**, below, in combat: its portrait with a
-  pulsing red ring, for 3 seconds after it takes a lot of damage (a crit,
-  a crushing blow, or 3 hits within 2 seconds) and for as long as its
-  health is under 35%; otherwise nothing. Health is secret in combat; it
-  goes from the client straight into the ring's visibility;
+- your **pet in trouble**, below, in combat: the G wheel's pet heal
+  (Mend Pet on Action Bar 6 slot 7) with a pulsing red frame, for 3
+  seconds after it takes a lot of damage (a crit, a crushing blow, or 3
+  hits within 2 seconds) and for as long as its health is under 35%;
+  otherwise nothing. `pet.portrait = true` shows its portrait with a
+  pulsing red ring there instead. Health is secret in combat; it goes
+  from the client straight into the frame's visibility;
 - your **debuffs**, left: Blizzard's own debuff frame, docked like the
   tracked buffs, with its icons, times and dispel-type borders. Blizzard
   reads the debuffs, so this works in combat; Edit Mode still shows it
@@ -749,8 +751,8 @@ glows. By default:
   in combat the seconds need the item on an action bar as well (a hidden
   one is fine), as a bag item's cooldown is secret there;
 - on Action Bar 6: **slot 6** (south-west, a mana spell) under 25% mana;
-  **slot 7** (south, heal your pet) while your pet is under 35% or just
-  took heavy damage, or with no pet out like the healthstone, for a
+  **slot 7** (south, heal your pet), with a pulsing red frame, while
+  your pet is under 35% or just took heavy damage, or with no pet out like the healthstone, for a
   second heal or defensive of your own; and **slot 8** (south-east, your
   own heal or defensive) under 35% health or after heavy damage.
 
@@ -1318,6 +1320,10 @@ is loaded.
     or the tracker flickers or errors, say what you see;
     `quest.newest_first = false` in `PadKeys_Cursor/Config.lua` turns it
     off.
+63. **Mend Pet pulses red**: as a hunter in combat, let your pet drop
+    under 35% (or take a crit): no portrait below the mouse; the Mend Pet
+    icon there shows with a pulsing red frame instead. Heal it above 35%:
+    it goes.
 
 Known risks:
 - The buff reminder reads auras by name out of combat. If a list stays
