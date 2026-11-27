@@ -47,7 +47,7 @@ error points at one part:
 | **PadKeys_CombatText** | Small combat text: your hits scroll beside the target's nameplate with the spell's icon; the hits you take show lower right of the mouse, fading in as your health drops (earlier as a tank) and fully on heavy damage | PadKeys |
 | **PadKeys_Ready** | A spell flashes above the mouse as it becomes ready: reactive abilities (Overpower, Revenge, Execute, Riposte, ...) as they light up, and long cooldowns (30 s or more) as they come back, in combat | PadKeys |
 | **PadKeys_Readout** | Beside the mouse: a ring that fills with your cast (blue, green for heals, or glowing yellow while a listed buff outlasts it) and the global cooldown, a swing timer ring around it, your big cooldowns that are ready, your debuffs, your totems, and boss abilities from Blizzard's encounter timeline as they come close | PadKeys |
-| **PadKeys_NotReady** | Pressing a key or using an item that is still on cooldown flashes its icon and the time left in the middle of the screen, fading out over a second | PadKeys |
+| **PadKeys_NotReady** | Pressing a key or using an item that is still on cooldown flashes its icon and the time left above your character, fading out over a second | PadKeys |
 | **PadKeys_Cooldowns** | Blizzard's Cooldown Manager (cooldowns, buff icons, buff bars) in the PadKeys look: black borders, grey tints, the countdown without a swipe | PadKeys |
 | **PadKeys_Totems** | Blizzard's totem bar in the PadKeys look: black borders, no gold or element frames | PadKeys |
 | **PadKeys_Combo** | Combo points as a row of black and white pips above the bar, in place of Blizzard's (rogues, druids in Cat Form) | PadKeys |
@@ -505,7 +505,7 @@ the health points of both curves and `tank = true / false` are in
 ## Not ready flash (PadKeys_NotReady)
 
 Press a key whose spell or item is still on cooldown (or out of charges),
-or use such an item from your bags, and its icon flashes in the middle of
+or use such an item from your bags, and its icon flashes above your
 the screen with the time left on it, then fades out over a second. Another
 press on cooldown, of the same key or another, replaces it at once. The
 global cooldown alone flashes nothing.

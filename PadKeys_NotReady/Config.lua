@@ -4,10 +4,11 @@ local ns = PadKeys
 
 ns.config.not_ready = {
   -- Icon size in pixels, and its offset from the centre of the screen
-  -- (positive y is up).
+  -- (positive y is up): above your character, under the combat banner
+  -- (PadKeys_Combat, y = 120).
   size = 32,
   x = 0,
-  y = 0,
+  y = 80,
   -- Seconds the icon stays at full strength, then seconds to fade out.
   -- Another press (the same key or another one on cooldown) starts over.
   hold = 0,
