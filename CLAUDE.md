@@ -35,6 +35,10 @@ what is untested.
 - Auras in combat - let Blizzard read them and move its frames: the Cooldown Manager's Tracked Buffs (`BuffIconCooldownViewer`) is docked at the mouse (PadKeys_Readout `Dock.lua`, also Blizzard's `DebuffFrame`)
 - Managed frames - an Edit Mode system in its default place is re-anchored by `BottomManagedFrameContainer` on every `Layout`; re-dock in a post-hook on the container's `Layout`
 - Edit Mode systems replace `SetScale` - call the widget's own: `getmetatable(frame).__index.SetScale`
+- No "not ready" error - an action pressed on cooldown sends no `UI_ERROR_MESSAGE`; decide from the slot's cooldown state before the press (PadKeys_NotReady)
+- No custom cursor - `SetCursor` with an addon's own image leaves the arrow as it is, also after a restart; the pointer can't be hidden
+- Health curves - pass `usePredicted = false` to `UnitHealthPercent`; a heal on its way pushes the predicted percent over 100%
+- Item cooldowns - a bag item's numbers are secret in combat and have no duration object; an action slot holding the item gives one
 - Blizzard source - Gethe's `wow-ui-source`, branch `forever`: `gh api "repos/Gethe/wow-ui-source/contents/<path>?ref=forever" -q .content | base64 -d`
 
 ## Ownership with wow-settings
