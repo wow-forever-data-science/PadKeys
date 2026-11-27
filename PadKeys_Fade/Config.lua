@@ -70,10 +70,11 @@ ns.config.fade = {
     buffs = {
       "BuffFrame",
     },
-    -- Party frames: in combat, or while someone is hurt.
+    -- Party frames: everywhere but in an inn or a city; there in combat,
+    -- or while someone is hurt.
     party = {
       "PartyFrame",
-      show_when = { "combat", "group_hurt" },
+      show_when = { "not_resting", "combat", "group_hurt" },
     },
     -- The experience and reputation bars, for a few seconds as they change.
     status = {
