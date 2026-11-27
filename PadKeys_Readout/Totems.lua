@@ -10,7 +10,8 @@
 -- frame's SetCooldownFromDurationObject, the icon from GetTotemInfo into
 -- SetTexture: both may be secret and neither is compared. Whether a slot
 -- has a totem is GetTotemInfo's haveTotem; if the client hides it, the
--- slot shows while the duration object is accepted. Nothing here is
+-- slot shows while the duration object is accepted. A slot held with no
+-- icon or no duration (a summon that never runs out) is left out. Nothing here is
 -- secure, and nothing takes the mouse.
 
 local ns = PadKeys
@@ -68,9 +69,15 @@ local function update()
   for slot = 1, slots do
     local f = icons[slot]
     local ok = pcall(function()
-      local have, _, _, _, icon = GetTotemInfo(slot)
+      local have, _, _, duration, icon = GetTotemInfo(slot)
       if not is_secret(have) and not have then
         error("no totem")
+      end
+      -- A slot held with no icon and no time (a hunter's summoned hawk:
+      -- true, nil, start, 0, nil) would be an empty black box.
+      if (not is_secret(icon) and not icon) or
+         (not is_secret(duration) and duration == 0) then
+        error("nothing to show")
       end
       f.icon:SetTexture(icon)
       f.cooldown:SetCooldownFromDurationObject(GetTotemDuration(slot))
