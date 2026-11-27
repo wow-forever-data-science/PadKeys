@@ -69,7 +69,8 @@ ns.config.combat.buffs = {
   -- buff is missing (click to use the item), yellow under warn_at.
   -- `buff` and `item` are parts of names, any case; `spell` a spell ID,
   -- shown while you know it (click casts it). leveling = true: only below
-  -- the level cap. describe = true: hover shows what the buff gives.
+  -- the level cap. describe = true: hover shows what the buff gives now
+  -- (its tooltip, else its spell's description).
   -- `skip`: parts of a description whose buff doesn't count, though its
   -- name matches.
   -- The sleeping bag's buff is "Well-Rested" (checked in game). To check
@@ -88,6 +89,9 @@ ns.config.combat.buffs = {
     -- The stat or damage one: an experience Well Fed is skipped.
     { label = "Well Fed", buff = { "Well Fed" }, describe = true,
       skip = { "experience" } },
+    -- Camp Benefits' time left while it is on, and on hover what it
+    -- gives now (its tooltip).
+    { label = "Camp Benefits", buff = { "Camp Benefits" }, describe = true },
   },
 
   -- Supplies, as grey icons with a count, out of combat.

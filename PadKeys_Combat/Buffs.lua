@@ -189,6 +189,7 @@ local function buffs_of(unit)
         spell = aura.spellId,
         icon = aura.icon,
         stacks = aura.applications,
+        instance = aura.auraInstanceID,
       }
     end
   end)
@@ -707,9 +708,37 @@ local function bag_item_holding(parts)
   return nil
 end
 
--- An aura's own description, its numbers filled in ("Stamina and Spirit
--- increased by 12."), or nil until the client has it.
-local function aura_description(spell)
+-- The text of an aura's tooltip under its name: what it gives now, so a
+-- buff that grows (Camp Benefits) reads its current state. Out of combat
+-- only (the buff bar's time); nil if the client can't give it.
+local function tooltip_text(aura)
+  local tip = C_TooltipInfo and C_TooltipInfo.GetUnitBuffByAuraInstanceID
+  if not (tip and aura.instance) then
+    return nil
+  end
+  local ok, data = pcall(tip, "player", aura.instance)
+  if not ok or not data or not data.lines then
+    return nil
+  end
+  local lines = {}
+  for i = 2, #data.lines do
+    local text = data.lines[i].leftText
+    if text and text ~= "" and not (issecretvalue and issecretvalue(text)) then
+      lines[#lines + 1] = text
+    end
+  end
+  return lines[1] and table.concat(lines, "\n") or nil
+end
+
+-- What an aura gives: its tooltip, else its spell's description with the
+-- numbers filled in ("Stamina and Spirit increased by 12."), or nil until
+-- the client has it.
+local function aura_description(aura)
+  local tooltip = tooltip_text(aura)
+  if tooltip then
+    return tooltip
+  end
+  local spell = aura.spell
   local describe = C_Spell and C_Spell.GetSpellDescription or GetSpellDescription
   local text = spell and describe and describe(spell)
   if not text or text == "" then
@@ -733,7 +762,7 @@ local function watch_rows(rows)
       local best
       for _, aura in ipairs(buffs_of("player") or {}) do
         if holds(aura.name, w.buff) and (not best or aura.left > best.left) and
-           not (w.skip and holds(aura_description(aura.spell), w.skip)) then
+           not (w.skip and holds(aura_description(aura), w.skip)) then
           best = aura
         end
       end
@@ -751,7 +780,7 @@ local function watch_rows(rows)
           badge = best and best.stacks and best.stacks > 1 and
             tostring(best.stacks) or nil,
           click = click,
-          detail = w.describe and best and aura_description(best.spell) or nil,
+          detail = w.describe and best and aura_description(best) or nil,
         }
         if best and best.left >= (w.warn_at or cfg.warn_at) then
           row.supply = true
