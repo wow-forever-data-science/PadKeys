@@ -68,13 +68,14 @@ ns.config.combat.buffs = {
   -- buff is missing (click to use the item), yellow under warn_at.
   -- `buff` and `item` are parts of names, any case. leveling = true: only
   -- below the level cap.
-  -- The sleeping bag's names are guesses until checked in game: with the
-  -- buff on, this prints your buffs' names, spell IDs and stacks:
+  -- The sleeping bag's buff is "Well-Rested" (checked in game). To check
+  -- another buff's name, with it on, this prints your buffs' names, spell
+  -- IDs and stacks:
   -- /run for i=1,40 do local a=C_UnitAuras.GetAuraDataByIndex("player",i)
   --   if a then print(a.name,a.spellId,a.applications) end end
   -- (one line in the chat box).
   watch = {
-    { label = "Sleeping bag", buff = { "Sleeping Bag", "Well Rested", "Cozy" },
+    { label = "Sleeping bag", buff = { "Well-Rested" },
       item = { "Sleeping Bag" }, leveling = true },
   },
 
