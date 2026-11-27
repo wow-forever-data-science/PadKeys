@@ -148,8 +148,9 @@ ns.config.readout = {
   -- that is down, draining with its time left, the seconds on it. point
   -- is the row's point placed at x, y from the pointer: "BOTTOMLEFT"
   -- grows right from there, "TOP" centres the row under it.
-  -- above_buffs: just above the tracked buffs while one shows; x, y
-  -- (the buffs' corner) while none does.
+  -- beside_buffs: on the tracked buffs' line, right after the last one
+  -- showing; x, y (the buffs' corner) while none does. For one line, set
+  -- Tracked Buffs to horizontal in Edit Mode (a wow-settings layout).
   totems = {
     enabled = true,
     icon_size = 29,
@@ -157,7 +158,7 @@ ns.config.readout = {
     point = "BOTTOMLEFT",
     x = 16,
     y = 16,
-    above_buffs = true,
+    beside_buffs = true,
     countdown = true,
     countdown_size = 12,
   },
