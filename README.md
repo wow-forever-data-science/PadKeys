@@ -562,7 +562,7 @@ What changes fast, beside the mouse pointer, only while it matters:
   own swing timer, `PLAYER_SWING`). Its faint track stays on all through
   combat and is the line everything else sits on.
 
-Everything else sits right outside the swing ring (about 44 px from the
+Everything else sits right outside the swing ring (about 22 px from the
 pointer), at about two thirds of the size it had; holding G covers it
 while the wheel is open:
 
@@ -598,7 +598,8 @@ while the wheel is open:
   where Blizzard keeps it;
 - your **totems**, above right over the tracked buffs (timers running on
   you, like them): one small icon per totem that is down, draining
-  with its time left and the seconds on it; gone when none are down;
+  with its time left and the seconds on it; gone when none are down.
+  With no tracked buff showing they take the buffs' corner on the ring;
 - your **tracked buffs**, above right: Blizzard's Cooldown Manager buff
   icons ("Tracked Buffs") follow the pointer, each while the buff is on
   you, with its time left. Pick them in the Cooldown Manager's options
@@ -1242,6 +1243,11 @@ is loaded.
     shows, hover again a second later; if it shows the experience one or
     nothing, send
     `/run for i=1,40 do local a=C_UnitAuras.GetAuraDataByIndex("player",i) if a and a.name:find("Fed") then print(a.spellId,C_Spell.GetSpellDescription(a.spellId)) end end`.
+51. **Readout on the small rings**: target a mob with a big cooldown
+    ready and a totem down: every group sits right outside the swing
+    ring, about 22 px from the pointer. With no tracked buff on, the
+    totems sit at the ring's upper right; when a tracked buff shows they
+    move up above it. If two groups overlap, say which.
 
 Known risks:
 - The buff reminder reads auras by name out of combat. If a list stays

@@ -75,7 +75,7 @@ ns.config.readout = {
     off_color = { 0.7, 0.7, 0.7 },
   },
 
-  -- Everything below sits just outside the swing ring (about 44 px from
+  -- Everything below sits just outside the swing ring (about 22 px from
   -- the pointer). Holding G covers it while the wheel is open.
 
   -- Your big cooldowns that are ready (Big.lua), right of the pointer: a
@@ -97,7 +97,7 @@ ns.config.readout = {
     icon_size = 34,
     gap = 3,
     grow = "right",       -- a row growing right; "down": a column
-    x = 44,               -- left edge of the first icon, from the pointer
+    x = 22,               -- left edge of the first icon, from the pointer
     y = 0,
     only_when_fighting = true,  -- in combat or with an enemy targeted
     names = {},           -- e.g. { "Recklessness", "Innervate" }
@@ -118,8 +118,8 @@ ns.config.readout = {
   pet = {
     enabled = true,
     size = 40,
-    x = 30,              -- its top right, from the pointer
-    y = -44,
+    x = 20,              -- its top right, from the pointer
+    y = -22,
     low = 0.35,
     burst_hits = 3,
     burst_window = 2,
@@ -135,7 +135,7 @@ ns.config.readout = {
   -- Mode still shows it where Blizzard keeps it.
   debuffs = true,
   debuffs_point = "RIGHT",
-  debuffs_x = -44,
+  debuffs_x = -22,
   debuffs_y = 0,
   debuffs_scale = 0.92,
 
@@ -144,13 +144,16 @@ ns.config.readout = {
   -- that is down, draining with its time left, the seconds on it. point
   -- is the row's point placed at x, y from the pointer: "BOTTOMLEFT"
   -- grows right from there, "TOP" centres the row under it.
+  -- above_buffs: just above the tracked buffs while one shows; x, y
+  -- (the buffs' corner) while none does.
   totems = {
     enabled = true,
     icon_size = 29,
     gap = 3,
     point = "BOTTOMLEFT",
-    x = 32,
-    y = 70,
+    x = 16,
+    y = 16,
+    above_buffs = true,
     countdown = true,
     countdown_size = 12,
   },
@@ -167,8 +170,8 @@ ns.config.readout = {
   -- Blizzard's own timeline stays where it is.
   boss = true,
   boss_rows = 3,
-  boss_x = -32,
-  boss_y = 32,
+  boss_x = -16,
+  boss_y = 16,
 
   -- Your tracked buffs (Blizzard's Cooldown Manager, "Tracked Buffs")
   -- beside the mouse, while they are on you, with their time left. Pick
@@ -179,8 +182,8 @@ ns.config.readout = {
   -- docked.
   buffs = true,
   buffs_point = "BOTTOMLEFT",
-  buffs_x = 32,
-  buffs_y = 32,
+  buffs_x = 16,
+  buffs_y = 16,
   buffs_scale = 0.8,
 
   -- Icon size and text size of the target cast and boss rows, and the
