@@ -618,8 +618,9 @@ while the wheel is open:
   where Blizzard keeps it. Recently Bandaged and Boosted Rest (Camp
   Tent) are left out (`debuffs_hide`, spell IDs or names):
   its icon is invisible, its slot stays (a gap beside other debuffs). One
-  already on you stays hidden in combat; one that lands in combat may
-  show until combat ends;
+  already on you stays hidden in combat, found by its place in the row
+  (the game hides which debuff an icon is then); one that lands in combat
+  shows until combat ends;
 - your **totems**, above right over the tracked buffs (timers running on
   you, like them): one small icon per totem that is down, draining
   with its time left and the seconds on it; gone when none are down.

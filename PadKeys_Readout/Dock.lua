@@ -23,10 +23,12 @@
 -- invisible there:
 -- their icon gets alpha 0, so Blizzard's filter is never replaced. Its
 -- slot stays, a gap when other debuffs show. Which icon it is comes from
--- the aura's instance ID, read with pcall. In combat the read may be
--- refused: the IDs learned before are kept then (an aura keeps its ID
--- while it lasts), and only a read out of combat drops them. A listed
--- debuff that lands in combat shows until combat ends.
+-- the aura's instance ID, read with pcall out of combat. In combat the
+-- icons' IDs are secret, so it goes by place: the row as last seen out of
+-- combat, each hidden debuff moved one place left for every debuff before
+-- it that has run out since (their end times are plain out of combat).
+-- One removed early in combat (dispelled) leaves it one place off; a
+-- listed debuff that lands in combat shows until combat ends.
 
 local ns = PadKeys
 local c = ns.config.readout
@@ -157,43 +159,85 @@ end
 local hide_ids = c.debuffs_hide or {}
 if c.debuffs and DebuffFrame and DebuffFrame.auraFrames and hide_ids[1] and
    C_UnitAuras and C_UnitAuras.GetPlayerAuraBySpellID then
-  -- hidden[auraInstanceID] = true for the debuffs not shown.
-  local hidden = {}
+  local function aura_of(read, ...)
+    local ok, aura = pcall(read, ...)
+    return ok and aura or nil
+  end
 
-  local function read_hidden()
-    -- In combat a refused read says nothing: keep what was learned.
-    if not InCombatLockdown() then
-      wipe(hidden)
-    end
+  -- The listed debuffs on you now, by instance ID. Out of combat only:
+  -- in combat the reads are refused.
+  local function hidden_instances()
+    local hidden = {}
     for _, id in ipairs(hide_ids) do
-      local ok, aura
+      local aura
       if type(id) == "string" then
-        ok, aura = pcall(C_UnitAuras.GetAuraDataBySpellName, "player", id,
-                         "HARMFUL")
+        aura = aura_of(C_UnitAuras.GetAuraDataBySpellName, "player", id,
+                       "HARMFUL")
       else
-        ok, aura = pcall(C_UnitAuras.GetPlayerAuraBySpellID, id)
+        aura = aura_of(C_UnitAuras.GetPlayerAuraBySpellID, id)
       end
-      local instance = ok and aura and aura.auraInstanceID
+      local instance = aura and aura.auraInstanceID
       if instance and not is_secret(instance) then
         hidden[instance] = true
+      end
+    end
+    return hidden
+  end
+
+  local buttons, index_of = {}, {}
+  for _, button in ipairs(DebuffFrame.auraFrames) do
+    if not button.isAuraAnchor then
+      buttons[#buttons + 1] = button
+      index_of[button] = #buttons
+    end
+  end
+
+  -- The row of icons as last seen out of combat, first icon first: each
+  -- one hidden or not, and when it runs out (math.huge: never, or not
+  -- known).
+  local row = {}
+  local function learn_row()
+    local hidden = hidden_instances()
+    wipe(row)
+    for _, button in ipairs(buttons) do
+      local info = button.hasValidInfo and button.buttonInfo
+      local instance = info and info.auraInstanceID
+      if button:IsShown() and instance and not is_secret(instance) then
+        local aura = aura_of(C_UnitAuras.GetAuraDataByAuraInstanceID,
+                             "player", instance)
+        local expires = aura and aura.expirationTime
+        if not expires or is_secret(expires) or expires <= 0 then
+          expires = math.huge
+        end
+        row[#row + 1] = { hidden = hidden[instance] or false,
+                          expires = expires }
+      end
+    end
+  end
+
+  -- The icons (by place in the row) the listed debuffs hold now. Blizzard
+  -- fills the row in order, so as earlier debuffs run out each moves one
+  -- place left; a debuff that lands in combat goes after them.
+  local hidden_slots = {}
+  local function place_hidden()
+    wipe(hidden_slots)
+    local now, gone = GetTime(), 0
+    for i, entry in ipairs(row) do
+      local running = entry.expires > now
+      if entry.hidden and running then
+        hidden_slots[i - gone] = true
+      end
+      if not running then
+        gone = gone + 1
       end
     end
   end
 
   local function is_hidden(button)
-    local info = button.buttonInfo
-    local instance = button.hasValidInfo and info and info.auraInstanceID
-    return instance ~= nil and not is_secret(instance) and
-           hidden[instance] or false
+    return button:IsShown() and hidden_slots[index_of[button]] or false
   end
 
   -- The widget's own SetAlpha, so the hook below doesn't call itself.
-  local buttons = {}
-  for _, button in ipairs(DebuffFrame.auraFrames) do
-    if not button.isAuraAnchor then
-      buttons[#buttons + 1] = button
-    end
-  end
   local set_alpha = buttons[1] and getmetatable(buttons[1]).__index.SetAlpha
 
   -- Blizzard sets each icon's alpha as it nears expiry (its warning
@@ -209,7 +253,10 @@ if c.debuffs and DebuffFrame and DebuffFrame.auraFrames and hide_ids[1] and
   -- After each update of the icons: hide the listed ones, show again an
   -- icon hidden before that now holds another debuff.
   hooksecurefunc(DebuffFrame, "UpdateAuraButtons", function()
-    read_hidden()
+    if not InCombatLockdown() then
+      learn_row()
+    end
+    place_hidden()
     for _, button in ipairs(buttons) do
       if is_hidden(button) then
         button.padkeys_hidden = true
