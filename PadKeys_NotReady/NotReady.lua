@@ -1,5 +1,6 @@
 -- Pressing a key or using an item that is still on cooldown flashes its
--- icon in the middle of the screen, with the time left, and fades it out
+-- icon just above the mouse pointer (or mid-screen, anchor in
+-- Config.lua), with the time left, and fades it out
 -- (Config.lua: one second). Another such press, of the same key or
 -- another, replaces it at once and starts the fade again.
 --
@@ -57,8 +58,23 @@ end
 
 local frame = CreateFrame("Frame", "PadKeysNotReady", UIParent)
 frame:SetSize(c.size, c.size)
-frame:SetPoint("CENTER", UIParent, "CENTER", c.x or 0, c.y or 0)
-frame:SetFrameStrata("HIGH")
+if c.anchor == "cursor" then
+  -- Follows the pointer; turning with the mouse hides it: stay put then.
+  frame:SetScript("OnUpdate", function(self)
+    if IsMouselooking and IsMouselooking() then
+      return
+    end
+    local x, y = GetCursorPosition()
+    local scale = UIParent:GetEffectiveScale()
+    self:ClearAllPoints()
+    self:SetPoint("CENTER", UIParent, "BOTTOMLEFT",
+                  x / scale + (c.x or 0), y / scale + (c.y or 0))
+  end)
+else
+  frame:SetPoint("CENTER", UIParent, "CENTER", c.x or 0, c.y or 0)
+end
+-- Over the readout (DIALOG), so it covers a missing buff for its moment.
+frame:SetFrameStrata("FULLSCREEN_DIALOG")
 frame:SetAlpha(0)
 frame:EnableMouse(false)
 

@@ -1,6 +1,6 @@
 ## Interface: 11507, 16001
 ## Title: PadKeys - Not Ready
-## Notes: Pressing a key or using an item that is still on cooldown flashes its icon and the time left in the middle of the screen. Needs PadKeys.
+## Notes: Pressing a key or using an item that is still on cooldown flashes its icon and the time left just above the mouse pointer. Needs PadKeys.
 ## Author: wow-forever-data-science
 ## Version: 0.1.0
 ## Dependencies: PadKeys

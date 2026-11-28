@@ -3,12 +3,16 @@
 local ns = PadKeys
 
 ns.config.not_ready = {
-  -- Icon size in pixels, and its offset from the centre of the screen
-  -- (positive y is up): above your character, under the combat banner
-  -- (PadKeys_Combat, y = 120).
-  size = 32,
+  -- Where it flashes. "cursor": just above the mouse pointer, on the
+  -- swing ring where PadKeys_Readout shows a missing buff (drawn over it
+  -- for that moment), under PadKeys_Ready's flash. "center": above your
+  -- character, under the combat banner (PadKeys_Combat), e.g. y = 80.
+  -- x, y is the icon's centre from the pointer or the middle of the
+  -- screen (positive y is up).
+  anchor = "cursor",
+  size = 29,
   x = 0,
-  y = 80,
+  y = 36,
   -- Seconds the icon stays at full strength, then seconds to fade out.
   -- Another press (the same key or another one on cooldown) starts over.
   hold = 0,

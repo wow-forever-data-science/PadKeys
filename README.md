@@ -47,7 +47,7 @@ error points at one part:
 | **PadKeys_CombatText** | Small combat text: your hits scroll beside the target's nameplate with the spell's icon; the hits you take show lower right of the mouse, fading in as your health drops (earlier as a tank) and fully on heavy damage | PadKeys |
 | **PadKeys_Ready** | A spell flashes above the mouse as it becomes ready: reactive abilities (Overpower, Revenge, Execute, Riposte, ...) as they light up, and long cooldowns (30 s or more) as they come back, in combat | PadKeys |
 | **PadKeys_Readout** | Beside the mouse: a ring that fills with your cast (blue, green for heals, or glowing yellow while a listed buff outlasts it) and the global cooldown, a swing timer ring around it, your big cooldowns that are ready, your debuffs, your totems, and boss abilities from Blizzard's encounter timeline as they come close | PadKeys |
-| **PadKeys_NotReady** | Pressing a key or using an item that is still on cooldown flashes its icon and the time left above your character, fading out over a second | PadKeys |
+| **PadKeys_NotReady** | Pressing a key or using an item that is still on cooldown flashes its icon and the time left just above the mouse pointer, fading out over a second | PadKeys |
 | **PadKeys_Cooldowns** | Blizzard's Cooldown Manager (cooldowns, buff icons, buff bars) in the PadKeys look: black borders, grey tints, the countdown without a swipe | PadKeys |
 | **PadKeys_Totems** | Blizzard's totem bar in the PadKeys look: black borders, no gold or element frames | PadKeys |
 | **PadKeys_Combo** | Combo points as a row of black and white pips above the bar, in place of Blizzard's (rogues, druids in Cat Form) | PadKeys |
@@ -511,8 +511,10 @@ the health points of both curves and `tank = true / false` are in
 ## Not ready flash (PadKeys_NotReady)
 
 Press a key whose spell or item is still on cooldown (or out of charges),
-or use such an item from your bags, and its icon flashes above your
-character (under the combat banner) with the time left on it, then fades out over a second. Another
+or use such an item from your bags, and its icon flashes just above the
+mouse pointer (on the swing ring, under the ready flash) with the time left
+on it, then fades out over a second. `anchor = "center"` puts it above your
+character instead. Another
 press on cooldown, of the same key or another, replaces it at once. The
 global cooldown alone flashes nothing.
 
@@ -1088,7 +1090,7 @@ is loaded.
 **Stage 10: + PadKeys_NotReady**
 
 23. **Not ready**: cast a spell with a cooldown, then press its key again,
-    in and out of combat: its icon flashes mid-screen with the time left
+    in and out of combat: its icon flashes above the pointer with the time left
     and fades out over a second. Press it twice fast: the flash restarts.
     Press another key on cooldown mid-fade: its icon replaces the first.
     Spam a key during the global cooldown alone: nothing flashes. Use a
@@ -1233,7 +1235,7 @@ is loaded.
     `/run print(C_Spell.GetSpellSubtext(C_Spell.GetSpellIDForSpellIdentifier("NAME")))`
     with its name.
 42. **Rapid Fire on hold**: as a hunter, use Rapid Fire, then press it
-    again while its buff runs: its icon flashes mid-screen (no time on
+    again while its buff runs: its icon flashes above the pointer (no time on
     it), and the PadKeys bar shows it see-through. Once the buff ends the
     countdown appears as usual, and pressing it then flashes with the
     time. If nothing flashes during the buff, send
@@ -1263,7 +1265,7 @@ is loaded.
     Well Fed's icon with its time left (e.g. 14m), yellow under 5
     minutes. Once it runs out, the food in your bags shows red instead.
 48. **Not ready, without the error**: as a dwarf, use Stoneform, then
-    press it again: its icon flashes mid-screen with the time left. A
+    press it again: its icon flashes above the pointer with the time left. A
     ready key and the global cooldown flash nothing. As a hunter, Rapid
     Fire pressed again during its buff flashes without a time. If a key
     on cooldown flashes nothing, send
@@ -1342,7 +1344,7 @@ is loaded.
     you see; `quest.progress_first = false` turns it off.
 65. **Recently Bandaged**: use a bandage out of combat: no Recently
     Bandaged icon among the debuffs at the mouse. Press the bandage
-    again: the debuff's icon flashes mid-screen with about a minute
+    again: the debuff's icon flashes above the pointer with about a minute
     left. Wait it out and press again: you bandage, nothing flashes. Do
     the same in combat: the flash works; if the debuff icon shows at the
     mouse there, it should go once combat ends.

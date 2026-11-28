@@ -6,8 +6,8 @@ ns.config.ready = {
   -- Where it flashes. "cursor": above the mouse pointer, just outside
   -- the swing ring (PadKeys_Readout; its icon's centre x, y from the
   -- pointer, positive y is up; the name above it). "center": x, y from
-  -- the middle of the screen (PadKeys_NotReady flashes at y = 80 there),
-  -- e.g. y = 70.
+  -- the middle of the screen, e.g. y = 70. PadKeys_NotReady flashes
+  -- under it, at y = 36 from the pointer.
   anchor = "cursor",
   size = 72,
   x = 0,
