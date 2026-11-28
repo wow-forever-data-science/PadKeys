@@ -19,7 +19,8 @@
 -- container's layouts. A frame that is protected is only moved out of
 -- combat.
 --
--- Debuffs in debuffs_hide (Recently Bandaged) are made invisible there:
+-- Debuffs in debuffs_hide (Recently Bandaged, Boosted Rest) are made
+-- invisible there:
 -- their icon gets alpha 0, so Blizzard's filter is never replaced. Its
 -- slot stays, a gap when other debuffs show. Which icon it is comes from
 -- the aura's instance ID, read with pcall; in combat the read may be
@@ -160,7 +161,13 @@ if c.debuffs and DebuffFrame and DebuffFrame.auraFrames and hide_ids[1] and
   local function read_hidden()
     wipe(hidden)
     for _, id in ipairs(hide_ids) do
-      local ok, aura = pcall(C_UnitAuras.GetPlayerAuraBySpellID, id)
+      local ok, aura
+      if type(id) == "string" then
+        ok, aura = pcall(C_UnitAuras.GetAuraDataBySpellName, "player", id,
+                         "HARMFUL")
+      else
+        ok, aura = pcall(C_UnitAuras.GetPlayerAuraBySpellID, id)
+      end
       local instance = ok and aura and aura.auraInstanceID
       if instance and not is_secret(instance) then
         hidden[instance] = true

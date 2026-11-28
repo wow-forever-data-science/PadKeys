@@ -614,7 +614,8 @@ while the wheel is open:
 - your **debuffs**, left: Blizzard's own debuff frame, docked like the
   tracked buffs, with its icons, times and dispel-type borders. Blizzard
   reads the debuffs, so this works in combat; Edit Mode still shows it
-  where Blizzard keeps it. Recently Bandaged is left out (`debuffs_hide`):
+  where Blizzard keeps it. Recently Bandaged and Boosted Rest (Camp
+  Tent) are left out (`debuffs_hide`, spell IDs or names):
   its icon is invisible, its slot stays (a gap beside other debuffs). In
   combat the game may refuse to say which icon it is, and then it shows
   until combat ends;
