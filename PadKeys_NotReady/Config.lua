@@ -15,10 +15,10 @@ ns.config.not_ready = {
   x = 0,
   y = 44,
   -- A soft glow behind the icon, so it stands apart from the buffs and
-  -- totems around the pointer: red, as the readout's other warnings
-  -- (missing buff). false for none.
-  glow = { 1, 0.15, 0.1 },
-  glow_alpha = 0.9,
+  -- totems around the pointer: soft gold, as WeakAuras and Blizzard
+  -- highlight spells and procs. false for none.
+  glow = { 1, 0.82, 0 },
+  glow_alpha = 0.7,
   -- Seconds the icon stays at full strength, then seconds to fade out.
   -- Another press (the same key or another one on cooldown) starts over.
   hold = 0,
