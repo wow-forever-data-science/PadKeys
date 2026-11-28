@@ -20,8 +20,10 @@ ns.config.fade = {
   --     resting      in an inn or a city
   --     not_resting  out of an inn or a city
   --     mounted      you are mounted
-  --     not_full     out of combat, your health or mana isn't full
-  --     group_hurt   out of combat, someone in your party isn't at full health
+  --     not_full     out of combat, your health or mana changed in the last
+  --                  5 seconds (still filling up: the game hides the numbers)
+  --     group_hurt   out of combat, a party member's health changed in the
+  --                  last 5 seconds
   --     talents      you have talent points to spend
   --     typing       a chat line is being typed
   -- - flash_on: game events that show it for flash_for seconds, then it

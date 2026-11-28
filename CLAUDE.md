@@ -25,6 +25,7 @@ what is untested.
 
 ## Forever client rules (learned from in-game errors)
 
+- Health and power always secret - current values are secret out of combat too (`UnitHealth` has `SecretReturns = true`); max health is plain; decide "not full" from `UNIT_HEALTH` / `UNIT_POWER_UPDATE` events (PadKeys_Fade `not_full`)
 - Secret values - cooldown, aura and health numbers are secret in combat; addon code may not compare them, do arithmetic on them, or pass them to most widget setters (`Cooldown:SetCooldown` refuses them)
 - Auras - `C_UnitAuras.GetAuraDataByIndex` errors in combat when tainted; `GameTooltip:SetUnitAura` can still show one by index
 - Use the duration objects instead - `C_ActionBar.GetActionCooldownDuration` / `GetActionChargeDuration` with `Cooldown:SetCooldownFromDurationObject`
