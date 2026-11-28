@@ -145,11 +145,13 @@ ns.config.readout = {
   debuffs_x = -22,
   debuffs_y = 0,
   debuffs_scale = 0.92,
-  -- Debuffs never shown there (spell IDs): invisible, their slot stays.
-  -- Pressing a bandage under Recently Bandaged flashes it in the middle
-  -- of the screen instead (PadKeys_NotReady).
+  -- Debuffs never shown there (spell IDs, or names as the tooltip shows
+  -- them, in your client's language): invisible, their slot stays.
+  -- Pressing a bandage under Recently Bandaged flashes it above the
+  -- pointer instead (PadKeys_NotReady).
   debuffs_hide = {
-    11196,  -- Recently Bandaged
+    11196,           -- Recently Bandaged
+    "Boosted Rest",  -- no more rested experience from a Camp Tent
   },
 
   -- Your totems above right of the pointer, over the tracked buffs
