@@ -522,6 +522,11 @@ until the cooldown starts. The PadKeys bar and the G wheel show it
 see-through without a countdown in that time, and the big cooldowns
 beside the mouse drop it at once.
 
+Bandages have no cooldown, only the Recently Bandaged debuff. Press a
+bandage under it, from an action bar or the bags, and the debuff's icon
+flashes with its time left. The debuff is kept from your own First Aid
+channel, so this works in combat too (`bandage` in Config.lua).
+
 The Forever client sends no "Spell is not ready yet." error for a key on
 cooldown, so a key flashes when its action was cooling just before the
 press (and still is). Items from your bags or worn wait for the game's
@@ -606,7 +611,10 @@ while the wheel is open:
 - your **debuffs**, left: Blizzard's own debuff frame, docked like the
   tracked buffs, with its icons, times and dispel-type borders. Blizzard
   reads the debuffs, so this works in combat; Edit Mode still shows it
-  where Blizzard keeps it;
+  where Blizzard keeps it. Recently Bandaged is left out (`debuffs_hide`):
+  its icon is invisible, its slot stays (a gap beside other debuffs). In
+  combat the game may refuse to say which icon it is, and then it shows
+  until combat ends;
 - your **totems**, above right over the tracked buffs (timers running on
   you, like them): one small icon per totem that is down, draining
   with its time left and the seconds on it; gone when none are down.
@@ -1332,6 +1340,12 @@ is loaded.
     the tracker (or untracked): the tracker flashes with that quest
     first. If the tracker flickers on every update or errors, say what
     you see; `quest.progress_first = false` turns it off.
+65. **Recently Bandaged**: use a bandage out of combat: no Recently
+    Bandaged icon among the debuffs at the mouse. Press the bandage
+    again: the debuff's icon flashes mid-screen with about a minute
+    left. Wait it out and press again: you bandage, nothing flashes. Do
+    the same in combat: the flash works; if the debuff icon shows at the
+    mouse there, it should go once combat ends.
 
 Known risks:
 - The buff reminder reads auras by name out of combat. If a list stays

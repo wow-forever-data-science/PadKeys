@@ -18,6 +18,12 @@
 -- icon showing is enough). So it is docked again after each of the
 -- container's layouts. A frame that is protected is only moved out of
 -- combat.
+--
+-- Debuffs in debuffs_hide (Recently Bandaged) are made invisible there:
+-- their icon gets alpha 0, so Blizzard's filter is never replaced. Its
+-- slot stays, a gap when other debuffs show. Which icon it is comes from
+-- the aura's instance ID, read with pcall; in combat the read may be
+-- refused, and then the icon shows until combat ends.
 
 local ns = PadKeys
 local c = ns.config.readout
@@ -137,6 +143,71 @@ end
 if c.debuffs and DebuffFrame then
   dock_frame(DebuffFrame, c.debuffs_point or "RIGHT",
              c.debuffs_x or -96, c.debuffs_y or 0, c.debuffs_scale or 0.7)
+end
+
+-- --- Hidden debuffs ---------------------------------------------------------
+
+local function is_secret(v)
+  return issecretvalue and issecretvalue(v)
+end
+
+local hide_ids = c.debuffs_hide or {}
+if c.debuffs and DebuffFrame and DebuffFrame.auraFrames and hide_ids[1] and
+   C_UnitAuras and C_UnitAuras.GetPlayerAuraBySpellID then
+  -- hidden[auraInstanceID] = true for the debuffs not shown.
+  local hidden = {}
+
+  local function read_hidden()
+    wipe(hidden)
+    for _, id in ipairs(hide_ids) do
+      local ok, aura = pcall(C_UnitAuras.GetPlayerAuraBySpellID, id)
+      local instance = ok and aura and aura.auraInstanceID
+      if instance and not is_secret(instance) then
+        hidden[instance] = true
+      end
+    end
+  end
+
+  local function is_hidden(button)
+    local info = button.buttonInfo
+    local instance = button.hasValidInfo and info and info.auraInstanceID
+    return instance ~= nil and not is_secret(instance) and
+           hidden[instance] or false
+  end
+
+  -- The widget's own SetAlpha, so the hook below doesn't call itself.
+  local buttons = {}
+  for _, button in ipairs(DebuffFrame.auraFrames) do
+    if not button.isAuraAnchor then
+      buttons[#buttons + 1] = button
+    end
+  end
+  local set_alpha = buttons[1] and getmetatable(buttons[1]).__index.SetAlpha
+
+  -- Blizzard sets each icon's alpha as it nears expiry (its warning
+  -- flash): a hidden one is set back to 0 right after.
+  for _, button in ipairs(buttons) do
+    hooksecurefunc(button, "SetAlpha", function(self)
+      if is_hidden(self) then
+        set_alpha(self, 0)
+      end
+    end)
+  end
+
+  -- After each update of the icons: hide the listed ones, show again an
+  -- icon hidden before that now holds another debuff.
+  hooksecurefunc(DebuffFrame, "UpdateAuraButtons", function()
+    read_hidden()
+    for _, button in ipairs(buttons) do
+      if is_hidden(button) then
+        button.padkeys_hidden = true
+        set_alpha(button, 0)
+      elseif button.padkeys_hidden then
+        button.padkeys_hidden = nil
+        set_alpha(button, 1)
+      end
+    end
+  end)
 end
 
 if not redocks[1] then

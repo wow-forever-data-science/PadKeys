@@ -145,6 +145,12 @@ ns.config.readout = {
   debuffs_x = -22,
   debuffs_y = 0,
   debuffs_scale = 0.92,
+  -- Debuffs never shown there (spell IDs): invisible, their slot stays.
+  -- Pressing a bandage under Recently Bandaged flashes it in the middle
+  -- of the screen instead (PadKeys_NotReady).
+  debuffs_hide = {
+    11196,  -- Recently Bandaged
+  },
 
   -- Your totems above right of the pointer, over the tracked buffs
   -- (Totems.lua): timers running on you, like them. One icon per totem
