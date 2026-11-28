@@ -317,7 +317,8 @@ PadKeys_Fade keeps Blizzard's frames and makes them invisible instead:
   - the **micro menu** while you have talent points to spend;
   - the **bags** for 3 seconds as loot goes into them;
   - your **player and pet frames** in combat, with a target, or out of
-    combat while your health or mana isn't full;
+    combat while your health or mana fills back up (it changed in the
+    last 5 seconds; the game hides the numbers themselves);
   - the **party frames** everywhere but in an inn or a city; there in
     combat, or while someone is hurt;
   - the **experience and reputation bars** for 4 seconds as they change;
@@ -1092,7 +1093,9 @@ is loaded.
     tracker are faded. Target a mob: the player frame shows. Pull it:
     the player frame stays. Kill a quest mob: the quest tracker shows for
     5 seconds. Hold `\`: everything shows; let go: it fades. After the fight,
-    the player frame stays until health and mana are full. Kill a mob for
+    the player frame stays while health and mana fill up, and fades
+    about 5 seconds after they are full. Eat or drink in the wild: the
+    player frame shows until you are full. Kill a mob for
     experience: the experience bar shows for 4 seconds. Loot an item: the
     bags show for 3 seconds. In a party, a hurt member shows the party
     frames out of combat.
@@ -1291,8 +1294,8 @@ is loaded.
     `/run for i=1,40 do local a=C_UnitAuras.GetAuraDataByIndex("player",i) if a and a.name:find("Camp") then print(a.name,a.spellId,a.duration) end end`.
 55. **Party frames outside cities**: in a party, out of combat in the
     wild with everyone at full health: the party frames show. Walk into
-    a city: they fade out, and come back in combat or when someone is
-    hurt.
+    a city: they fade out, and come back in combat or while someone's
+    health changes (fills back up after a fight).
 56. **Mend Pet and dead mobs**: as a hunter, let your pet drop under
     35%, Mend Pet it back to full: the Mend Pet slice at the mouse goes
     once it is above 35%, also while Mend Pet still heals. Kill a mob and

@@ -9,9 +9,13 @@
 -- event (flash_on: experience gained, loot in the bags). Holding the
 -- show-all key (\ in Config.lua) shows every group until it is let go.
 --
--- Health and power are secret values in combat, so not_full and
--- group_hurt read them out of combat only, skip a secret one and wrap the
--- reads in pcall; in combat those groups rely on "combat".
+-- Current health and power are secret values, in and out of combat, and
+-- no plain "is full" flag exists. So not_full and group_hurt never read
+-- them: they watch the events instead (UNIT_HEALTH, UNIT_POWER_UPDATE,
+-- whose payload is plain). Health or mana that changed in the last few
+-- seconds isn't full yet: regeneration, eating and drinking tick every
+-- 2-3 seconds until it is, then the events stop. Out of combat only; in
+-- combat those groups rely on "combat".
 --
 -- Nothing here is secure, and it never shows, hides or moves a Blizzard
 -- frame: alpha is all it sets, so it works in combat and the keys keep
@@ -274,33 +278,50 @@ local function is_secret(v)
   return issecretvalue and issecretvalue(v)
 end
 
--- true if a's plain value is below b's; false if either is secret.
-local function below(a, b)
-  if a == nil or b == nil or is_secret(a) or is_secret(b) then
-    return false
+-- Seconds after a change that health or mana still counts as not full:
+-- longer than the 2-3 seconds between regeneration ticks.
+local CHANGE_WINDOW = 5
+
+-- changed_at[unit] = when that unit's health (or the player's mana) last
+-- changed.
+local changed_at = {}
+local MANA_TOKEN = "MANA"
+
+local function on_change(_, event, unit, power)
+  if event == "UNIT_POWER_UPDATE" and power ~= MANA_TOKEN then
+    return
   end
-  return a < b
+  changed_at[unit] = GetTime()
 end
 
--- Out of combat: unit's health (and mana, with `mana`) isn't full.
-local function not_full(unit, mana)
-  if InCombatLockdown() or not UnitExists(unit) or UnitIsDeadOrGhost(unit) then
+-- RegisterUnitEvent takes two units per event, so a frame per pair.
+local function watch(event, unit1, unit2)
+  local f = CreateFrame("Frame")
+  f:RegisterUnitEvent(event, unit1, unit2)
+  f:SetScript("OnEvent", on_change)
+end
+watch("UNIT_HEALTH", "player")
+watch("UNIT_POWER_UPDATE", "player")
+watch("UNIT_HEALTH", "party1", "party2")
+watch("UNIT_HEALTH", "party3", "party4")
+
+local function in_combat()
+  return InCombatLockdown() or UnitAffectingCombat("player")
+end
+
+-- Out of combat: unit's health (or the player's mana) changed a moment
+-- ago, so it is still filling up (or just dropped).
+local function not_full(unit)
+  if in_combat() or not UnitExists(unit) or UnitIsDeadOrGhost(unit) then
     return false
   end
-  local ok, result = pcall(function()
-    if below(UnitHealth(unit), UnitHealthMax(unit)) then
-      return true
-    end
-    local MANA = Enum and Enum.PowerType and Enum.PowerType.Mana or 0
-    return mana and UnitPowerType(unit) == MANA and
-           below(UnitPower(unit, MANA), UnitPowerMax(unit, MANA))
-  end)
-  return ok and result or false
+  local at = changed_at[unit]
+  return at ~= nil and GetTime() - at < CHANGE_WINDOW
 end
 
 local function group_hurt()
   for i = 1, 4 do
-    if not_full("party" .. i, false) then
+    if not_full("party" .. i) then
       return true
     end
   end
@@ -319,15 +340,15 @@ local function typing()
 end
 
 local CONDITIONS = {
-  combat = function() return InCombatLockdown() or UnitAffectingCombat("player") end,
-  no_combat = function() return not (InCombatLockdown() or UnitAffectingCombat("player")) end,
+  combat = in_combat,
+  no_combat = function() return not in_combat() end,
   target = function() return UnitExists("target") end,
   pet = function() return UnitExists("pet") end,
   group = function() return IsInGroup() end,
   resting = function() return IsResting() end,
   not_resting = function() return not IsResting() end,
   mounted = function() return IsMounted() end,
-  not_full = function() return not_full("player", true) end,
+  not_full = function() return not_full("player") end,
   group_hurt = group_hurt,
   talents = talents,
   typing = typing,
