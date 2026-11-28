@@ -14,11 +14,6 @@
 -- slot shows while the duration object is accepted. A slot held with no
 -- icon or no duration (a summon that never runs out) is left out. Nothing here is
 -- secure, and nothing takes the mouse.
---
--- Eating and drinking join the row out of combat (totems.eating): the
--- Food and Drink buffs, after the totems, draining with their time left.
--- They are read by name out of combat only, where auras are plain; combat
--- ends them anyway.
 
 local ns = PadKeys
 local c = ns.config.readout
@@ -42,9 +37,8 @@ row:SetSize(1, size)
 row:SetPoint(point, readout, "CENTER", t.x or 62, t.y or 96)
 row:EnableMouse(false)
 
-local eating = t.eating or {}
 local icons = {}
-for i = 1, slots + #eating do
+for i = 1, slots do
   local f = CreateFrame("Frame", nil, row)
   f:SetSize(size, size)
   ns.box(f, 0, c.rounded)
@@ -91,27 +85,6 @@ local function update()
     end)
     f:SetShown(ok)
     if ok then
-      shown[#shown + 1] = f
-    else
-      f.cooldown:Clear()
-    end
-  end
-  -- Food and Drink after the totems, out of combat.
-  for i, name in ipairs(eating) do
-    local f = icons[slots + i]
-    local aura
-    if not InCombatLockdown() then
-      local ok, data = pcall(C_UnitAuras.GetAuraDataBySpellName, "player",
-                             name, "HELPFUL")
-      if ok and data and not is_secret(data.duration) and
-         not is_secret(data.expirationTime) and data.duration > 0 then
-        aura = data
-      end
-    end
-    f:SetShown(aura ~= nil)
-    if aura then
-      f.icon:SetTexture(aura.icon)
-      f.cooldown:SetCooldown(aura.expirationTime - aura.duration, aura.duration)
       shown[#shown + 1] = f
     else
       f.cooldown:Clear()
@@ -176,12 +149,8 @@ row:SetScript("OnUpdate", function(_, elapsed)
 end)
 
 local events = CreateFrame("Frame")
-for _, event in ipairs({ "PLAYER_TOTEM_UPDATE", "PLAYER_ENTERING_WORLD",
-                         "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED" }) do
+for _, event in ipairs({ "PLAYER_TOTEM_UPDATE", "PLAYER_ENTERING_WORLD" }) do
   pcall(events.RegisterEvent, events, event)
-end
-if eating[1] then
-  events:RegisterUnitEvent("UNIT_AURA", "player")
 end
 events:SetScript("OnEvent", update)
 

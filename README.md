@@ -623,9 +623,7 @@ while the wheel is open:
   you, like them): one small icon per totem that is down, draining
   with its time left and the seconds on it; gone when none are down.
   They join the tracked buffs' line, right after the last one showing
-  (or take the buffs' corner on the ring while none shows). Out of
-  combat, **eating and drinking** join the row after them: the Food and
-  Drink buffs with their time left (`totems.eating`);
+  (or take the buffs' corner on the ring while none shows);
 - a **buff you need that is missing**, in combat, just above the
   pointer: its icon with a red frame, e.g. Aspect of the Hawk for a
   hunter (`missing`). Buffs are secret in combat, so what is on you is
@@ -1352,10 +1350,6 @@ is loaded.
     left. Wait it out and press again: you bandage, nothing flashes. Do
     the same in combat: the flash works; if the debuff icon shows at the
     mouse there, it should go once combat ends.
-66. **Eating timer**: out of combat, eat and drink: their icons show
-    above right of the pointer, after any totems, draining with the
-    seconds left. Stand up or get full: they go. If nothing shows, send
-    `/run for i=1,40 do local a=C_UnitAuras.GetAuraDataByIndex("player",i,"HELPFUL") if a then print(a.name, a.duration) end end`.
 
 Known risks:
 - The buff reminder reads auras by name out of combat. If a list stays

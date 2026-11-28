@@ -172,10 +172,6 @@ ns.config.readout = {
     beside_buffs = true,
     countdown = true,
     countdown_size = 12,
-    -- Eating and drinking, after the totems, out of combat: these buffs
-    -- (names as the buff bar shows them, in your client's language) with
-    -- their time left. {} for none.
-    eating = { "Food", "Drink", "Food & Drink", "Refreshment" },
   },
 
   -- A buff you need that is missing, in combat, just above the pointer
