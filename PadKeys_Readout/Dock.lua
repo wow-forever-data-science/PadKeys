@@ -23,8 +23,10 @@
 -- invisible there:
 -- their icon gets alpha 0, so Blizzard's filter is never replaced. Its
 -- slot stays, a gap when other debuffs show. Which icon it is comes from
--- the aura's instance ID, read with pcall; in combat the read may be
--- refused, and then the icon shows until combat ends.
+-- the aura's instance ID, read with pcall. In combat the read may be
+-- refused: the IDs learned before are kept then (an aura keeps its ID
+-- while it lasts), and only a read out of combat drops them. A listed
+-- debuff that lands in combat shows until combat ends.
 
 local ns = PadKeys
 local c = ns.config.readout
@@ -159,7 +161,10 @@ if c.debuffs and DebuffFrame and DebuffFrame.auraFrames and hide_ids[1] and
   local hidden = {}
 
   local function read_hidden()
-    wipe(hidden)
+    -- In combat a refused read says nothing: keep what was learned.
+    if not InCombatLockdown() then
+      wipe(hidden)
+    end
     for _, id in ipairs(hide_ids) do
       local ok, aura
       if type(id) == "string" then

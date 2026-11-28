@@ -616,9 +616,9 @@ while the wheel is open:
   reads the debuffs, so this works in combat; Edit Mode still shows it
   where Blizzard keeps it. Recently Bandaged and Boosted Rest (Camp
   Tent) are left out (`debuffs_hide`, spell IDs or names):
-  its icon is invisible, its slot stays (a gap beside other debuffs). In
-  combat the game may refuse to say which icon it is, and then it shows
-  until combat ends;
+  its icon is invisible, its slot stays (a gap beside other debuffs). One
+  already on you stays hidden in combat; one that lands in combat may
+  show until combat ends;
 - your **totems**, above right over the tracked buffs (timers running on
   you, like them): one small icon per totem that is down, draining
   with its time left and the seconds on it; gone when none are down.
