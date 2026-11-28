@@ -73,7 +73,7 @@ if c.anchor == "cursor" then
 else
   frame:SetPoint("CENTER", UIParent, "CENTER", c.x or 0, c.y or 0)
 end
--- Over the readout (DIALOG), so it covers a missing buff for its moment.
+-- Over the readout (DIALOG) and the ready flash, whatever it overlaps.
 frame:SetFrameStrata("FULLSCREEN_DIALOG")
 frame:SetAlpha(0)
 frame:EnableMouse(false)
