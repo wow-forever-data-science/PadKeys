@@ -93,6 +93,10 @@ ns.config.combat.buffs = {
     -- Camp Benefits' time left while it is on, and on hover what it
     -- gives now (its tooltip).
     { label = "Camp Benefits", buff = { "Camp Benefits" }, describe = true },
+    -- Eating and drinking: their time left while you sit (also in an inn).
+    -- warn_at = 0 keeps them grey, not yellow as running out.
+    { label = "Eating", buff = { "Food" }, warn_at = 0 },
+    { label = "Drinking", buff = { "Drink", "Refreshment" }, warn_at = 0 },
   },
 
   -- Supplies, as grey icons with a count, out of combat.
