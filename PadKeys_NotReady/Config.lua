@@ -22,4 +22,8 @@ ns.config.not_ready = {
   rounded = true,
   -- Pressing a key during the global cooldown alone flashes nothing.
   ignore_gcd = true,
+  -- Pressing a bandage under Recently Bandaged flashes the debuff with its
+  -- time left (bandages have no cooldown of their own). PadKeys_Readout
+  -- leaves the debuff out at the mouse (debuffs_hide).
+  bandage = true,
 }

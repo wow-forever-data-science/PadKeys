@@ -24,6 +24,13 @@
 -- isOnGCD) are tested, as on PadKeys_Bar. Item cooldowns have no duration
 -- object: SetCooldown is tried with pcall and the countdown is left out if
 -- it refuses the numbers.
+--
+-- Bandages have no cooldown, only the Recently Bandaged debuff (60
+-- seconds). Pressing one under it (action slot or bag) flashes the
+-- debuff's icon with its time left. The debuff is kept from your own
+-- First Aid channel starting (a plain event, also in combat), and set
+-- right from the aura itself whenever the client hands it over (out of
+-- combat; someone else's bandage, or the debuff gone as you die).
 
 local ns = PadKeys
 local c = ns.config.not_ready
@@ -96,6 +103,53 @@ local function flash(texture)
   icon:SetTexture(texture)
   frame:SetAlpha(1)
   anim:Play()
+end
+
+-- --- Recently Bandaged -----------------------------------------------------
+
+local RECENTLY_BANDAGED = 11196
+local BANDAGED_FOR = 60
+local FIRST_AID = C_Spell.GetSpellName(746)  -- a bandage's channel
+local GetItemSpell = C_Item and C_Item.GetItemSpell or GetItemSpell
+
+-- When the debuff started, and how long it lasts.
+local bandaged_at, bandaged_for = -math.huge, BANDAGED_FOR
+
+local function bandaged()
+  return GetTime() < bandaged_at + bandaged_for
+end
+
+local function is_bandage(item)
+  return FIRST_AID ~= nil and item ~= nil and GetItemSpell(item) == FIRST_AID
+end
+
+-- The aura itself, when the client hands it over as plain numbers.
+local function read_bandaged()
+  local ok, aura = pcall(C_UnitAuras.GetPlayerAuraBySpellID, RECENTLY_BANDAGED)
+  if not ok then
+    return
+  end
+  -- No aura in combat may only mean the client hides it: the kept time
+  -- stays then.
+  if not aura then
+    if not InCombatLockdown() then
+      bandaged_at = -math.huge
+    end
+  elseif not is_secret(aura.expirationTime) and not is_secret(aura.duration) and
+         aura.duration > 0 then
+    bandaged_at, bandaged_for = aura.expirationTime - aura.duration, aura.duration
+  end
+end
+
+-- A bandage pressed under the debuff: flashes the debuff, true. Any other
+-- press: false.
+local function show_bandage(item)
+  if not (c.bandage and is_bandage(item) and bandaged()) then
+    return false
+  end
+  flash(C_Spell.GetSpellTexture(RECENTLY_BANDAGED))
+  cooldown:SetCooldown(bandaged_at, bandaged_for)
+  return true
 end
 
 -- --- What was pressed -------------------------------------------------------
@@ -192,13 +246,22 @@ end
 -- An action pressed while it was cooling: flashed at once, no error
 -- needed.
 hooksecurefunc("UseAction", function(action)
-  if type(action) == "number" and cooling[action] then
+  if type(action) ~= "number" then
+    return
+  end
+  local ok, kind, id = pcall(GetActionInfo, action)
+  if ok and kind == "item" and show_bandage(id) then
+    return
+  end
+  if cooling[action] then
     show_action(action)
   end
 end)
 if C_Container and C_Container.UseContainerItem then
   hooksecurefunc(C_Container, "UseContainerItem", function(bag, slot)
-    pressed("bag", bag, slot)
+    if not show_bandage(C_Container.GetContainerItemID(bag, slot)) then
+      pressed("bag", bag, slot)
+    end
   end)
 end
 if UseInventoryItem then
@@ -215,8 +278,17 @@ events:RegisterEvent("SPELL_UPDATE_COOLDOWN")
 events:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN")
 events:RegisterEvent("ACTIONBAR_SLOT_CHANGED")
 events:RegisterEvent("PLAYER_ENTERING_WORLD")
-events:SetScript("OnEvent", function(_, event, error_type)
-  if event == "UI_ERROR_MESSAGE" then
+events:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_START", "player")
+events:RegisterUnitEvent("UNIT_AURA", "player")
+events:SetScript("OnEvent", function(_, event, error_type, _, spell)
+  if event == "UNIT_SPELLCAST_CHANNEL_START" then
+    -- error_type is the unit here, spell the channel's spell ID.
+    if not is_secret(spell) and C_Spell.GetSpellName(spell) == FIRST_AID then
+      bandaged_at, bandaged_for = GetTime(), BANDAGED_FOR
+    end
+  elseif event == "UNIT_AURA" then
+    read_bandaged()
+  elseif event == "UI_ERROR_MESSAGE" then
     if not is_secret(error_type) and COOLDOWN_ERRORS[error_type] then
       error_at = GetTime()
       try_match()
