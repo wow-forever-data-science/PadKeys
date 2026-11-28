@@ -13,7 +13,7 @@ ns.config.not_ready = {
   anchor = "cursor",
   size = 42,
   x = 0,
-  y = 44,
+  y = 50,
   -- A soft glow behind the icon, so it stands apart from the buffs and
   -- totems around the pointer: soft gold, as WeakAuras and Blizzard
   -- highlight spells and procs. false for none.
