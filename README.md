@@ -446,7 +446,8 @@ combat (`fade_in`).
   campfire's Cozy Fire while you know Basic Campfire (click lights one);
   and Well Fed's time left while it is on (hover for its stat or damage
   bonus, without its experience bonus); and Camp Benefits' time left,
-  hover for what it gives now.
+  hover for what it gives now; and while you eat or drink, Food's and
+  Drink's time left (grey).
   Add others under `watch`.
   Your pet in trouble in combat shows at the mouse (PadKeys_Readout).
 
@@ -1350,6 +1351,10 @@ is loaded.
     left. Wait it out and press again: you bandage, nothing flashes. Do
     the same in combat: the flash works; if the debuff icon shows at the
     mouse there, it should go once combat ends.
+66. **Eating timer**: out of combat, eat and drink: the buff bar shows
+    an Eating and a Drinking icon with the seconds left, in grey, also
+    in an inn. Stand up or get full: they go. If nothing shows, send
+    `/run for i=1,40 do local a=C_UnitAuras.GetAuraDataByIndex("player",i,"HELPFUL") if a then print(a.name, a.duration) end end`.
 
 Known risks:
 - The buff reminder reads auras by name out of combat. If a list stays
