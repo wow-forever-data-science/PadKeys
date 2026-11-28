@@ -24,10 +24,14 @@ ns.config.ready = {
 
   -- Reactive abilities: they flash as they become usable (after a dodge,
   -- a block, a parry, or a target under 20% health). Names as the
-  -- spellbook shows them, in your client's language.
+  -- spellbook shows them, in your client's language. Fire Nova is usable
+  -- only with a fire totem down, and its cooldown is under cooldown_min:
+  -- it flashes as you drop a fire totem with it ready, or as it comes
+  -- back with one down.
   reactive = {
     "Overpower", "Revenge", "Execute", "Riposte", "Counterattack",
     "Mongoose Bite", "Victory Rush", "Hammer of Wrath", "Kill Shot",
+    "Fire Nova", "Fire Nova Totem",
   },
 
   -- Cooldowns: any spell or item on your action bars flashes as it comes

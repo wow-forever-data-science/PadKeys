@@ -545,7 +545,8 @@ fade out. `anchor = "center"` puts it above the middle of the screen.
 
 - **Reactive abilities** flash as they light up: Overpower after a dodge,
   Revenge after a block, Execute under 20%, Riposte, Counterattack,
-  Mongoose Bite (the `reactive` list in `Config.lua`).
+  Mongoose Bite, and Fire Nova as a fire totem goes down or it comes back
+  with one down (the `reactive` list in `Config.lua`).
 - **Cooldowns**: any spell or item on your action bars flashes as it
   comes back, if its cooldown lasted 30 seconds or more (`cooldown_min`):
   Evocation, Innervate, trinkets, potions. `ignore` leaves some out
