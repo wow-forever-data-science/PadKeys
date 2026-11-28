@@ -512,7 +512,8 @@ the health points of both curves and `tank = true / false` are in
 
 Press a key whose spell or item is still on cooldown (or out of charges),
 or use such an item from your bags, and its icon flashes above the mouse
-pointer (just over the swing ring, bigger than the icons around it) with the time left
+pointer (just over the swing ring, bigger than the icons around it, with a
+red glow) with the time left
 on it, then fades out over a second. `anchor = "center"` puts it above your
 character instead. Another
 press on cooldown, of the same key or another, replaces it at once. The

@@ -78,6 +78,20 @@ frame:SetFrameStrata("FULLSCREEN_DIALOG")
 frame:SetAlpha(0)
 frame:EnableMouse(false)
 
+-- The glow: Blizzard's button border in additive blend, tinted (colour
+-- before alpha: SetVertexColor would undo an alpha set first). Its art has
+-- wide see-through margins, hence the size. It fades with the frame.
+if c.glow then
+  local glow = frame:CreateTexture(nil, "BACKGROUND", nil, -8)
+  glow:SetTexture("Interface\\Buttons\\UI-ActionButton-Border")
+  glow:SetBlendMode("ADD")
+  glow:SetDesaturated(true)
+  glow:SetVertexColor(c.glow[1], c.glow[2], c.glow[3])
+  glow:SetAlpha(c.glow_alpha or 0.9)
+  glow:SetPoint("CENTER")
+  glow:SetSize(c.size * 1.9, c.size * 1.9)
+end
+
 ns.box(frame, 0, c.rounded)
 
 local icon = frame:CreateTexture(nil, "ARTWORK")

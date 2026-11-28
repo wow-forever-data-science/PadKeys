@@ -13,7 +13,12 @@ ns.config.not_ready = {
   anchor = "cursor",
   size = 42,
   x = 0,
-  y = 54,
+  y = 44,
+  -- A soft glow behind the icon, so it stands apart from the buffs and
+  -- totems around the pointer: red, as the readout's other warnings
+  -- (missing buff). false for none.
+  glow = { 1, 0.15, 0.1 },
+  glow_alpha = 0.9,
   -- Seconds the icon stays at full strength, then seconds to fade out.
   -- Another press (the same key or another one on cooldown) starts over.
   hold = 0,
