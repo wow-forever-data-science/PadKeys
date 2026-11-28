@@ -5,8 +5,8 @@ local ns = PadKeys
 ns.config.not_ready = {
   -- Where it flashes. "cursor": above the mouse pointer, just over the
   -- swing ring and PadKeys_Readout's missing buff, bigger than the icons
-  -- around the pointer (29-37) so it stands out; PadKeys_Ready's flash
-  -- overlaps its top when both show. "center": above your
+  -- around the pointer (29-37) so it stands out; PadKeys_Ready's flash,
+  -- the same size, sits just above it. "center": above your
   -- character, under the combat banner (PadKeys_Combat), e.g. y = 80.
   -- x, y is the icon's centre from the pointer or the middle of the
   -- screen (positive y is up).

@@ -7,11 +7,12 @@ ns.config.ready = {
   -- the swing ring (PadKeys_Readout; its icon's centre x, y from the
   -- pointer, positive y is up; the name above it). "center": x, y from
   -- the middle of the screen, e.g. y = 70. PadKeys_NotReady flashes
-  -- under it, at y = 44 from the pointer.
+  -- under it, at y = 44 from the pointer. The same size as that flash,
+  -- a little bigger than the icons around the pointer.
   anchor = "cursor",
-  size = 72,
+  size = 42,
   x = 0,
-  y = 82,
+  y = 90,
   -- Seconds the icon stays at full strength, then seconds to fade out.
   hold = 0.5,
   fade_out = 0.8,
