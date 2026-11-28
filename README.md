@@ -578,8 +578,8 @@ What changes fast, beside the mouse pointer, only while it matters:
   own swing timer, `PLAYER_SWING`). Its faint track stays on all through
   combat and is the line everything else sits on.
 
-Everything else sits right outside the swing ring (about 22 px from the
-pointer), at about two thirds of the size it had; holding G covers it
+Everything else sits outside the swing ring with some room (about 28 px
+from the pointer), at about two thirds of the size it had; holding G covers it
 while the wheel is open:
 
 - your **big cooldowns that are ready**, to the right: a row of icons
@@ -1288,7 +1288,7 @@ is loaded.
     `/run for i=1,40 do local a=C_UnitAuras.GetAuraDataByIndex("player",i) if a and a.name:find("Fed") then local t=C_TooltipInfo.GetUnitBuffByAuraInstanceID("player",a.auraInstanceID) print(a.spellId,t and t.lines[2] and t.lines[2].leftText) end end`.
 51. **Readout on the small rings**: target a mob with a big cooldown
     ready and a totem down: every group sits right outside the swing
-    ring, about 22 px from the pointer. With no tracked buff on, the
+    ring, about 28 px from the pointer. With no tracked buff on, the
     totems sit at the ring's upper right; when a tracked buff shows they
     move to its right, on the same line. If two groups overlap, say
     which.
